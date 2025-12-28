@@ -25,9 +25,9 @@ export default function Home() {
             <button className="hidden sm:block px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors">
               Log in
             </button>
-            <button className="hidden sm:block btn-glow px-4 py-2 rounded-full text-sm font-medium text-white">
+            <a href="/onboarding" className="hidden sm:block btn-glow px-4 py-2 rounded-full text-sm font-medium text-white">
               Get Started
-            </button>
+            </a>
             <button className="md:hidden p-2 text-zinc-400 hover:text-white">
               <Menu className="w-5 h-5" />
             </button>
@@ -64,10 +64,10 @@ export default function Home() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn-glow px-8 py-4 rounded-full text-white font-semibold flex items-center justify-center gap-2">
+            <a href="/onboarding" className="btn-glow px-8 py-4 rounded-full text-white font-semibold flex items-center justify-center gap-2">
               <Play className="w-5 h-5" fill="currentColor" />
               Start Creating
-            </button>
+            </a>
             <button className="px-8 py-4 rounded-full border border-zinc-700 text-zinc-300 font-semibold hover:bg-surface-hover transition-colors flex items-center justify-center gap-2">
               Watch Demo
             </button>
