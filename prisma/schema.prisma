@@ -1,0 +1,45 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Influencer {
+  id              String   @id @default(uuid())
+  name            String
+  country         String
+  city            String
+  neighborhood    String?
+  apartmentStyle  String
+  currentBalance  Float    @default(5000)
+  personalityVibe String   // e.g., "Minimalist Glam", "Streetwear Rebel"
+  
+  // The 14-Slot Asset Management
+  faceReferences  String[] // URLs to master face images
+  roomReferences  String[] // URLs to influencer's apartment shots
+  
+  posts           Post[]
+  memories        Memory[]
+  createdAt       DateTime @default(now())
+}
+
+model Post {
+  id           String     @id @default(uuid())
+  influencerId String
+  influencer   Influencer @relation(fields: [influencerId], references: [id])
+  type         String     // "IMAGE" or "VIDEO"
+  contentUrl   String
+  caption      String
+  postedAt     DateTime   @default(now())
+}
+
+model Memory {
+  id           String     @id @default(uuid())
+  influencerId String
+  influencer   Influencer @relation(fields: [influencerId], references: [id])
+  description  String     // Short-term memory of recent events
+  importance   Int        @default(1)
+  createdAt    DateTime   @default(now())
+}
