@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MapPin, User, Wallet, ArrowRight, ArrowLeft, Sparkles, Home, Palette } from "lucide-react";
+import { MapPin, User, Wallet, ArrowRight, ArrowLeft, Sparkles, Home, Palette, Shirt } from "lucide-react";
 
 // Step data types
 interface OnboardingData {
@@ -14,7 +14,12 @@ interface OnboardingData {
     // Step 2: Persona
     name: string;
     personalityVibe: string;
-    // Step 3: Wealth
+    // Step 3: Style
+    clothingStyle: string;
+    bottomwear: string[];
+    footwear: string[];
+    signatureItems: string[];
+    // Step 4: Wealth
     currentBalance: number;
 }
 
@@ -25,6 +30,10 @@ const initialData: OnboardingData = {
     apartmentStyle: "",
     name: "",
     personalityVibe: "",
+    clothingStyle: "",
+    bottomwear: [],
+    footwear: [],
+    signatureItems: [],
     currentBalance: 5000,
 };
 
@@ -46,6 +55,44 @@ const personalityVibes = [
     { id: "vintage-collector", label: "Vintage Collector", emoji: "📷" },
 ];
 
+const clothingStyles = [
+    { id: "casual", label: "Casual", emoji: "👕" },
+    { id: "sporty", label: "Sporty", emoji: "🏃" },
+    { id: "elegant", label: "Elegant", emoji: "👗" },
+    { id: "streetwear", label: "Streetwear", emoji: "🧢" },
+    { id: "bohemian", label: "Bohemian", emoji: "🌻" },
+    { id: "minimalist", label: "Minimalist", emoji: "⚪" },
+];
+
+const bottomwearOptions = [
+    { id: "jeans", label: "Jeans", emoji: "👖" },
+    { id: "skirts", label: "Skirts", emoji: "👗" },
+    { id: "shorts", label: "Shorts", emoji: "🩳" },
+    { id: "leggings", label: "Leggings", emoji: "🦵" },
+    { id: "dresses", label: "Dresses", emoji: "👘" },
+    { id: "sweatpants", label: "Sweatpants", emoji: "🏠" },
+];
+
+const footwearOptions = [
+    { id: "sneakers", label: "Sneakers", emoji: "👟" },
+    { id: "heels", label: "Heels", emoji: "👠" },
+    { id: "boots", label: "Boots", emoji: "🥾" },
+    { id: "sandals", label: "Sandals", emoji: "🩴" },
+    { id: "slippers", label: "Slippers", emoji: "🥿" },
+    { id: "barefoot", label: "Often Barefoot", emoji: "🦶" },
+];
+
+const signatureItemOptions = [
+    { id: "tights", label: "Always wears tights", emoji: "🩱" },
+    { id: "oversized-sweaters", label: "Oversized sweaters", emoji: "🧥" },
+    { id: "jewelry", label: "Statement jewelry", emoji: "💍" },
+    { id: "sunglasses", label: "Sunglasses always", emoji: "🕶️" },
+    { id: "hats", label: "Hats & caps", emoji: "🧢" },
+    { id: "layered-looks", label: "Layered looks", emoji: "🧣" },
+    { id: "crop-tops", label: "Crop tops", emoji: "👙" },
+    { id: "maxi-dresses", label: "Maxi dresses", emoji: "👗" },
+];
+
 const budgetPresets = [
     { amount: 1000, label: "Starter", desc: "Budget lifestyle" },
     { amount: 5000, label: "Comfortable", desc: "Mid-range choices" },
@@ -63,13 +110,25 @@ export default function OnboardingPage() {
         setData((prev) => ({ ...prev, ...updates }));
     };
 
-    const nextStep = () => setStep((s) => Math.min(s + 1, 3));
+    const toggleArrayItem = (field: 'bottomwear' | 'footwear' | 'signatureItems', item: string) => {
+        setData((prev) => {
+            const current = prev[field];
+            if (current.includes(item)) {
+                return { ...prev, [field]: current.filter((i) => i !== item) };
+            } else {
+                return { ...prev, [field]: [...current, item] };
+            }
+        });
+    };
+
+    const nextStep = () => setStep((s) => Math.min(s + 1, 4));
     const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
     const canProceed = () => {
         if (step === 1) return data.country && data.city && data.apartmentStyle;
         if (step === 2) return data.name && data.personalityVibe;
-        if (step === 3) return data.currentBalance > 0;
+        if (step === 3) return data.clothingStyle && data.bottomwear.length > 0 && data.footwear.length > 0;
+        if (step === 4) return data.currentBalance > 0;
         return false;
     };
 
@@ -107,7 +166,7 @@ export default function OnboardingPage() {
 
                     {/* Step indicator */}
                     <div className="flex items-center gap-2">
-                        {[1, 2, 3].map((s) => (
+                        {[1, 2, 3, 4].map((s) => (
                             <div
                                 key={s}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${s === step
@@ -132,7 +191,7 @@ export default function OnboardingPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
                                 <MapPin className="w-6 h-6 text-purple-400" />
-                                <span className="text-sm text-purple-400 font-medium">Step 1 of 3</span>
+                                <span className="text-sm text-purple-400 font-medium">Step 1 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Define the World</h1>
                             <p className="text-zinc-400 mb-8">Where will your influencer live?</p>
@@ -202,7 +261,7 @@ export default function OnboardingPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
                                 <User className="w-6 h-6 text-pink-400" />
-                                <span className="text-sm text-pink-400 font-medium">Step 2 of 3</span>
+                                <span className="text-sm text-pink-400 font-medium">Step 2 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Create the Persona</h1>
                             <p className="text-zinc-400 mb-8">Who will your influencer be?</p>
@@ -244,12 +303,112 @@ export default function OnboardingPage() {
                         </div>
                     )}
 
-                    {/* Step 3: Wealth */}
+                    {/* Step 3: Style */}
                     {step === 3 && (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
+                                <Shirt className="w-6 h-6 text-cyan-400" />
+                                <span className="text-sm text-cyan-400 font-medium">Step 3 of 4</span>
+                            </div>
+                            <h1 className="text-3xl md:text-4xl font-bold mb-2">Define the Style</h1>
+                            <p className="text-zinc-400 mb-8">How does your influencer dress?</p>
+
+                            <div className="space-y-8">
+                                {/* Clothing Style */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-4">Overall Style</label>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                        {clothingStyles.map((style) => (
+                                            <button
+                                                key={style.id}
+                                                onClick={() => updateData({ clothingStyle: style.id })}
+                                                className={`p-4 rounded-xl border text-left transition-all ${data.clothingStyle === style.id
+                                                    ? "border-cyan-500 bg-cyan-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    }`}
+                                            >
+                                                <span className="text-2xl mb-2 block">{style.emoji}</span>
+                                                <span className="text-sm font-medium">{style.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Bottomwear */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-2">
+                                        Preferred Bottomwear <span className="text-zinc-500">(select multiple)</span>
+                                    </label>
+                                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                                        {bottomwearOptions.map((item) => (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => toggleArrayItem('bottomwear', item.id)}
+                                                className={`p-3 rounded-xl border text-center transition-all ${data.bottomwear.includes(item.id)
+                                                    ? "border-cyan-500 bg-cyan-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    }`}
+                                            >
+                                                <span className="text-xl block">{item.emoji}</span>
+                                                <span className="text-xs">{item.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Footwear */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-2">
+                                        Preferred Footwear <span className="text-zinc-500">(select multiple)</span>
+                                    </label>
+                                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                                        {footwearOptions.map((item) => (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => toggleArrayItem('footwear', item.id)}
+                                                className={`p-3 rounded-xl border text-center transition-all ${data.footwear.includes(item.id)
+                                                    ? "border-cyan-500 bg-cyan-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    }`}
+                                            >
+                                                <span className="text-xl block">{item.emoji}</span>
+                                                <span className="text-xs">{item.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Signature Items */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-2">
+                                        Signature Elements <span className="text-zinc-500">(optional)</span>
+                                    </label>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        {signatureItemOptions.map((item) => (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => toggleArrayItem('signatureItems', item.id)}
+                                                className={`p-3 rounded-xl border text-center transition-all ${data.signatureItems.includes(item.id)
+                                                    ? "border-cyan-500 bg-cyan-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    }`}
+                                            >
+                                                <span className="text-lg">{item.emoji}</span>
+                                                <span className="text-xs block mt-1">{item.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 4: Wealth */}
+                    {step === 4 && (
+                        <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                            <div className="flex items-center gap-3 mb-2">
                                 <Wallet className="w-6 h-6 text-orange-400" />
-                                <span className="text-sm text-orange-400 font-medium">Step 3 of 3</span>
+                                <span className="text-sm text-orange-400 font-medium">Step 4 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Set the Wealth</h1>
                             <p className="text-zinc-400 mb-8">How much will they start with?</p>
@@ -303,12 +462,16 @@ export default function OnboardingPage() {
                                             <span>{data.city ? `${data.city}, ${data.country}` : "—"}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-zinc-400">Style</span>
+                                            <span className="text-zinc-400">Apartment</span>
                                             <span>{apartmentStyles.find(s => s.id === data.apartmentStyle)?.label || "—"}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-zinc-400">Vibe</span>
                                             <span>{personalityVibes.find(v => v.id === data.personalityVibe)?.label || "—"}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-zinc-400">Style</span>
+                                            <span>{clothingStyles.find(s => s.id === data.clothingStyle)?.label || "—"}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-zinc-400">Balance</span>
@@ -337,7 +500,7 @@ export default function OnboardingPage() {
                         Back
                     </button>
 
-                    {step < 3 ? (
+                    {step < 4 ? (
                         <button
                             onClick={nextStep}
                             disabled={!canProceed()}

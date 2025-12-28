@@ -16,6 +16,12 @@ model Influencer {
   currentBalance  Float    @default(5000)
   personalityVibe String   // e.g., "Minimalist Glam", "Streetwear Rebel"
   
+  // Clothing Style Preferences
+  clothingStyle   String   @default("casual") // casual, sporty, elegant, streetwear, bohemian
+  bottomwear      String[] // jeans, skirts, shorts, leggings, dresses
+  footwear        String[] // sneakers, heels, barefoot, slippers, boots
+  signatureItems  String[] // always tights, oversized sweaters, accessories, etc.
+  
   // The 14-Slot Asset Management
   faceReferences  String[] // URLs to master face images
   roomReferences  String[] // URLs to influencer's apartment shots

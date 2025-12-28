@@ -12,11 +12,15 @@ export async function POST(request: NextRequest) {
             apartmentStyle,
             name,
             personalityVibe,
+            clothingStyle,
+            bottomwear,
+            footwear,
+            signatureItems,
             currentBalance,
         } = body;
 
         // Validate required fields
-        if (!country || !city || !apartmentStyle || !name || !personalityVibe) {
+        if (!country || !city || !apartmentStyle || !name || !personalityVibe || !clothingStyle) {
             return NextResponse.json(
                 { error: "Missing required fields" },
                 { status: 400 }
@@ -32,6 +36,10 @@ export async function POST(request: NextRequest) {
                 neighborhood: neighborhood || null,
                 apartmentStyle,
                 personalityVibe,
+                clothingStyle,
+                bottomwear: bottomwear || [],
+                footwear: footwear || [],
+                signatureItems: signatureItems || [],
                 currentBalance: currentBalance || 5000,
                 faceReferences: [],
                 roomReferences: [],
