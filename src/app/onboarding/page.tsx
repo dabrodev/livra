@@ -84,7 +84,7 @@ export default function OnboardingPage() {
 
             if (res.ok) {
                 const { id } = await res.json();
-                router.push(`/feed/${id}`);
+                router.push(`/influencer/${id}`);
             }
         } catch (error) {
             console.error("Failed to create influencer:", error);
@@ -111,10 +111,10 @@ export default function OnboardingPage() {
                             <div
                                 key={s}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${s === step
-                                        ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white"
-                                        : s < step
-                                            ? "bg-purple-500/20 text-purple-400"
-                                            : "bg-zinc-800 text-zinc-500"
+                                    ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white"
+                                    : s < step
+                                        ? "bg-purple-500/20 text-purple-400"
+                                        : "bg-zinc-800 text-zinc-500"
                                     }`}
                             >
                                 {s}
@@ -183,8 +183,8 @@ export default function OnboardingPage() {
                                                 key={style.id}
                                                 onClick={() => updateData({ apartmentStyle: style.id })}
                                                 className={`p-4 rounded-xl border text-left transition-all ${data.apartmentStyle === style.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <span className="text-2xl mb-2 block">{style.icon}</span>
@@ -230,8 +230,8 @@ export default function OnboardingPage() {
                                                 key={vibe.id}
                                                 onClick={() => updateData({ personalityVibe: vibe.id })}
                                                 className={`p-4 rounded-xl border text-left transition-all ${data.personalityVibe === vibe.id
-                                                        ? "border-pink-500 bg-pink-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-pink-500 bg-pink-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <span className="text-2xl mb-2 block">{vibe.emoji}</span>
@@ -261,8 +261,8 @@ export default function OnboardingPage() {
                                             key={preset.amount}
                                             onClick={() => updateData({ currentBalance: preset.amount })}
                                             className={`p-4 rounded-xl border text-center transition-all ${data.currentBalance === preset.amount
-                                                    ? "border-orange-500 bg-orange-500/10"
-                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                ? "border-orange-500 bg-orange-500/10"
+                                                : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                 }`}
                                         >
                                             <span className="text-2xl font-bold gradient-text block">
@@ -329,8 +329,8 @@ export default function OnboardingPage() {
                         onClick={prevStep}
                         disabled={step === 1}
                         className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all ${step === 1
-                                ? "opacity-0 pointer-events-none"
-                                : "text-zinc-300 hover:text-white"
+                            ? "opacity-0 pointer-events-none"
+                            : "text-zinc-300 hover:text-white"
                             }`}
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -342,8 +342,8 @@ export default function OnboardingPage() {
                             onClick={nextStep}
                             disabled={!canProceed()}
                             className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all ${canProceed()
-                                    ? "btn-glow text-white"
-                                    : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                                ? "btn-glow text-white"
+                                : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
                                 }`}
                         >
                             Continue
@@ -354,8 +354,8 @@ export default function OnboardingPage() {
                             onClick={handleSubmit}
                             disabled={!canProceed() || isSubmitting}
                             className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all ${canProceed() && !isSubmitting
-                                    ? "btn-glow text-white"
-                                    : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                                ? "btn-glow text-white"
+                                : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
                                 }`}
                         >
                             {isSubmitting ? (
