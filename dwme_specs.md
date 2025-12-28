@@ -102,6 +102,45 @@ The life cycle is orchestrated via Inngest to handle long-running processes:
 - Agent ensures that the `last_frame` prompt includes continuity markers from the `first_frame`.
 
 ## 7. UI/UX Requirements
-- **Mobile-First Design:** Vertical feed (Instagram-style).
+- **Dashboard:** Management panel for all influencers (cards with status).
+- **Timeline View:** Activity-based feed showing daily life simulation.
 - **Onboarding Flow:** 1. World -> 2. Persona -> 3. Wealth.
-- **Real-time:** Supabase Realtime for automatic feed updates.
+- **Real-time:** Supabase Realtime for automatic updates.
+
+## 8. Platform Roadmap (Progressive Development)
+
+### Phase 1: Private Influencers (MVP)
+- Users create and manage **private AI influencers**
+- Full control over generation, content, and visibility
+- Personal entertainment / experimentation use case
+- Influencer states: `Generating`, `Sleeping`, `Active`, `Paused`
+
+### Phase 2: Public Sharing
+- **Visibility modes:** Private (default) | Public | Unlisted
+- Public influencers visible on platform's discovery feed
+- Followers can "observe" influencer's simulated life
+- Export to external platforms (Instagram, TikTok, X) for promotion
+
+### Phase 3: Creator Economy & Monetization
+
+#### User Roles:
+- **Creators:** Build & manage AI influencers, monetize content
+- **Observers:** Follow public influencers, consume content, interact
+
+#### Revenue Streams:
+- **UGC Ads / Product Placement:** Brands pay creators to feature products in generated content
+- **Platform Ads:** In-feed advertising for observers
+- **Subscription Tiers:** Premium features for creators (faster generation, more influencers)
+- **Tips / Gifts:** Observers can tip popular creators
+
+#### Creator Dashboard:
+- Analytics: views, followers, engagement
+- Revenue tracking
+- Brand deal management
+- Content scheduling & approval
+
+### Phase 4: Advanced Features
+- Multi-influencer interactions (collabs, shared events)
+- Real-world brand partnerships API
+- AI-generated storylines and drama arcs
+- Virtual merchandise & digital assets
