@@ -16,6 +16,14 @@ model Influencer {
   currentBalance  Float    @default(5000)
   personalityVibe String   // e.g., "Minimalist Glam", "Streetwear Rebel"
   
+  // Appearance
+  hairColor       String   @default("brown")   // blonde, brunette, red, black, auburn, gray
+  hairStyle       String   @default("long")    // long, short, medium, curly, straight, wavy
+  eyeColor        String   @default("brown")   // blue, green, brown, hazel, gray
+  skinTone        String   @default("medium")  // light, fair, medium, tan, olive, dark
+  lipStyle        String   @default("natural") // full, thin, natural
+  features        String[] // freckles, glasses, dimples, beauty-mark, etc.
+  
   // Clothing Style Preferences
   clothingStyle   String   @default("casual") // casual, sporty, elegant, streetwear, bohemian
   bottomwear      String[] // jeans, skirts, shorts, leggings, dresses

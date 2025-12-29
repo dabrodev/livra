@@ -104,8 +104,8 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                             {/* Controls */}
                             <div className="flex gap-2">
                                 <button className={`p-3 rounded-xl transition-all ${isActive
-                                        ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
-                                        : "bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                                    ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
+                                    : "bg-green-500/20 text-green-400 hover:bg-green-500/30"
                                     }`}>
                                     {isActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                                 </button>
@@ -115,6 +115,31 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                             </div>
                         </div>
                     </div>
+
+                    {/* Create Avatar Banner - show if no avatar yet */}
+                    {influencer.faceReferences.length === 0 && (
+                        <Link
+                            href={`/influencer/${influencer.id}/avatar`}
+                            className="block glass-card rounded-2xl p-6 mb-8 border border-purple-500/30 hover:border-purple-500/50 transition-all group"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                                    <Sparkles className="w-8 h-8 text-purple-400 group-hover:scale-110 transition-transform" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-lg group-hover:text-purple-400 transition-colors">
+                                        Create Your Avatar
+                                    </h3>
+                                    <p className="text-sm text-zinc-400">
+                                        Define {influencer.name}&apos;s appearance and generate AI avatar options
+                                    </p>
+                                </div>
+                                <div className="text-purple-400">
+                                    <ArrowLeft className="w-5 h-5 rotate-180" />
+                                </div>
+                            </div>
+                        </Link>
+                    )}
 
                     {/* Timeline */}
                     <div className="mb-6">
@@ -135,8 +160,8 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                     <div key={index} className="relative flex gap-4">
                                         {/* Icon */}
                                         <div className={`relative z-10 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isContent
-                                                ? "bg-gradient-to-br from-purple-500 to-pink-500"
-                                                : "bg-zinc-800"
+                                            ? "bg-gradient-to-br from-purple-500 to-pink-500"
+                                            : "bg-zinc-800"
                                             }`}>
                                             <Icon className={`w-5 h-5 ${isContent ? "text-white" : "text-zinc-400"}`} />
                                         </div>
