@@ -55,6 +55,19 @@ const featureOptions = [
     { id: "high-cheekbones", label: "High Cheekbones", emoji: "💎" },
 ];
 
+const bodyHeights = [
+    { id: "petite", label: "Petite", desc: "Under 5'4\" / 160cm", emoji: "🔹" },
+    { id: "average", label: "Average", desc: "5'4\" - 5'7\" / 160-170cm", emoji: "➖" },
+    { id: "tall", label: "Tall", desc: "Over 5'7\" / 170cm", emoji: "🔷" },
+];
+
+const bodyTypes = [
+    { id: "slim", label: "Slim", emoji: "🩰" },
+    { id: "athletic", label: "Athletic", emoji: "💪" },
+    { id: "curvy", label: "Curvy", emoji: "⏳" },
+    { id: "plus-size", label: "Plus Size", emoji: "🌸" },
+];
+
 interface AvatarData {
     hairColor: string;
     hairStyle: string;
@@ -62,6 +75,8 @@ interface AvatarData {
     skinTone: string;
     lipStyle: string;
     features: string[];
+    bodyHeight: string;
+    bodyType: string;
 }
 
 export default function AvatarCreationPage() {
@@ -76,6 +91,8 @@ export default function AvatarCreationPage() {
         skinTone: "",
         lipStyle: "",
         features: [],
+        bodyHeight: "",
+        bodyType: "",
     });
     const [step, setStep] = useState<"configure" | "generating" | "select">("configure");
     const [isGenerating, setIsGenerating] = useState(false);
@@ -93,7 +110,7 @@ export default function AvatarCreationPage() {
         }));
     };
 
-    const canGenerate = data.hairColor && data.hairStyle && data.eyeColor && data.skinTone && data.lipStyle;
+    const canGenerate = data.hairColor && data.hairStyle && data.eyeColor && data.skinTone && data.lipStyle && data.bodyHeight && data.bodyType;
 
     const handleGenerate = async () => {
         setIsGenerating(true);
@@ -177,8 +194,8 @@ export default function AvatarCreationPage() {
                                                 key={color.id}
                                                 onClick={() => updateData({ hairColor: color.id })}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${data.hairColor === color.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <div
@@ -200,8 +217,8 @@ export default function AvatarCreationPage() {
                                                 key={style.id}
                                                 onClick={() => updateData({ hairStyle: style.id })}
                                                 className={`p-3 rounded-xl border text-left transition-all ${data.hairStyle === style.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <span className="text-xl">{style.emoji}</span>
@@ -220,8 +237,8 @@ export default function AvatarCreationPage() {
                                                 key={color.id}
                                                 onClick={() => updateData({ eyeColor: color.id })}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${data.eyeColor === color.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <div
@@ -243,8 +260,8 @@ export default function AvatarCreationPage() {
                                                 key={tone.id}
                                                 onClick={() => updateData({ skinTone: tone.id })}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${data.skinTone === tone.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <div
@@ -266,8 +283,8 @@ export default function AvatarCreationPage() {
                                                 key={style.id}
                                                 onClick={() => updateData({ lipStyle: style.id })}
                                                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${data.lipStyle === style.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <span className="text-xl">{style.emoji}</span>
@@ -288,12 +305,53 @@ export default function AvatarCreationPage() {
                                                 key={feature.id}
                                                 onClick={() => toggleFeature(feature.id)}
                                                 className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${data.features.includes(feature.id)
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <span>{feature.emoji}</span>
                                                 <span className="text-sm">{feature.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Body Height */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-3">Body Height</label>
+                                    <div className="flex gap-3">
+                                        {bodyHeights.map((height) => (
+                                            <button
+                                                key={height.id}
+                                                onClick={() => updateData({ bodyHeight: height.id })}
+                                                className={`flex-1 p-4 rounded-xl border text-center transition-all ${data.bodyHeight === height.id
+                                                        ? "border-purple-500 bg-purple-500/10"
+                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    }`}
+                                            >
+                                                <span className="text-xl block">{height.emoji}</span>
+                                                <span className="text-sm font-medium block mt-1">{height.label}</span>
+                                                <span className="text-xs text-zinc-500 block">{height.desc}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Body Type */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-3">Body Type</label>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        {bodyTypes.map((type) => (
+                                            <button
+                                                key={type.id}
+                                                onClick={() => updateData({ bodyType: type.id })}
+                                                className={`p-4 rounded-xl border text-center transition-all ${data.bodyType === type.id
+                                                        ? "border-purple-500 bg-purple-500/10"
+                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    }`}
+                                            >
+                                                <span className="text-2xl block">{type.emoji}</span>
+                                                <span className="text-sm font-medium block mt-1">{type.label}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -304,8 +362,8 @@ export default function AvatarCreationPage() {
                                     onClick={handleGenerate}
                                     disabled={!canGenerate}
                                     className={`w-full py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${canGenerate
-                                            ? "btn-glow text-white"
-                                            : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                                        ? "btn-glow text-white"
+                                        : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
                                         }`}
                                 >
                                     <Wand2 className="w-5 h-5" />

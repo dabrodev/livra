@@ -8,6 +8,8 @@ interface AppearanceData {
     skinTone: string;
     lipStyle: string;
     features: string[];
+    bodyHeight: string;
+    bodyType: string;
 }
 
 export async function POST(
@@ -18,7 +20,7 @@ export async function POST(
         const { id } = await params;
         const body: AppearanceData = await request.json();
 
-        const { hairColor, hairStyle, eyeColor, skinTone, lipStyle, features } = body;
+        const { hairColor, hairStyle, eyeColor, skinTone, lipStyle, features, bodyHeight, bodyType } = body;
 
         // Update influencer with appearance data
         const influencer = await prisma.influencer.update({
@@ -30,6 +32,8 @@ export async function POST(
                 skinTone,
                 lipStyle,
                 features: features || [],
+                bodyHeight,
+                bodyType,
             },
         });
 

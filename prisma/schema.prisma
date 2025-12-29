@@ -23,6 +23,8 @@ model Influencer {
   skinTone        String   @default("medium")  // light, fair, medium, tan, olive, dark
   lipStyle        String   @default("natural") // full, thin, natural
   features        String[] // freckles, glasses, dimples, beauty-mark, etc.
+  bodyHeight      String   @default("average") // petite, average, tall
+  bodyType        String   @default("slim")    // slim, athletic, curvy, plus-size
   
   // Clothing Style Preferences
   clothingStyle   String   @default("casual") // casual, sporty, elegant, streetwear, bohemian
