@@ -97,7 +97,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                     </span>
                                 </div>
                                 <p className="text-sm text-zinc-500 mt-2">
-                                    {influencer.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())} • {influencer.apartmentStyle.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                                    {influencer.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())} • {influencer.apartmentStyle.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}
                                 </p>
                             </div>
 

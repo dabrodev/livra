@@ -1,4 +1,4 @@
-import { inngest } from './client'
+import { inngest } from '../client'
 
 export const lifecycleCycle = inngest.createFunction(
     { id: 'lifecycle-cycle' },
