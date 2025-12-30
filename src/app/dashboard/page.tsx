@@ -1,13 +1,29 @@
 import { prisma } from "@/lib/db";
-import { Sparkles, Plus, MapPin, Wallet, Activity, Moon, Zap } from "lucide-react";
+import { Sparkles, Plus, MapPin, Wallet, Activity, Moon, Zap, Camera } from "lucide-react";
 import Link from "next/link";
 
 type InfluencerStatus = "generating" | "sleeping" | "active" | "idle";
 
-function getInfluencerStatus(): InfluencerStatus {
-    // For now, randomly assign status - later this will come from Inngest workflow state
-    const statuses: InfluencerStatus[] = ["generating", "sleeping", "active", "idle"];
-    return statuses[Math.floor(Math.random() * statuses.length)];
+function getInfluencerStatus(lastActivityTime: Date | null, memoryCount: number): InfluencerStatus {
+    if (memoryCount === 0) return "idle";
+
+    if (!lastActivityTime) return "idle";
+
+    const now = new Date();
+    const diff = now.getTime() - new Date(lastActivityTime).getTime();
+    const hours = diff / (1000 * 60 * 60);
+
+    // If last activity was within 1 hour, consider generating
+    if (hours < 1) return "generating";
+
+    // If within 4 hours, active
+    if (hours < 4) return "active";
+
+    // If between 4-8 hours, sleeping
+    if (hours < 8) return "sleeping";
+
+    // Otherwise idle
+    return "idle";
 }
 
 function StatusBadge({ status }: { status: InfluencerStatus }) {
@@ -33,7 +49,11 @@ export default async function DashboardPage() {
         orderBy: { createdAt: "desc" },
         include: {
             _count: {
-                select: { posts: true },
+                select: { posts: true, memories: true },
+            },
+            memories: {
+                orderBy: { createdAt: "desc" },
+                take: 1,
             },
         },
     });
@@ -70,6 +90,34 @@ export default async function DashboardPage() {
                         </Link>
                     </div>
 
+                    {/* Stats summary */}
+                    {influencers.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            <div className="glass-card rounded-xl p-4">
+                                <span className="text-2xl font-bold gradient-text">{influencers.length}</span>
+                                <span className="text-sm text-zinc-400 block">Influencers</span>
+                            </div>
+                            <div className="glass-card rounded-xl p-4">
+                                <span className="text-2xl font-bold gradient-text">
+                                    {influencers.reduce((sum, i) => sum + i._count.posts, 0)}
+                                </span>
+                                <span className="text-sm text-zinc-400 block">Total Posts</span>
+                            </div>
+                            <div className="glass-card rounded-xl p-4">
+                                <span className="text-2xl font-bold gradient-text">
+                                    {influencers.reduce((sum, i) => sum + i._count.memories, 0)}
+                                </span>
+                                <span className="text-sm text-zinc-400 block">Memories Created</span>
+                            </div>
+                            <div className="glass-card rounded-xl p-4">
+                                <span className="text-2xl font-bold gradient-text">
+                                    ${influencers.reduce((sum, i) => sum + i.currentBalance, 0).toLocaleString()}
+                                </span>
+                                <span className="text-sm text-zinc-400 block">Total Balance</span>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Influencer grid */}
                     {influencers.length === 0 ? (
                         <div className="text-center py-20">
@@ -89,7 +137,10 @@ export default async function DashboardPage() {
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {influencers.map((influencer) => {
-                                const status = getInfluencerStatus();
+                                const lastActivity = influencer.memories[0]?.createdAt || null;
+                                const status = getInfluencerStatus(lastActivity, influencer._count.memories);
+                                const hasAvatar = influencer.faceReferences.length > 0;
+
                                 return (
                                     <Link
                                         key={influencer.id}
@@ -98,9 +149,17 @@ export default async function DashboardPage() {
                                     >
                                         {/* Avatar and status */}
                                         <div className="flex items-start justify-between mb-4">
-                                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl font-bold">
-                                                {influencer.name.charAt(0)}
-                                            </div>
+                                            {hasAvatar ? (
+                                                <img
+                                                    src={influencer.faceReferences[0]}
+                                                    alt={influencer.name}
+                                                    className="w-14 h-14 rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl font-bold">
+                                                    {influencer.name.charAt(0)}
+                                                </div>
+                                            )}
                                             <StatusBadge status={status} />
                                         </div>
 
@@ -123,16 +182,22 @@ export default async function DashboardPage() {
                                                     ${influencer.currentBalance.toLocaleString()}
                                                 </span>
                                             </div>
-                                            <div className="text-sm text-zinc-400">
+                                            <div className="flex items-center gap-1.5 text-sm text-zinc-400">
+                                                <Camera className="w-3.5 h-3.5" />
                                                 {influencer._count.posts} posts
                                             </div>
                                         </div>
 
-                                        {/* Vibe tag */}
-                                        <div className="mt-3">
+                                        {/* Vibe tag + avatar indicator */}
+                                        <div className="flex items-center gap-2 mt-3">
                                             <span className="text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-400">
                                                 {influencer.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
                                             </span>
+                                            {!hasAvatar && (
+                                                <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-400">
+                                                    Needs Avatar
+                                                </span>
+                                            )}
                                         </div>
                                     </Link>
                                 );
