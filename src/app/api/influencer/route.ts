@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { inngest } from "@/inngest/client";
 
 export async function POST(request: NextRequest) {
     try {
@@ -44,6 +45,12 @@ export async function POST(request: NextRequest) {
                 faceReferences: [],
                 roomReferences: [],
             },
+        });
+
+        // Trigger the autonomous lifecycle via Inngest
+        await inngest.send({
+            name: "daywithme/influencer.created",
+            data: { influencerId: influencer.id },
         });
 
         return NextResponse.json({ id: influencer.id }, { status: 201 });

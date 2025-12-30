@@ -7,9 +7,96 @@ import { prisma } from "@/lib/db";
 // Mastra will auto-detect GOOGLE_GENERATIVE_AI_API_KEY from environment
 const GEMINI_MODEL = "google/gemini-2.0-flash";
 
-// Life Director Agent Tools (using Mastra's createTool format)
+// =============================================================================
+// Utility Functions (can be called directly from Inngest workflows)
+// =============================================================================
 
-// Tool: Get current weather for influencer's city
+export type WeatherResult = {
+    city: string;
+    condition: string;
+    temp: number;
+    description: string;
+};
+
+export type TrendsResult = {
+    category: string;
+    trends: string[];
+    tip: string;
+};
+
+export type Category = "lifestyle" | "fashion" | "food" | "fitness" | "travel";
+
+/**
+ * Get weather for a city (placeholder - integrate with real API later)
+ */
+export async function getWeather(city: string): Promise<WeatherResult> {
+    const weatherConditions = [
+        { condition: "sunny", temp: 25, description: "Clear skies, perfect for outdoors" },
+        { condition: "cloudy", temp: 18, description: "Overcast but dry" },
+        { condition: "rainy", temp: 15, description: "Light rain, indoor activities recommended" },
+        { condition: "snowy", temp: -2, description: "Snow falling, cozy indoor vibes" },
+    ];
+    const weather = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
+    return { city, ...weather };
+}
+
+/**
+ * Get trending topics for a category (placeholder - integrate with social APIs later)
+ */
+export async function getTrends(category: Category): Promise<TrendsResult> {
+    const trendsByCategory: Record<string, string[]> = {
+        lifestyle: ["#morningroutine", "#selfcare", "#productivity", "#cozyvibes"],
+        fashion: ["#ootd", "#streetstyle", "#minimalfashion", "#thriftflip"],
+        food: ["#coffeelover", "#brunchtime", "#healthyeating", "#foodporn"],
+        fitness: ["#gymmotivation", "#yogalife", "#homeworkout", "#wellnessjourney"],
+        travel: ["#wanderlust", "#cityexplore", "#weekendvibes", "#localguide"],
+    };
+    return {
+        category,
+        trends: trendsByCategory[category] || trendsByCategory.lifestyle,
+        tip: "Use these trends in your next post for better engagement",
+    };
+}
+
+/**
+ * Update an influencer's wallet balance
+ */
+export async function updateWallet(influencerId: string, amount: number, reason: string) {
+    try {
+        const influencer = await prisma.influencer.update({
+            where: { id: influencerId },
+            data: {
+                currentBalance: { increment: amount },
+            },
+        });
+        return {
+            success: true,
+            newBalance: influencer.currentBalance,
+            transaction: { amount, reason },
+        };
+    } catch {
+        return { success: false, error: "Failed to update wallet" };
+    }
+}
+
+/**
+ * Create a memory for an influencer
+ */
+export async function createMemory(influencerId: string, description: string, importance: number) {
+    try {
+        const memory = await prisma.memory.create({
+            data: { influencerId, description, importance },
+        });
+        return { success: true, memoryId: memory.id };
+    } catch {
+        return { success: false, error: "Failed to create memory" };
+    }
+}
+
+// =============================================================================
+// Mastra Tools (wrap the utility functions for agent use)
+// =============================================================================
+
 export const getWeatherTool = createTool({
     id: "get-weather",
     description: "Get current weather conditions for a city. Use this to decide outdoor activities.",
@@ -23,23 +110,10 @@ export const getWeatherTool = createTool({
         description: z.string(),
     }),
     execute: async ({ context }) => {
-        const { city } = context;
-        // Placeholder - later integrate with real weather API
-        const weatherConditions = [
-            { condition: "sunny", temp: 25, description: "Clear skies, perfect for outdoors" },
-            { condition: "cloudy", temp: 18, description: "Overcast but dry" },
-            { condition: "rainy", temp: 15, description: "Light rain, indoor activities recommended" },
-            { condition: "snowy", temp: -2, description: "Snow falling, cozy indoor vibes" },
-        ];
-        const weather = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
-        return {
-            city,
-            ...weather,
-        };
+        return getWeather(context.city);
     },
 });
 
-// Tool: Get trending topics for content ideas
 export const getTrendsTool = createTool({
     id: "get-trends",
     description: "Get current trending topics and hashtags. Use this for content inspiration.",
@@ -52,24 +126,10 @@ export const getTrendsTool = createTool({
         tip: z.string(),
     }),
     execute: async ({ context }) => {
-        const { category } = context;
-        // Placeholder trends - later integrate with social media APIs
-        const trendsByCategory: Record<string, string[]> = {
-            lifestyle: ["#morningroutine", "#selfcare", "#productivity", "#cozyvibes"],
-            fashion: ["#ootd", "#streetstyle", "#minimalfashion", "#thriftflip"],
-            food: ["#coffeelover", "#brunchtime", "#healthyeating", "#foodporn"],
-            fitness: ["#gymmotivation", "#yogalife", "#homeworkout", "#wellnessjourney"],
-            travel: ["#wanderlust", "#cityexplore", "#weekendvibes", "#localguide"],
-        };
-        return {
-            category,
-            trends: trendsByCategory[category] || trendsByCategory.lifestyle,
-            tip: "Use these trends in your next post for better engagement",
-        };
+        return getTrends(context.category);
     },
 });
 
-// Tool: Update influencer's wallet balance
 export const updateWalletTool = createTool({
     id: "update-wallet",
     description: "Update the influencer's wallet balance after spending or earning money.",
@@ -88,28 +148,10 @@ export const updateWalletTool = createTool({
         error: z.string().optional(),
     }),
     execute: async ({ context }) => {
-        const { influencerId, amount, reason } = context;
-        try {
-            const influencer = await prisma.influencer.update({
-                where: { id: influencerId },
-                data: {
-                    currentBalance: {
-                        increment: amount,
-                    },
-                },
-            });
-            return {
-                success: true,
-                newBalance: influencer.currentBalance,
-                transaction: { amount, reason },
-            };
-        } catch {
-            return { success: false, error: "Failed to update wallet" };
-        }
+        return updateWallet(context.influencerId, context.amount, context.reason);
     },
 });
 
-// Tool: Create a memory for the influencer
 export const createMemoryTool = createTool({
     id: "create-memory",
     description: "Store a memory of an event or experience for the influencer.",
@@ -124,19 +166,14 @@ export const createMemoryTool = createTool({
         error: z.string().optional(),
     }),
     execute: async ({ context }) => {
-        const { influencerId, description, importance } = context;
-        try {
-            const memory = await prisma.memory.create({
-                data: { influencerId, description, importance },
-            });
-            return { success: true, memoryId: memory.id };
-        } catch {
-            return { success: false, error: "Failed to create memory" };
-        }
+        return createMemory(context.influencerId, context.description, context.importance);
     },
 });
 
-// System prompt for Life Director
+// =============================================================================
+// System Prompt and Agent
+// =============================================================================
+
 const LIFE_DIRECTOR_SYSTEM_PROMPT = `You are the Life Director for an AI influencer. Your role is to simulate a realistic day-to-day life for your influencer character.
 
 You make decisions about:
@@ -177,8 +214,7 @@ export const lifeDirectorAgent = new Agent({
 // Main agent function - wrapper for backward compatibility
 export async function runLifeDirector(prompt: string) {
     const result = await lifeDirectorAgent.generate(prompt, {
-        maxSteps: 5, // Allow up to 5 tool calls
+        maxSteps: 5,
     });
-
     return result;
 }
