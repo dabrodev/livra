@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, Wand2, Check, RefreshCw, AlertCircle } from "lucide-react";
+import { ArrowLeft, Sparkles, Wand2, Check, RefreshCw, AlertCircle, Library } from "lucide-react";
 
 // Appearance options
 const hairColors = [
@@ -84,6 +84,13 @@ interface GeneratedAvatar {
     description?: string;
 }
 
+interface LibraryAvatar {
+    id: string;
+    url: string;
+    hairColor?: string;
+    skinTone?: string;
+}
+
 export default function AvatarCreationPage() {
     const router = useRouter();
     const params = useParams();
@@ -99,11 +106,33 @@ export default function AvatarCreationPage() {
         bodyHeight: "",
         bodyType: "",
     });
-    const [step, setStep] = useState<"configure" | "generating" | "select">("configure");
+    const [step, setStep] = useState<"configure" | "generating" | "select" | "library">("configure");
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedAvatars, setGeneratedAvatars] = useState<GeneratedAvatar[]>([]);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [generationProgress, setGenerationProgress] = useState(0);
+    const [libraryAvatars, setLibraryAvatars] = useState<LibraryAvatar[]>([]);
+    const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
+
+    // Fetch library avatars on mount
+    useEffect(() => {
+        fetchLibraryAvatars();
+    }, []);
+
+    const fetchLibraryAvatars = async () => {
+        setIsLoadingLibrary(true);
+        try {
+            const response = await fetch("/api/avatars");
+            const result = await response.json();
+            if (result.success) {
+                setLibraryAvatars(result.avatars);
+            }
+        } catch (error) {
+            console.error("Failed to fetch library:", error);
+        } finally {
+            setIsLoadingLibrary(false);
+        }
+    };
 
     const updateData = (updates: Partial<AvatarData>) => {
         setData((prev) => ({ ...prev, ...updates }));
@@ -178,6 +207,22 @@ export default function AvatarCreationPage() {
                 body: JSON.stringify({
                     selectedIndex: avatarIndex,
                     avatarUrl: selectedAvatar.url,
+                }),
+            });
+
+            router.push(`/influencer/${influencerId}`);
+        } catch (error) {
+            console.error("Failed to save avatar:", error);
+        }
+    };
+
+    const handleSelectFromLibrary = async (avatar: LibraryAvatar) => {
+        try {
+            await fetch(`/api/influencer/${influencerId}/avatar`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    avatarUrl: avatar.url,
                 }),
             });
 
@@ -417,6 +462,17 @@ export default function AvatarCreationPage() {
                                     <Wand2 className="w-5 h-5" />
                                     Generate Avatar Options
                                 </button>
+
+                                {/* Browse Library Button */}
+                                {libraryAvatars.length > 0 && (
+                                    <button
+                                        onClick={() => setStep("library")}
+                                        className="w-full py-3 rounded-xl border border-zinc-700 text-zinc-300 font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-all"
+                                    >
+                                        <Library className="w-5 h-5" />
+                                        Browse Library ({libraryAvatars.length} avatars)
+                                    </button>
+                                )}
                             </div>
                         </div>
                     )}
@@ -428,7 +484,7 @@ export default function AvatarCreationPage() {
                                 <Wand2 className="w-12 h-12 text-white animate-bounce" />
                             </div>
                             <h2 className="text-2xl font-bold mb-2">Generating Avatars...</h2>
-                            <p className="text-zinc-400 mb-6">AI is creating 6 unique avatar options for you</p>
+                            <p className="text-zinc-400 mb-6">AI is creating 3 unique avatar options for you</p>
 
                             {/* Progress bar */}
                             <div className="w-64 mx-auto bg-zinc-800 rounded-full h-2 overflow-hidden">
@@ -475,6 +531,58 @@ export default function AvatarCreationPage() {
                             >
                                 <RefreshCw className="w-4 h-4" />
                                 Adjust Appearance &amp; Regenerate
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Library Step */}
+                    {step === "library" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Library className="w-6 h-6 text-purple-400" />
+                                <span className="text-sm text-purple-400 font-medium">Avatar Library</span>
+                            </div>
+                            <h1 className="text-3xl font-bold mb-2">Choose from Library</h1>
+                            <p className="text-zinc-400 mb-8">Select a previously generated avatar</p>
+
+                            {isLoadingLibrary ? (
+                                <div className="text-center py-12">
+                                    <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                    <p className="text-zinc-400">Loading library...</p>
+                                </div>
+                            ) : libraryAvatars.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <p className="text-zinc-400">No avatars in library yet</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-3 md:grid-cols-4 gap-3 mb-8">
+                                    {libraryAvatars.map((avatar) => (
+                                        <button
+                                            key={avatar.id}
+                                            onClick={() => handleSelectFromLibrary(avatar)}
+                                            className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 hover:border-purple-500 transition-all group overflow-hidden relative"
+                                        >
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={avatar.url}
+                                                alt="Library avatar"
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-purple-500/0 group-hover:bg-purple-500/20 transition-colors flex items-center justify-center">
+                                                <Check className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Back Button */}
+                            <button
+                                onClick={() => setStep("configure")}
+                                className="w-full py-3 rounded-xl border border-zinc-700 text-zinc-300 font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-all"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                Back to Configuration
                             </button>
                         </div>
                     )}
