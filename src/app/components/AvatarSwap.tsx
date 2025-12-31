@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { RefreshCw, X, Check, Library } from "lucide-react";
+import { RefreshCw, X, Check, Library, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Portal from "./Portal";
 
 interface Avatar {
     id: string;
@@ -74,91 +75,101 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
 
             {/* Modal */}
             {isOpen && (
-                <div
-                    className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all"
-                    onClick={() => setIsOpen(false)}
-                >
+                <Portal>
                     <div
-                        className="bg-zinc-900 rounded-2xl max-w-2xl w-full max-h-[80vh] border border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95"
-                        onClick={(e) => e.stopPropagation()}
+                        className="fixed inset-0 z-[99999] bg-black/80 flex items-center justify-center p-4"
+                        onClick={() => setIsOpen(false)}
                     >
-                        {/* Header */}
-                        <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Library className="w-5 h-5 text-purple-400" />
-                                <h2 className="font-semibold">Change Avatar</h2>
+                        <div
+                            className="bg-zinc-900 rounded-2xl max-w-2xl w-full flex flex-col max-h-[85vh] border border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Library className="w-5 h-5 text-purple-400" />
+                                    <h2 className="font-semibold">Change Avatar</h2>
+                                </div>
+                                <button
+                                    onClick={() => setIsOpen(false)}
+                                    className="p-1 rounded-lg hover:bg-zinc-800 transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
                             </div>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="p-1 rounded-lg hover:bg-zinc-800 transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
 
-                        {/* Content */}
-                        <div className="p-4 overflow-y-auto max-h-[60vh]">
-                            {isLoading ? (
-                                <div className="text-center py-12">
-                                    <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                                    <p className="text-zinc-400">Loading avatars...</p>
-                                </div>
-                            ) : avatars.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <p className="text-zinc-400 mb-4">No avatars in library</p>
-                                    <a
-                                        href={`/influencer/${influencerId}/avatar`}
-                                        className="text-purple-400 hover:underline"
-                                    >
-                                        Generate new avatars
-                                    </a>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-4 md:grid-cols-5 gap-3">
-                                    {avatars.map((avatar) => (
-                                        <button
-                                            key={avatar.id}
-                                            onClick={() => handleSelectAvatar(avatar)}
-                                            disabled={isSaving}
-                                            className={`aspect-square rounded-xl overflow-hidden border-2 transition-all hover:scale-105 ${currentAvatarUrl === avatar.url
-                                                ? "border-purple-500 ring-2 ring-purple-500/30"
-                                                : "border-zinc-700 hover:border-purple-500"
-                                                } ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
+                            {/* Content */}
+                            <div className="p-6 overflow-y-auto flex-1">
+                                {isLoading ? (
+                                    <div className="text-center py-12">
+                                        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                        <p className="text-zinc-400">Loading avatars...</p>
+                                    </div>
+                                ) : avatars.length === 0 ? (
+                                    <div className="text-center py-12">
+                                        <p className="text-zinc-400 mb-4">No avatars in library</p>
+                                        <a
+                                            href={`/influencer/${influencerId}/avatar`}
+                                            className="text-purple-400 hover:underline"
                                         >
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                src={avatar.url}
-                                                alt="Avatar option"
-                                                className="w-full h-full object-cover"
-                                            />
-                                            {currentAvatarUrl === avatar.url && (
-                                                <div className="absolute inset-0 bg-purple-500/20 flex items-center justify-center">
-                                                    <Check className="w-6 h-6 text-white" />
-                                                </div>
-                                            )}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                                            Generate new avatars
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                                        {avatars.map((avatar) => (
+                                            <button
+                                                key={avatar.id}
+                                                onClick={() => handleSelectAvatar(avatar)}
+                                                disabled={isSaving}
+                                                className={`aspect-square rounded-xl overflow-hidden border-2 transition-all relative group ${currentAvatarUrl === avatar.url
+                                                    ? "border-purple-500 ring-2 ring-purple-500/30"
+                                                    : "border-zinc-800 hover:border-purple-500/50"
+                                                    } ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
+                                            >
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    src={avatar.url}
+                                                    alt="Avatar option"
+                                                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                                />
+                                                {currentAvatarUrl === avatar.url && (
+                                                    <div className="absolute inset-0 bg-purple-500/30 flex items-center justify-center">
+                                                        <div className="bg-purple-500 rounded-full p-1 shadow-lg">
+                                                            <Check className="w-5 h-5 text-white" />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {isSaving && (
+                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                    </div>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
-                        {/* Footer */}
-                        <div className="p-4 border-t border-zinc-800 flex justify-between items-center">
-                            <a
-                                href={`/influencer/${influencerId}/avatar`}
-                                className="text-sm text-purple-400 hover:underline"
-                            >
-                                + Generate new avatars
-                            </a>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="px-4 py-2 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
-                            >
-                                Cancel
-                            </button>
+                            {/* Footer */}
+                            <div className="p-4 bg-zinc-900/50 border-t border-zinc-800 flex justify-between items-center bg-zinc-900">
+                                <a
+                                    href={`/influencer/${influencerId}/avatar`}
+                                    className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-2"
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    + Generate new
+                                </a>
+                                <button
+                                    onClick={() => setIsOpen(false)}
+                                    className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-all text-sm font-medium"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </Portal>
             )}
         </>
     );
