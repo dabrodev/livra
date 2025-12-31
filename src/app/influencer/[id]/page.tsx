@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import {
-    Sparkles, ArrowLeft, MapPin, Wallet, Play, Pause, Download,
+    Sparkles, ArrowLeft, MapPin, Wallet, Play, Pause, Download, Wand2,
     Coffee, Camera, Utensils, ShoppingBag, Dumbbell, Moon, Sun,
     Activity, Zap, Heart, Home, Music, BookOpen, type LucideIcon
 } from "lucide-react";
@@ -150,7 +150,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                         <div className="flex flex-col md:flex-row md:items-center gap-6">
                             {/* Avatar */}
                             {influencer.faceReferences.length > 0 ? (
-                                <img
+                                <ImageLightbox
                                     src={influencer.faceReferences[0]}
                                     alt={influencer.name}
                                     className="w-20 h-20 rounded-full object-cover flex-shrink-0"
@@ -188,12 +188,23 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
 
                             {/* Controls */}
                             <div className="flex gap-2">
-                                {/* Change Avatar - only if avatar exists AND lifecycle not started */}
+                                {/* Avatar controls - only before lifecycle starts */}
                                 {influencer.faceReferences.length > 0 && !hasRealActivity && (
-                                    <AvatarSwap
-                                        influencerId={influencer.id}
-                                        currentAvatarUrl={influencer.faceReferences[0]}
-                                    />
+                                    <>
+                                        {/* Swap from library */}
+                                        <AvatarSwap
+                                            influencerId={influencer.id}
+                                            currentAvatarUrl={influencer.faceReferences[0]}
+                                        />
+                                        {/* Generate new */}
+                                        <Link
+                                            href={`/influencer/${influencer.id}/avatar`}
+                                            className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-purple-400 transition-all"
+                                            title="Generate New Avatar"
+                                        >
+                                            <Wand2 className="w-5 h-5" />
+                                        </Link>
+                                    </>
                                 )}
                                 <button className={`p-3 rounded-xl transition-all ${isActive
                                     ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"

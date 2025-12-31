@@ -26,18 +26,18 @@ export default function ImageLightbox({ src, alt, className }: ImageLightboxProp
             {/* Lightbox Modal */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all"
                     onClick={() => setIsOpen(false)}
                 >
                     <button
-                        className="absolute top-4 right-4 p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                        className="absolute top-4 right-4 p-2 rounded-full bg-zinc-800/50 hover:bg-zinc-700 transition-colors z-[110]"
                         onClick={() => setIsOpen(false)}
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-6 h-6 text-white" />
                     </button>
 
                     <div
-                        className="max-w-4xl max-h-[90vh] animate-in zoom-in-95 duration-200"
+                        className="max-w-4xl max-h-[90vh] animate-in zoom-in-95"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* eslint-disable-next-line @next/next/no-img-element */}

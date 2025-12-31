@@ -75,11 +75,11 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
             {/* Modal */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all"
                     onClick={() => setIsOpen(false)}
                 >
                     <div
-                        className="bg-zinc-900 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-200"
+                        className="bg-zinc-900 rounded-2xl max-w-2xl w-full max-h-[80vh] border border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
@@ -121,8 +121,8 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                                             onClick={() => handleSelectAvatar(avatar)}
                                             disabled={isSaving}
                                             className={`aspect-square rounded-xl overflow-hidden border-2 transition-all hover:scale-105 ${currentAvatarUrl === avatar.url
-                                                    ? "border-purple-500 ring-2 ring-purple-500/30"
-                                                    : "border-zinc-700 hover:border-purple-500"
+                                                ? "border-purple-500 ring-2 ring-purple-500/30"
+                                                : "border-zinc-700 hover:border-purple-500"
                                                 } ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
                                         >
                                             {/* eslint-disable-next-line @next/next/no-img-element */}

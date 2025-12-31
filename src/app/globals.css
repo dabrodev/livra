@@ -71,8 +71,15 @@ body {
 
 /* Floating animation */
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-float {
@@ -81,15 +88,22 @@ body {
 
 /* Phone mockup glow */
 .phone-glow {
-  box-shadow: 
+  box-shadow:
     0 0 60px rgba(139, 92, 246, 0.3),
     0 0 120px rgba(236, 72, 153, 0.2);
 }
 
 /* Pulse ring */
 @keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(1.4); opacity: 0; }
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
 }
 
 .pulse-ring::before {
@@ -99,4 +113,41 @@ body {
   border: 2px solid rgba(139, 92, 246, 0.4);
   border-radius: 50%;
   animation: pulse-ring 2s ease-out infinite;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation-duration: 0.2s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+}
+
+.fade-in {
+  animation-name: fade-in;
+}
+
+.zoom-in-95 {
+  animation-name: zoom-in;
 }
