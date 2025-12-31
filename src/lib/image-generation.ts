@@ -197,8 +197,8 @@ async function fetchImageAsBase64(urlOrBase64: string): Promise<ReferenceImage |
 }
 
 /**
- * Save base64 image data to Supabase Storage (placeholder)
- * TODO: Implement actual Supabase storage upload
+ * Save base64 image data to Supabase Storage
+ * Returns the public URL of the uploaded image
  */
 export async function saveGeneratedImage(
     imageBase64: string,
@@ -206,7 +206,68 @@ export async function saveGeneratedImage(
     influencerId: string,
     postId: string
 ): Promise<string | null> {
-    // TODO: Implement Supabase Storage upload
-    // For now, return a data URL placeholder
-    return `data:${mimeType};base64,${imageBase64}`;
+    try {
+        // Import supabase admin client (server-side only)
+        const { supabaseAdmin, STORAGE_BUCKET } = await import("@/lib/supabase");
+
+        // Determine file extension from mime type
+        const extension = mimeType.split("/")[1] || "png";
+        const timestamp = Date.now();
+        const fileName = `${influencerId}/${postId}-${timestamp}.${extension}`;
+
+        // Convert base64 to buffer
+        const buffer = Buffer.from(imageBase64, "base64");
+
+        // Upload to Supabase Storage
+        const { data, error } = await supabaseAdmin.storage
+            .from(STORAGE_BUCKET)
+            .upload(fileName, buffer, {
+                contentType: mimeType,
+                upsert: false,
+            });
+
+        if (error) {
+            console.error("Supabase Storage upload error:", error);
+            // If bucket doesn't exist error, try to create it
+            if (error.message.includes("not found") || error.message.includes("Bucket")) {
+                console.log("Bucket may not exist, attempting to create...");
+                const { error: bucketError } = await supabaseAdmin.storage.createBucket(STORAGE_BUCKET, {
+                    public: true,
+                    fileSizeLimit: 10485760, // 10MB
+                });
+                if (bucketError && !bucketError.message.includes("already exists")) {
+                    console.error("Failed to create bucket:", bucketError);
+                    return null;
+                }
+                // Retry upload after bucket creation
+                const { data: retryData, error: retryError } = await supabaseAdmin.storage
+                    .from(STORAGE_BUCKET)
+                    .upload(fileName, buffer, {
+                        contentType: mimeType,
+                        upsert: false,
+                    });
+                if (retryError) {
+                    console.error("Retry upload failed:", retryError);
+                    return null;
+                }
+                // Get public URL after retry
+                const { data: urlData } = supabaseAdmin.storage
+                    .from(STORAGE_BUCKET)
+                    .getPublicUrl(retryData.path);
+                return urlData.publicUrl;
+            }
+            return null;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabaseAdmin.storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(data.path);
+
+        return urlData.publicUrl;
+    } catch (error) {
+        console.error("Failed to save generated image:", error);
+        return null;
+    }
 }
+
