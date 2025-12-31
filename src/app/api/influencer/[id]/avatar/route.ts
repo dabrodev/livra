@@ -8,16 +8,17 @@ export async function POST(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { selectedIndex } = body;
+        const { avatarUrl } = body;
 
-        // For now, we'll save a placeholder URL - later this will be the actual generated image
-        // When Nano Banana Pro is integrated, this will save the actual generated avatar URL
-        const placeholderUrl = `https://placeholder.avatar/${id}/${selectedIndex}`;
+        if (!avatarUrl) {
+            return NextResponse.json({ error: "avatarUrl required" }, { status: 400 });
+        }
 
+        // Save the selected avatar URL to faceReferences
         const influencer = await prisma.influencer.update({
             where: { id },
             data: {
-                faceReferences: [placeholderUrl],
+                faceReferences: [avatarUrl],
             },
         });
 
@@ -30,3 +31,4 @@ export async function POST(
         );
     }
 }
+

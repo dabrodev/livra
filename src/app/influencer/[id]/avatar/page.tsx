@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, Wand2, Check, RefreshCw } from "lucide-react";
+import { ArrowLeft, Sparkles, Wand2, Check, RefreshCw, AlertCircle } from "lucide-react";
 
 // Appearance options
 const hairColors = [
@@ -79,6 +79,11 @@ interface AvatarData {
     bodyType: string;
 }
 
+interface GeneratedAvatar {
+    url: string;
+    description?: string;
+}
+
 export default function AvatarCreationPage() {
     const router = useRouter();
     const params = useParams();
@@ -96,6 +101,9 @@ export default function AvatarCreationPage() {
     });
     const [step, setStep] = useState<"configure" | "generating" | "select">("configure");
     const [isGenerating, setIsGenerating] = useState(false);
+    const [generatedAvatars, setGeneratedAvatars] = useState<GeneratedAvatar[]>([]);
+    const [generationError, setGenerationError] = useState<string | null>(null);
+    const [generationProgress, setGenerationProgress] = useState(0);
 
     const updateData = (updates: Partial<AvatarData>) => {
         setData((prev) => ({ ...prev, ...updates }));
@@ -114,34 +122,63 @@ export default function AvatarCreationPage() {
 
     const handleGenerate = async () => {
         setIsGenerating(true);
+        setGenerationError(null);
         setStep("generating");
+        setGenerationProgress(0);
 
-        // Save appearance data to influencer
         try {
+            // Save appearance data to influencer first
             await fetch(`/api/influencer/${influencerId}/appearance`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
 
-            // Simulate AI generation time (later this will call Nano Banana Pro)
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+            // Start progress animation
+            const progressInterval = setInterval(() => {
+                setGenerationProgress((prev) => Math.min(prev + 2, 90));
+            }, 500);
 
-            setStep("select");
+            // Generate avatars with AI
+            const response = await fetch(`/api/influencer/${influencerId}/avatar/generate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            clearInterval(progressInterval);
+            setGenerationProgress(100);
+
+            const result = await response.json();
+
+            if (result.success && result.avatars?.length > 0) {
+                setGeneratedAvatars(result.avatars);
+                setStep("select");
+            } else {
+                setGenerationError(result.error || "Failed to generate avatars");
+                setStep("configure");
+            }
         } catch (error) {
-            console.error("Failed to save appearance:", error);
+            console.error("Failed to generate avatars:", error);
+            setGenerationError("Failed to connect to AI service");
+            setStep("configure");
         } finally {
             setIsGenerating(false);
         }
     };
 
     const handleSelectAvatar = async (avatarIndex: number) => {
-        // Save selected avatar (placeholder for now)
+        const selectedAvatar = generatedAvatars[avatarIndex];
+        if (!selectedAvatar) return;
+
         try {
+            // Save selected avatar URL to faceReferences
             await fetch(`/api/influencer/${influencerId}/avatar`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ selectedIndex: avatarIndex }),
+                body: JSON.stringify({
+                    selectedIndex: avatarIndex,
+                    avatarUrl: selectedAvatar.url,
+                }),
             });
 
             router.push(`/influencer/${influencerId}`);
@@ -325,8 +362,8 @@ export default function AvatarCreationPage() {
                                                 key={height.id}
                                                 onClick={() => updateData({ bodyHeight: height.id })}
                                                 className={`flex-1 p-4 rounded-xl border text-center transition-all ${data.bodyHeight === height.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <span className="text-xl block">{height.emoji}</span>
@@ -346,8 +383,8 @@ export default function AvatarCreationPage() {
                                                 key={type.id}
                                                 onClick={() => updateData({ bodyType: type.id })}
                                                 className={`p-4 rounded-xl border text-center transition-all ${data.bodyType === type.id
-                                                        ? "border-purple-500 bg-purple-500/10"
-                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
                                                 <span className="text-2xl block">{type.emoji}</span>
@@ -356,6 +393,17 @@ export default function AvatarCreationPage() {
                                         ))}
                                     </div>
                                 </div>
+
+                                {/* Error display */}
+                                {generationError && (
+                                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center gap-3">
+                                        <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                                        <div>
+                                            <p className="text-red-400 font-medium">Generation failed</p>
+                                            <p className="text-red-400/70 text-sm">{generationError}</p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Generate Button */}
                                 <button
@@ -380,7 +428,16 @@ export default function AvatarCreationPage() {
                                 <Wand2 className="w-12 h-12 text-white animate-bounce" />
                             </div>
                             <h2 className="text-2xl font-bold mb-2">Generating Avatars...</h2>
-                            <p className="text-zinc-400">AI is creating unique avatar options for you</p>
+                            <p className="text-zinc-400 mb-6">AI is creating 6 unique avatar options for you</p>
+
+                            {/* Progress bar */}
+                            <div className="w-64 mx-auto bg-zinc-800 rounded-full h-2 overflow-hidden">
+                                <div
+                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
+                                    style={{ width: `${generationProgress}%` }}
+                                />
+                            </div>
+                            <p className="text-zinc-500 text-sm mt-2">{generationProgress}%</p>
                         </div>
                     )}
 
@@ -390,19 +447,22 @@ export default function AvatarCreationPage() {
                             <h1 className="text-3xl font-bold mb-2 text-center">Choose Your Avatar</h1>
                             <p className="text-zinc-400 mb-8 text-center">Select the one that best represents your influencer</p>
 
-                            {/* Avatar Grid - Placeholders for now */}
+                            {/* Avatar Grid - Real generated avatars */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                                {[1, 2, 3, 4, 5, 6].map((index) => (
+                                {generatedAvatars.map((avatar, index) => (
                                     <button
                                         key={index}
                                         onClick={() => handleSelectAvatar(index)}
                                         className="aspect-square rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-purple-500 transition-all group overflow-hidden relative"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                                            <span className="text-4xl font-bold text-zinc-700">#{index}</span>
-                                        </div>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={avatar.url}
+                                            alt={`Avatar option ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
                                         <div className="absolute inset-0 bg-purple-500/0 group-hover:bg-purple-500/20 transition-colors flex items-center justify-center">
-                                            <Check className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <Check className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                                         </div>
                                     </button>
                                 ))}

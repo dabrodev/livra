@@ -59,3 +59,24 @@ model Memory {
   importance   Int        @default(1)
   createdAt    DateTime   @default(now())
 }
+
+// Global avatar library for reuse across influencers
+model AvatarLibrary {
+  id          String   @id @default(uuid())
+  url         String   // URL to the stored avatar image
+  
+  // Appearance traits for filtering
+  hairColor   String?
+  hairStyle   String?
+  eyeColor    String?
+  skinTone    String?
+  lipStyle    String?
+  features    String[]
+  bodyHeight  String?
+  bodyType    String?
+  
+  // Usage tracking
+  usedBy      String[] // IDs of influencers using this avatar
+  createdAt   DateTime @default(now())
+}
+
