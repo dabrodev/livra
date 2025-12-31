@@ -4,9 +4,10 @@ import Link from "next/link";
 import {
     Sparkles, ArrowLeft, MapPin, Wallet, Play, Pause, Download,
     Coffee, Camera, Utensils, ShoppingBag, Dumbbell, Moon, Sun,
-    Activity, Zap, Heart, Home, Music, BookOpen, RefreshCw, type LucideIcon
+    Activity, Zap, Heart, Home, Music, BookOpen, type LucideIcon
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
+import AvatarSwap from "@/app/components/AvatarSwap";
 
 interface TimelinePageProps {
     params: Promise<{ id: string }>;
@@ -187,15 +188,12 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
 
                             {/* Controls */}
                             <div className="flex gap-2">
-                                {/* Change Avatar - only if avatar exists */}
-                                {influencer.faceReferences.length > 0 && (
-                                    <Link
-                                        href={`/influencer/${influencer.id}/avatar`}
-                                        className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-purple-400 transition-all"
-                                        title="Change Avatar"
-                                    >
-                                        <RefreshCw className="w-5 h-5" />
-                                    </Link>
+                                {/* Change Avatar - only if avatar exists AND lifecycle not started */}
+                                {influencer.faceReferences.length > 0 && !hasRealActivity && (
+                                    <AvatarSwap
+                                        influencerId={influencer.id}
+                                        currentAvatarUrl={influencer.faceReferences[0]}
+                                    />
                                 )}
                                 <button className={`p-3 rounded-xl transition-all ${isActive
                                     ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
