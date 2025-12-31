@@ -58,6 +58,9 @@ export default async function DashboardPage() {
         },
     });
 
+    // Get avatar library count
+    const avatarCount = await prisma.avatarLibrary.count();
+
     return (
         <div className="min-h-screen bg-background text-foreground">
             {/* Header */}
@@ -69,6 +72,14 @@ export default async function DashboardPage() {
                         </div>
                         <span className="font-semibold text-lg">daywith.me</span>
                     </Link>
+                    {avatarCount > 0 && (
+                        <Link
+                            href="/avatars"
+                            className="text-sm text-zinc-400 hover:text-white transition-colors"
+                        >
+                            📚 Avatar Library ({avatarCount})
+                        </Link>
+                    )}
                 </div>
             </header>
 
