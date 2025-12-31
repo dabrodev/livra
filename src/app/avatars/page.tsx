@@ -1,11 +1,41 @@
-import { prisma } from "@/lib/db";
-import { Sparkles, ArrowLeft, Trash2 } from "lucide-react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Sparkles, ArrowLeft, X } from "lucide-react";
 import Link from "next/link";
 
-export default async function AvatarLibraryPage() {
-    const avatars = await prisma.avatarLibrary.findMany({
-        orderBy: { createdAt: "desc" },
-    });
+interface Avatar {
+    id: string;
+    url: string;
+    hairColor?: string;
+    skinTone?: string;
+    eyeColor?: string;
+    bodyType?: string;
+    createdAt: string;
+}
+
+export default function AvatarLibraryPage() {
+    const [avatars, setAvatars] = useState<Avatar[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null);
+
+    useEffect(() => {
+        fetchAvatars();
+    }, []);
+
+    const fetchAvatars = async () => {
+        try {
+            const response = await fetch("/api/avatars");
+            const data = await response.json();
+            if (data.success) {
+                setAvatars(data.avatars);
+            }
+        } catch (error) {
+            console.error("Failed to fetch avatars:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -32,12 +62,20 @@ export default async function AvatarLibraryPage() {
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold">Avatar Library</h1>
                         <p className="text-zinc-400 mt-1">
-                            {avatars.length} avatar{avatars.length !== 1 ? "s" : ""} generated
+                            {isLoading ? "Loading..." : `${avatars.length} avatar${avatars.length !== 1 ? "s" : ""} generated`}
                         </p>
                     </div>
 
+                    {/* Loading state */}
+                    {isLoading && (
+                        <div className="text-center py-20">
+                            <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                            <p className="text-zinc-400">Loading library...</p>
+                        </div>
+                    )}
+
                     {/* Empty state */}
-                    {avatars.length === 0 ? (
+                    {!isLoading && avatars.length === 0 && (
                         <div className="text-center py-20">
                             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-zinc-800 flex items-center justify-center">
                                 <span className="text-3xl">📚</span>
@@ -53,18 +91,24 @@ export default async function AvatarLibraryPage() {
                                 Create Influencer
                             </Link>
                         </div>
-                    ) : (
+                    )}
+
+                    {/* Avatar grid */}
+                    {!isLoading && avatars.length > 0 && (
                         <>
-                            {/* Avatar grid */}
                             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                 {avatars.map((avatar) => (
-                                    <div key={avatar.id} className="group relative">
-                                        <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800">
+                                    <button
+                                        key={avatar.id}
+                                        onClick={() => setSelectedAvatar(avatar)}
+                                        className="group relative cursor-zoom-in"
+                                    >
+                                        <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-purple-500 transition-all">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
                                                 src={avatar.url}
                                                 alt="Avatar"
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                             />
                                         </div>
                                         {/* Traits badge */}
@@ -82,21 +126,71 @@ export default async function AvatarLibraryPage() {
                                                 )}
                                             </div>
                                         </div>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
 
                             {/* Info */}
                             <div className="mt-8 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
                                 <p className="text-sm text-zinc-400">
-                                    💡 These avatars are automatically available when creating new influencers.
-                                    Select &quot;Browse Library&quot; during avatar creation to reuse them.
+                                    💡 Click on any avatar to view full size. These avatars are automatically available when creating new influencers.
                                 </p>
                             </div>
                         </>
                     )}
                 </div>
             </main>
+
+            {/* Lightbox Modal */}
+            {selectedAvatar && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    onClick={() => setSelectedAvatar(null)}
+                >
+                    <button
+                        className="absolute top-4 right-4 p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                        onClick={() => setSelectedAvatar(null)}
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+
+                    <div
+                        className="max-w-3xl max-h-[90vh] animate-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={selectedAvatar.url}
+                            alt="Avatar full size"
+                            className="max-w-full max-h-[80vh] rounded-2xl object-contain"
+                        />
+
+                        {/* Avatar details */}
+                        <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                            {selectedAvatar.hairColor && (
+                                <span className="text-sm px-3 py-1 bg-zinc-800 rounded-full text-zinc-300">
+                                    Hair: {selectedAvatar.hairColor}
+                                </span>
+                            )}
+                            {selectedAvatar.eyeColor && (
+                                <span className="text-sm px-3 py-1 bg-zinc-800 rounded-full text-zinc-300">
+                                    Eyes: {selectedAvatar.eyeColor}
+                                </span>
+                            )}
+                            {selectedAvatar.skinTone && (
+                                <span className="text-sm px-3 py-1 bg-zinc-800 rounded-full text-zinc-300">
+                                    Skin: {selectedAvatar.skinTone}
+                                </span>
+                            )}
+                            {selectedAvatar.bodyType && (
+                                <span className="text-sm px-3 py-1 bg-zinc-800 rounded-full text-zinc-300">
+                                    Body: {selectedAvatar.bodyType}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
