@@ -1,6 +1,6 @@
 import { inngest } from '../client'
 import { prisma } from '@/lib/db'
-import { lifeDirectorAgent, getWeather, getTrends, type WeatherResult, type TrendsResult } from '@/lib/agent'
+import { lifeDirectorAgent, getWeather, getTrends, type WeatherResult, type TrendsResult } from '@/mastra'
 import { generateInfluencerImage, saveGeneratedImage } from '@/lib/image-generation'
 
 // Types for better structure
