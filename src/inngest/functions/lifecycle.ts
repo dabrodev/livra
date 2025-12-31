@@ -1,6 +1,7 @@
 import { inngest } from '../client'
 import { prisma } from '@/lib/db'
 import { lifeDirectorAgent, getWeather, getTrends, type WeatherResult, type TrendsResult } from '@/lib/agent'
+import { generateInfluencerImage, saveGeneratedImage } from '@/lib/image-generation'
 
 // Types for better structure
 interface ActivityPlan {
@@ -138,27 +139,70 @@ Respond with a JSON object containing:
             })
         }
 
-        // Step 5: Production (Image) - Placeholder for Nano Banana Pro integration
+        // Step 5: Production (Image) - Using Gemini 3 Pro Image (Nano Banana Pro)
         const image = await step.run('produce-image', async () => {
-            // TODO: Integrate with Nano Banana Pro API
-            // 1. Query DB for 14 best references (Face + Room)
-            // 2. Generate prompt based on activity
-            // 3. Call Nano Banana Pro API
-            // 4. Save to Post table
+            if (!plan.isContentWorthy) {
+                return null
+            }
 
-            if (plan.isContentWorthy) {
+            // Build image generation prompt based on activity
+            const imagePrompt = `A beautiful, Instagram-worthy photo of a ${influencer.personalityVibe} influencer ${plan.activity} at ${plan.location || 'home'}. 
+The scene is ${plan.timeOfDay}, with ${environment.weather.condition} weather.
+Style: authentic lifestyle photography, natural lighting, warm tones.
+Clothing style: ${influencer.clothingStyle}.
+Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
+
+            // Generate image with face and room references
+            const result = await generateInfluencerImage(
+                imagePrompt,
+                influencer.faceReferences,
+                influencer.roomReferences,
+                {
+                    aspectRatio: '4:5', // Instagram portrait
+                    resolution: '2K',
+                }
+            )
+
+            if (result.success && result.imageBase64) {
+                // Create post with generated image
+                const caption = `${plan.activity} ✨ #${influencer.city.toLowerCase().replace(/\s/g, '')} ${environment.trends.trends.slice(0, 2).join(' ')}`
+
+                // Save image (returns data URL for now, TODO: upload to Supabase Storage)
+                const imageUrl = await saveGeneratedImage(
+                    result.imageBase64,
+                    result.mimeType || 'image/png',
+                    influencerId,
+                    'pending'
+                )
+
                 const post = await prisma.post.create({
                     data: {
                         influencerId,
                         type: 'IMAGE',
-                        contentUrl: '', // Placeholder - will be filled by Nano Banana Pro
+                        contentUrl: imageUrl || '',
+                        caption,
+                    },
+                })
+
+                return {
+                    postId: post.id,
+                    contentUrl: imageUrl,
+                    caption: post.caption,
+                    description: result.description,
+                }
+            } else {
+                console.error('Image generation failed:', result.error)
+                // Create post without image (placeholder)
+                const post = await prisma.post.create({
+                    data: {
+                        influencerId,
+                        type: 'IMAGE',
+                        contentUrl: '',
                         caption: `${plan.activity} ✨ #${influencer.city.toLowerCase().replace(/\s/g, '')}`,
                     },
                 })
-                return { postId: post.id, contentUrl: '', caption: post.caption }
+                return { postId: post.id, contentUrl: '', caption: post.caption, error: result.error }
             }
-
-            return null
         })
 
         // Step 6: Sleep 4-8 hours (randomized for natural feel)
