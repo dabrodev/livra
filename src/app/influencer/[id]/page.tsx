@@ -4,8 +4,9 @@ import Link from "next/link";
 import {
     Sparkles, ArrowLeft, MapPin, Wallet, Play, Pause, Download,
     Coffee, Camera, Utensils, ShoppingBag, Dumbbell, Moon, Sun,
-    Activity, Zap, Heart, Home, Music, BookOpen, type LucideIcon
+    Activity, Zap, Heart, Home, Music, BookOpen, RefreshCw, type LucideIcon
 } from "lucide-react";
+import ImageLightbox from "@/app/components/ImageLightbox";
 
 interface TimelinePageProps {
     params: Promise<{ id: string }>;
@@ -186,6 +187,16 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
 
                             {/* Controls */}
                             <div className="flex gap-2">
+                                {/* Change Avatar - only if avatar exists */}
+                                {influencer.faceReferences.length > 0 && (
+                                    <Link
+                                        href={`/influencer/${influencer.id}/avatar`}
+                                        className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-purple-400 transition-all"
+                                        title="Change Avatar"
+                                    >
+                                        <RefreshCw className="w-5 h-5" />
+                                    </Link>
+                                )}
                                 <button className={`p-3 rounded-xl transition-all ${isActive
                                     ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
                                     : "bg-green-500/20 text-green-400 hover:bg-green-500/30"
@@ -269,7 +280,11 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                                 {isContent && item.contentUrl && (
                                                     <div className="mt-3 aspect-video rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden">
                                                         {item.contentUrl ? (
-                                                            <img src={item.contentUrl} alt="Generated content" className="w-full h-full object-cover" />
+                                                            <ImageLightbox
+                                                                src={item.contentUrl}
+                                                                alt="Generated content"
+                                                                className="w-full h-full object-cover"
+                                                            />
                                                         ) : (
                                                             <span className="text-zinc-600 text-sm">Generating content...</span>
                                                         )}
