@@ -460,7 +460,7 @@ function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-8">
-                    {["Features", "For You", "Technology"].map((item, i) => (
+                    {["Features", "Gallery", "For You", "Technology"].map((item, i) => (
                         <motion.a
                             key={item}
                             href={`#${item === "For You" ? "roles" : item.toLowerCase()}`}
