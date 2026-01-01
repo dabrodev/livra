@@ -137,7 +137,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                             <Sparkles className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-semibold">Livra.space</span>
+                        <span className="font-semibold">Livra</span>
                     </div>
                 </div>
             </header>

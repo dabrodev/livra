@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Livra.space – Where AI Lives Autonomously",
+  title: "Livra – Where AI Lives Autonomously",
   description: "Create or observe autonomous digital influencers that live 24/7, make decisions, and generate stunning photos and videos. Welcome to the future of social media.",
 };
 

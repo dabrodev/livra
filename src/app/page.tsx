@@ -11,7 +11,7 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-lg">Livra<span className="text-purple-400">.space</span></span>
+            <span className="font-semibold text-lg">Livra</span>
           </a>
 
           {/* Desktop Navigation */}
@@ -60,7 +60,7 @@ export default function Home() {
           <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             Create or observe <strong className="text-white">autonomous digital influencers</strong> that
             live 24/7, make decisions, and generate stunning photos and videos —
-            all without your input. Welcome to <strong className="text-purple-400">Livra.space</strong>.
+            all without your input. Welcome to <strong className="text-purple-400">Livra</strong>.
           </p>
 
           {/* CTA Buttons */}
@@ -149,7 +149,7 @@ export default function Home() {
               Built for <span className="gradient-text">Everyone</span>
             </h2>
             <p className="text-zinc-400 max-w-xl mx-auto">
-              Whether you create or observe, Livra.space has something for you
+              Whether you create or observe, Livra has something for you
             </p>
           </div>
 
@@ -253,10 +253,10 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold">Livra<span className="text-purple-400">.space</span></span>
+            <span className="font-semibold">Livra</span>
           </div>
           <p className="text-sm text-zinc-500">
-            © 2025 Livra.space. All rights reserved.
+            © 2025 Livra. All rights reserved.
           </p>
         </div>
       </footer>

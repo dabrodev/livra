@@ -2,7 +2,7 @@
  * Mastra - Agentic Framework Configuration
  * 
  * This module exports all Mastra agents, tools, and utilities
- * for use throughout the Livra.space application.
+ * for use throughout the Livra application.
  * 
  * Structure:
  * - agents/: AI agent definitions (Life Director, etc.)
