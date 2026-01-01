@@ -52,59 +52,65 @@ function AnimatedOrbs() {
 function PhoneMockup() {
     return (
         <motion.div
-            className="relative mt-16 w-64 h-[500px] rounded-[3rem] bg-zinc-900 border-4 border-zinc-800 overflow-hidden"
+            className="relative mt-16"
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
-            style={{
-                boxShadow: "0 0 60px rgba(168, 85, 247, 0.3), 0 0 120px rgba(236, 72, 153, 0.2)"
-            }}
         >
-            {/* Floating animation */}
+            {/* Floating animation wrapper */}
             <motion.div
-                className="absolute inset-0"
-                animate={{ y: [-8, 8, -8] }}
-                transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                }}
+                animate={{ y: [-12, 0, -12] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-                {/* Screen content */}
-                <div className="absolute inset-4 rounded-[2.5rem] bg-gradient-to-b from-purple-900/50 to-pink-900/50 flex items-center justify-center overflow-hidden">
-                    {/* Animated content preview */}
-                    <motion.div
-                        className="text-center p-4"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 1.2, duration: 0.5 }}
-                    >
-                        <motion.div
-                            className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"
-                            animate={{
-                                boxShadow: [
-                                    "0 0 20px rgba(168, 85, 247, 0.5)",
-                                    "0 0 40px rgba(168, 85, 247, 0.8)",
-                                    "0 0 20px rgba(168, 85, 247, 0.5)"
-                                ]
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            <Camera className="w-8 h-8 text-white" />
-                        </motion.div>
-                        <p className="text-sm text-zinc-300 font-medium">@julia_ai</p>
-                        <motion.p
-                            className="text-xs text-zinc-500 mt-1"
-                            animate={{ opacity: [0.5, 1, 0.5] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            Living autonomously...
-                        </motion.p>
-                    </motion.div>
+                <div
+                    className="w-64 h-[500px] rounded-[3rem] bg-zinc-900 border-4 border-zinc-800 overflow-hidden"
+                    style={{
+                        boxShadow: "0 0 60px rgba(168, 85, 247, 0.3), 0 0 120px rgba(236, 72, 153, 0.2)"
+                    }}
+                >
+                    {/* Notch */}
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-10" />
+
+                    {/* Screen with example avatar image */}
+                    <div className="absolute inset-4 rounded-[2.5rem] overflow-hidden bg-zinc-800">
+                        <img
+                            src="/examples/cafe.png"
+                            alt="AI Influencer post"
+                            className="w-full h-full object-cover"
+                        />
+                        {/* Overlay with profile info */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <div className="absolute bottom-4 left-4 right-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                <motion.div
+                                    className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"
+                                    animate={{
+                                        boxShadow: [
+                                            "0 0 10px rgba(168, 85, 247, 0.4)",
+                                            "0 0 20px rgba(168, 85, 247, 0.6)",
+                                            "0 0 10px rgba(168, 85, 247, 0.4)"
+                                        ]
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                >
+                                    <Camera className="w-5 h-5 text-white" />
+                                </motion.div>
+                                <div>
+                                    <p className="text-sm text-white font-medium">@julia_ai</p>
+                                    <motion.p
+                                        className="text-xs text-zinc-400"
+                                        animate={{ opacity: [0.5, 1, 0.5] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                    >
+                                        Living autonomously...
+                                    </motion.p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </motion.div>
-            {/* Notch */}
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-10" />
         </motion.div>
     );
 }
@@ -238,10 +244,11 @@ function FeaturesSection() {
 
 // Gallery section showing example avatar content
 function GallerySection() {
+    // Sorted chronologically: 7:15 AM → 9:32 AM → 6:45 PM → 8:30 PM
     const examples = [
+        { src: "/examples/workout.png", alt: "Home yoga session", time: "7:15 AM", activity: "Morning workout" },
         { src: "/examples/cafe.png", alt: "Morning coffee at upscale café", time: "9:32 AM", activity: "Morning routine" },
         { src: "/examples/city.png", alt: "Evening walk in the city", time: "6:45 PM", activity: "Golden hour stroll" },
-        { src: "/examples/workout.png", alt: "Home yoga session", time: "7:15 AM", activity: "Morning workout" },
         { src: "/examples/dinner.png", alt: "Fine dining experience", time: "8:30 PM", activity: "Dinner date" },
     ];
 
