@@ -1,7 +1,7 @@
-# Project Specification: daywith.me
+# Project Specification: Livra.space
 
 ## 1. Executive Summary
-**daywith.me** is a lifestyle AI simulator that creates autonomous digital influencers. Users define the "seed" (location, budget, style, and physical appearance), and the system takes over, simulating a 24/7 life cycle. The app generates real-time, context-aware photos (via Nano Banana Pro) and videos (via Veo3.1) that reflect the character's daily activities, budget constraints, and real-world trends.
+**Livra.space** is a lifestyle AI simulator that creates autonomous digital influencers. Users define the "seed" (location, budget, style, and physical appearance), and the system takes over, simulating a 24/7 life cycle. The app generates real-time, context-aware photos (via Nano Banana Pro) and videos (via Veo3.1) that reflect the character's daily activities, budget constraints, and real-world trends.
 
 ## 2. Technical Stack (The "Agentic Monolith")
 - **Framework:** Next.js 15 (App Router)

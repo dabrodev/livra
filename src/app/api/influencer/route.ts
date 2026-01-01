@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
         // Trigger the autonomous lifecycle via Inngest
         await inngest.send({
-            name: "daywithme/influencer.created",
+            name: "livra/influencer.created",
             data: { influencerId: influencer.id },
         });
 

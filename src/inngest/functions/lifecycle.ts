@@ -20,7 +20,7 @@ interface EnvironmentContext {
 
 export const lifecycleCycle = inngest.createFunction(
     { id: 'lifecycle-cycle' },
-    { event: 'daywithme/cycle.start' },
+    { event: 'livra/cycle.start' },
     async ({ event, step }) => {
         const influencerId = event.data.influencerId as string
 
@@ -222,7 +222,7 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
 
         // Trigger next cycle to keep the autonomous loop going
         await step.sendEvent('trigger-next-cycle', {
-            name: 'daywithme/cycle.start',
+            name: 'livra/cycle.start',
             data: { influencerId },
         })
 
@@ -241,7 +241,7 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
 // Function to start the lifecycle for a new influencer
 export const startLifecycle = inngest.createFunction(
     { id: 'start-lifecycle' },
-    { event: 'daywithme/influencer.created' },
+    { event: 'livra/influencer.created' },
     async ({ event, step }) => {
         const influencerId = event.data.influencerId as string
 
@@ -258,7 +258,7 @@ export const startLifecycle = inngest.createFunction(
 
         // Trigger the first lifecycle cycle
         await step.sendEvent('trigger-first-cycle', {
-            name: 'daywithme/cycle.start',
+            name: 'livra/cycle.start',
             data: { influencerId },
         })
 
