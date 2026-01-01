@@ -236,6 +236,80 @@ function FeaturesSection() {
     );
 }
 
+// Gallery section showing example avatar content
+function GallerySection() {
+    const examples = [
+        { src: "/examples/cafe.png", alt: "Morning coffee at upscale café", time: "9:32 AM", activity: "Morning routine" },
+        { src: "/examples/city.png", alt: "Evening walk in the city", time: "6:45 PM", activity: "Golden hour stroll" },
+        { src: "/examples/workout.png", alt: "Home yoga session", time: "7:15 AM", activity: "Morning workout" },
+        { src: "/examples/dinner.png", alt: "Fine dining experience", time: "8:30 PM", activity: "Dinner date" },
+    ];
+
+    return (
+        <section id="gallery" className="py-24 px-6 border-t border-zinc-800 scroll-mt-20">
+            <div className="max-w-6xl mx-auto">
+                <AnimatedSection className="text-center mb-16">
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4">
+                        A Day in <span className="gradient-text">Her Life</span>
+                    </h2>
+                    <p className="text-zinc-400 max-w-xl mx-auto">
+                        AI-generated content from an autonomous influencer living in NYC
+                    </p>
+                </AnimatedSection>
+
+                <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {examples.map((example, i) => (
+                        <StaggerItem key={i}>
+                            <motion.div
+                                className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                {/* Image */}
+                                <img
+                                    src={example.src}
+                                    alt={example.alt}
+                                    className="w-full h-full object-cover"
+                                />
+
+                                {/* Gradient overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+                                {/* Content */}
+                                <div className="absolute bottom-0 left-0 right-0 p-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <motion.div
+                                            className="w-2 h-2 rounded-full bg-green-500"
+                                            animate={{ opacity: [1, 0.5, 1] }}
+                                            transition={{ duration: 1.5, repeat: Infinity }}
+                                        />
+                                        <span className="text-xs text-zinc-400">{example.time}</span>
+                                    </div>
+                                    <p className="text-sm font-medium text-white">{example.activity}</p>
+                                </div>
+
+                                {/* Hover glow */}
+                                <motion.div
+                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    style={{
+                                        boxShadow: "inset 0 0 40px rgba(168, 85, 247, 0.3)"
+                                    }}
+                                />
+                            </motion.div>
+                        </StaggerItem>
+                    ))}
+                </StaggerContainer>
+
+                <AnimatedSection className="text-center mt-12">
+                    <p className="text-zinc-500 text-sm">
+                        All photos are <span className="text-purple-400">100% AI-generated</span> based on the influencer&apos;s personality and current context
+                    </p>
+                </AnimatedSection>
+            </div>
+        </section>
+    );
+}
+
 // Roles section
 function RolesSection() {
     return (
@@ -454,6 +528,7 @@ export default function AnimatedLandingPage() {
             <Header />
             <HeroSection />
             <FeaturesSection />
+            <GallerySection />
             <RolesSection />
             <TechSection />
             <Footer />
