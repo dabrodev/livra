@@ -244,72 +244,97 @@ function FeaturesSection() {
 
 // Gallery section showing example avatar content
 function GallerySection() {
-    // Sorted chronologically: 7:15 AM → 9:32 AM → 6:45 PM → 8:30 PM
-    const examples = [
+    // Female influencer - Julia
+    const juliaExamples = [
         { src: "/examples/workout.png", alt: "Home yoga session", time: "7:15 AM", activity: "Morning workout" },
         { src: "/examples/cafe.png", alt: "Morning coffee at upscale café", time: "9:32 AM", activity: "Morning routine" },
         { src: "/examples/city.png", alt: "Evening walk in the city", time: "6:45 PM", activity: "Golden hour stroll" },
         { src: "/examples/dinner.png", alt: "Fine dining experience", time: "8:30 PM", activity: "Dinner date" },
     ];
 
+    // Male influencer - Marcus
+    const marcusExamples = [
+        { src: "/examples/male_gym.png", alt: "Gym workout", time: "6:30 AM", activity: "Morning lift" },
+        { src: "/examples/male_coffee.png", alt: "Coffee shop", time: "10:15 AM", activity: "Coffee break" },
+        { src: "/examples/male_rooftop.png", alt: "Rooftop sunset", time: "7:00 PM", activity: "Golden hour" },
+        { src: "/examples/male_cooking.png", alt: "Home cooking", time: "8:45 PM", activity: "Cooking dinner" },
+    ];
+
+    const renderGallery = (examples: typeof juliaExamples, name: string, handle: string, location: string) => (
+        <div className="mb-16 last:mb-0">
+            <AnimatedSection className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                    {name[0]}
+                </div>
+                <div>
+                    <p className="font-semibold text-white">{name}</p>
+                    <p className="text-zinc-400 text-sm">{handle} · {location}</p>
+                </div>
+            </AnimatedSection>
+
+            <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {examples.map((example, i) => (
+                    <StaggerItem key={i}>
+                        <motion.div
+                            className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {/* Image */}
+                            <img
+                                src={example.src}
+                                alt={example.alt}
+                                className="w-full h-full object-cover"
+                            />
+
+                            {/* Gradient overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+                            {/* Content */}
+                            <div className="absolute bottom-0 left-0 right-0 p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <motion.div
+                                        className="w-2 h-2 rounded-full bg-green-500"
+                                        animate={{ opacity: [1, 0.5, 1] }}
+                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                    />
+                                    <span className="text-xs text-zinc-400">{example.time}</span>
+                                </div>
+                                <p className="text-sm font-medium text-white">{example.activity}</p>
+                            </div>
+
+                            {/* Hover glow */}
+                            <motion.div
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                style={{
+                                    boxShadow: "inset 0 0 40px rgba(168, 85, 247, 0.3)"
+                                }}
+                            />
+                        </motion.div>
+                    </StaggerItem>
+                ))}
+            </StaggerContainer>
+        </div>
+    );
+
     return (
         <section id="gallery" className="py-24 px-6 border-t border-zinc-800 scroll-mt-20">
             <div className="max-w-6xl mx-auto">
                 <AnimatedSection className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">
-                        A Day in <span className="gradient-text">Her Life</span>
+                        A Day in <span className="gradient-text">Their Lives</span>
                     </h2>
                     <p className="text-zinc-400 max-w-xl mx-auto">
-                        AI-generated content from an autonomous influencer living in NYC
+                        AI-generated content from autonomous influencers living their digital lives
                     </p>
                 </AnimatedSection>
 
-                <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {examples.map((example, i) => (
-                        <StaggerItem key={i}>
-                            <motion.div
-                                className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
-                                whileHover={{ scale: 1.02 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {/* Image */}
-                                <img
-                                    src={example.src}
-                                    alt={example.alt}
-                                    className="w-full h-full object-cover"
-                                />
-
-                                {/* Gradient overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-                                {/* Content */}
-                                <div className="absolute bottom-0 left-0 right-0 p-4">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <motion.div
-                                            className="w-2 h-2 rounded-full bg-green-500"
-                                            animate={{ opacity: [1, 0.5, 1] }}
-                                            transition={{ duration: 1.5, repeat: Infinity }}
-                                        />
-                                        <span className="text-xs text-zinc-400">{example.time}</span>
-                                    </div>
-                                    <p className="text-sm font-medium text-white">{example.activity}</p>
-                                </div>
-
-                                {/* Hover glow */}
-                                <motion.div
-                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                    style={{
-                                        boxShadow: "inset 0 0 40px rgba(168, 85, 247, 0.3)"
-                                    }}
-                                />
-                            </motion.div>
-                        </StaggerItem>
-                    ))}
-                </StaggerContainer>
+                {renderGallery(juliaExamples, "Julia", "@julia_ai", "NYC")}
+                {renderGallery(marcusExamples, "Marcus", "@marcus_ai", "Berlin")}
 
                 <AnimatedSection className="text-center mt-12">
                     <p className="text-zinc-500 text-sm">
-                        All photos are <span className="text-purple-400">100% AI-generated</span> based on the influencer&apos;s personality and current context
+                        All photos are <span className="text-purple-400">100% AI-generated</span> based on each influencer&apos;s personality and context
                     </p>
                 </AnimatedSection>
             </div>
