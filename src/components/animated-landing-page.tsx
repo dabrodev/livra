@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Play, Zap, Brain, Camera, Video, Menu, Users, Eye, Globe } from "lucide-react";
 import { AnimatedSection, StaggerContainer, StaggerItem, fadeInUp, fadeIn, staggerContainer } from "@/components/animations";
 
@@ -48,8 +49,30 @@ function AnimatedOrbs() {
     );
 }
 
-// Animated phone mockup
+// Animated phone mockup with rotating influencers
 function PhoneMockup() {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const influencers = [
+        { src: "/examples/cafe.png", name: "Julia", location: "NYC" },
+        { src: "/examples/male_cooking.png", name: "Marcus", location: "Berlin" },
+        { src: "/portraits/asian_female.png", name: "Yuki", location: "Tokyo" },
+        { src: "/portraits/black_male.png", name: "Kwame", location: "Lagos" },
+        { src: "/portraits/latina.png", name: "Sofia", location: "São Paulo" },
+        { src: "/portraits/indian_male.png", name: "Arjun", location: "Mumbai" },
+        { src: "/portraits/nordic_female.png", name: "Astrid", location: "Stockholm" },
+        { src: "/portraits/middle_eastern.png", name: "Omar", location: "Dubai" },
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prev: number) => (prev + 1) % influencers.length);
+        }, 2500);
+        return () => clearInterval(interval);
+    }, [influencers.length]);
+
+    const current = influencers[currentIndex];
+
     return (
         <motion.div
             className="relative mt-16"
@@ -72,41 +95,36 @@ function PhoneMockup() {
                     {/* Notch */}
                     <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-10" />
 
-                    {/* Screen with example avatar image */}
+                    {/* Screen with rotating portrait images */}
                     <div className="absolute inset-4 rounded-[2.5rem] overflow-hidden bg-zinc-800">
-                        <img
-                            src="/examples/cafe.png"
-                            alt="AI Influencer post"
-                            className="w-full h-full object-cover"
-                        />
-                        {/* Overlay with profile info */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <AnimatePresence mode="wait">
+                            <motion.img
+                                key={current.src}
+                                src={current.src}
+                                alt={`${current.name} - AI Avatar`}
+                                className="w-full h-full object-cover"
+                                initial={{ opacity: 0, scale: 1.1 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.5 }}
+                            />
+                        </AnimatePresence>
+
+                        {/* Minimal overlay with name/location */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                         <div className="absolute bottom-4 left-4 right-4">
-                            <div className="flex items-center gap-3 mb-2">
+                            <AnimatePresence mode="wait">
                                 <motion.div
-                                    className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"
-                                    animate={{
-                                        boxShadow: [
-                                            "0 0 10px rgba(168, 85, 247, 0.4)",
-                                            "0 0 20px rgba(168, 85, 247, 0.6)",
-                                            "0 0 10px rgba(168, 85, 247, 0.4)"
-                                        ]
-                                    }}
-                                    transition={{ duration: 2, repeat: Infinity }}
+                                    key={current.name}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.3 }}
                                 >
-                                    <Camera className="w-5 h-5 text-white" />
+                                    <p className="text-lg font-semibold text-white">{current.name}</p>
+                                    <p className="text-sm text-zinc-300">{current.location}</p>
                                 </motion.div>
-                                <div>
-                                    <p className="text-sm text-white font-medium">@julia_ai</p>
-                                    <motion.p
-                                        className="text-xs text-zinc-400"
-                                        animate={{ opacity: [0.5, 1, 0.5] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                    >
-                                        Living autonomously...
-                                    </motion.p>
-                                </div>
-                            </div>
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>
