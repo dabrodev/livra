@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
 import AvatarSwap from "@/app/components/AvatarSwap";
+import RealtimeTimeline, { TimelineItem } from "@/app/components/RealtimeTimeline";
+import LifecycleControls from "@/app/components/LifecycleControls";
 
 interface TimelinePageProps {
     params: Promise<{ id: string }>;
@@ -83,17 +85,6 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
     }
 
     // Combine memories and posts into a unified timeline
-    type TimelineItem = {
-        id: string;
-        time: Date;
-        icon: LucideIcon;
-        action: string;
-        description: string;
-        type: 'life' | 'content';
-        contentUrl?: string;
-        importance?: number;
-    };
-
     const timelineItems: TimelineItem[] = [
         // Add memories
         ...influencer.memories.map(memory => ({
@@ -120,8 +111,8 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
     // Check if there are any real activities
     const hasRealActivity = timelineItems.length > 0;
 
-    // For demo, determine active state
-    const isActive = hasRealActivity &&
+    // For visual status badge
+    const isRecentlyActive = hasRealActivity &&
         (new Date().getTime() - new Date(timelineItems[0]?.time || 0).getTime()) < 8 * 60 * 60 * 1000;
 
     return (
@@ -165,10 +156,10 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                     <h1 className="text-2xl font-bold">{influencer.name}</h1>
-                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${isActive ? "text-green-400 bg-green-400/10" : "text-zinc-400 bg-zinc-400/10"
+                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${(influencer as any).isActive ? "text-green-400 bg-green-400/10" : "text-zinc-400 bg-zinc-400/10"
                                         }`}>
-                                        {isActive ? <Zap className="w-3 h-3" /> : <Activity className="w-3 h-3" />}
-                                        {isActive ? "Active" : "Idle"}
+                                        {(influencer as any).isActive ? <Zap className="w-3 h-3" /> : <Activity className="w-3 h-3" />}
+                                        {(influencer as any).isActive ? "Active" : "Idle"}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-zinc-400">
@@ -206,12 +197,10 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                         </Link>
                                     </>
                                 )}
-                                <button className={`p-3 rounded-xl transition-all ${isActive
-                                    ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
-                                    : "bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                                    }`}>
-                                    {isActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                                </button>
+                                <LifecycleControls
+                                    influencerId={influencer.id}
+                                    initialIsActive={(influencer as any).isActive || false}
+                                />
                                 <button className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 transition-all">
                                     <Download className="w-5 h-5" />
                                 </button>
@@ -251,72 +240,11 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                         </h2>
                     </div>
 
-                    {hasRealActivity ? (
-                        <div className="relative">
-                            {/* Timeline line */}
-                            <div className="absolute left-[23px] top-0 bottom-0 w-0.5 bg-zinc-800" />
-
-                            {/* Timeline items */}
-                            <div className="space-y-6">
-                                {timelineItems.map((item) => {
-                                    const Icon = item.icon;
-                                    const isContent = item.type === "content";
-
-                                    return (
-                                        <div key={item.id} className="relative flex gap-4">
-                                            {/* Icon */}
-                                            <div className={`relative z-10 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isContent
-                                                ? "bg-gradient-to-br from-purple-500 to-pink-500"
-                                                : item.importance && item.importance >= 4
-                                                    ? "bg-gradient-to-br from-orange-500 to-red-500"
-                                                    : "bg-zinc-800"
-                                                }`}>
-                                                <Icon className={`w-5 h-5 ${isContent || (item.importance && item.importance >= 4) ? "text-white" : "text-zinc-400"}`} />
-                                            </div>
-
-                                            {/* Content */}
-                                            <div className={`flex-1 ${isContent ? "glass-card rounded-xl p-4" : "pt-2"}`}>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-xs text-zinc-500 font-mono">
-                                                        {formatRelativeTime(item.time)}
-                                                    </span>
-                                                    <span className={`font-medium ${isContent ? "gradient-text" : ""}`}>
-                                                        {item.action}
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-zinc-400">{item.description}</p>
-
-                                                {isContent && item.contentUrl && (
-                                                    <div className="mt-3 aspect-video rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden">
-                                                        {item.contentUrl ? (
-                                                            <ImageLightbox
-                                                                src={item.contentUrl}
-                                                                alt="Generated content"
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <span className="text-zinc-600 text-sm">Generating content...</span>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="glass-card rounded-2xl p-12 text-center">
-                            <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mx-auto mb-4">
-                                <Activity className="w-8 h-8 text-zinc-600" />
-                            </div>
-                            <h3 className="text-lg font-medium mb-2">No Activity Yet</h3>
-                            <p className="text-zinc-400 text-sm max-w-md mx-auto">
-                                {influencer.name}&apos;s autonomous life cycle is starting up.
-                                Activities will appear here as they happen throughout the day.
-                            </p>
-                        </div>
-                    )}
+                    {/* Real-time Timeline Component */}
+                    <RealtimeTimeline
+                        influencerId={influencer.id}
+                        initialItems={timelineItems}
+                    />
 
                     {/* Stats cards */}
                     <div className="grid grid-cols-3 gap-4 mt-12">

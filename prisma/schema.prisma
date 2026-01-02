@@ -15,6 +15,7 @@ model Influencer {
   apartmentStyle  String
   currentBalance  Float    @default(5000)
   personalityVibe String   // e.g., "Minimalist Glam", "Streetwear Rebel"
+  isActive        Boolean  @default(false)
   
   // Appearance
   hairColor       String   @default("brown")   // blonde, brunette, red, black, auburn, gray

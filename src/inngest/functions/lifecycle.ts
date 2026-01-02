@@ -39,6 +39,12 @@ export const lifecycleCycle = inngest.createFunction(
             return data
         })
 
+        // Check if lifecycle is active
+        if (!(influencer as any).isActive) {
+            console.log(`Lifecycle for ${influencer.name} is paused.`)
+            return { paused: true, influencer: influencer.name }
+        }
+
         // Step 1: Environmental Check - use utility functions directly
         const environment = await step.run('check-environment', async (): Promise<EnvironmentContext> => {
             const weather = await getWeather(influencer.city)
