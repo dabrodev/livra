@@ -4,15 +4,19 @@
 
 ## 🔧 In-Code TODOs
 
-- [ ] Upload images to Supabase Storage (instead of data URLs) - `lifecycle.ts:170`
-- [ ] Integrate with Veo 3.1 API for video generation - `lifecycle.ts:214`
+- [ ] Integrate with Veo 3.1 API for video generation - `lifecycle.ts:219`
+- [ ] Implement budget/spend tracking UI on the profile page
 
 ## 🚀 Upcoming
 
-- [ ] Test full lifecycle flow end-to-end
+- [ ] Video generation infrastructure (First/Last frame logic with Nano Banana Pro)
+- [ ] Financial Dashboard for influencer (see earnings vs spend)
+- [ ] Post Analytics (likes/engagement simulation)
 
 ## ✅ Completed
 
+- [x] Test full lifecycle flow end-to-end (Verified with Inngest & Storage) *(2026-01-02)*
+- [x] Integrate Supabase Storage for generated images (Replaced Base64) *(2026-01-02)*
 - [x] Implement Play/Pause controls for lifecycle *(2026-01-02)*
 - [x] Add Supabase Realtime for live timeline updates *(2026-01-02)*
 - [x] Enhance LP with diverse phone mockup and consistent Marcus gallery

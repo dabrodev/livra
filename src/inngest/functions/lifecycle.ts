@@ -173,7 +173,7 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
                 // Create post with generated image
                 const caption = `${plan.activity} ✨ #${influencer.city.toLowerCase().replace(/\s/g, '')} ${environment.trends.trends.slice(0, 2).join(' ')}`
 
-                // Save image (returns data URL for now, TODO: upload to Supabase Storage)
+                // Save image to Supabase Storage
                 const imageUrl = await saveGeneratedImage(
                     result.imageBase64,
                     result.mimeType || 'image/png',
