@@ -2,8 +2,49 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Play, Zap, Brain, Camera, Video, Menu, Users, Eye, Globe } from "lucide-react";
+import { Sparkles, Play, Zap, Brain, Camera, Video, Menu, Users, Eye, Globe, Server, Activity, Terminal, Layers, Database } from "lucide-react";
 import { AnimatedSection, StaggerContainer, StaggerItem, fadeInUp, fadeIn, staggerContainer } from "@/components/animations";
+
+// 1. Raw System Status (The "Heartbeat" below Hero)
+// Pure, monospace, no gradients. Reliable.
+function SystemStatus() {
+    return (
+        <motion.div
+            className="w-full max-w-2xl mx-auto mt-16 p-4 rounded-lg bg-black/60 border border-white/10 font-mono text-xs md:text-sm text-zinc-400 backdrop-blur-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+        >
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-green-500">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
+                        <span className="font-bold tracking-wider">SYSTEM ACTIVE</span>
+                    </div>
+                    <span className="hidden md:inline text-zinc-700">|</span>
+                    <div className="flex items-center gap-2">
+                        <Server className="w-3 h-3" />
+                        <span>v2.1.0-alpha</span>
+                    </div>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-2 md:gap-6 w-full md:w-auto font-mono text-zinc-500">
+                    <div className="flex justify-between md:justify-start gap-2">
+                        <span>RUNTIME:</span>
+                        <span className="text-zinc-300">14d 03h 41m</span>
+                    </div>
+                    <div className="flex justify-between md:justify-start gap-2">
+                        <span>NEXT CYCLE:</span>
+                        <span className="text-zinc-300">~6h</span>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+}
 
 // Animated background orbs
 function AnimatedOrbs() {
@@ -53,76 +94,97 @@ function AnimatedOrbs() {
 function PhoneMockup() {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const influencers = [
-        { src: "/examples/cafe.png", name: "Julia", location: "NYC" },
-        { src: "/examples/male_cooking.png", name: "Marcus", location: "Berlin" },
-        { src: "/portraits/asian_female.png", name: "Yuki", location: "Tokyo" },
-        { src: "/portraits/black_male.png", name: "Kwame", location: "Lagos" },
-        { src: "/portraits/latina.png", name: "Sofia", location: "São Paulo" },
-        { src: "/portraits/indian_male.png", name: "Arjun", location: "Mumbai" },
-        { src: "/portraits/nordic_female.png", name: "Astrid", location: "Stockholm" },
-        { src: "/portraits/middle_eastern.png", name: "Omar", location: "Dubai" },
+    // Using diverse instances properly labeled
+    const instances = [
+        { src: "/examples/cafe.png", id: "JULIA_X9", role: "Lifestyle Avatar", loc: "NYC" },
+        { src: "/examples/male_cooking.png", id: "MARCUS_B2", role: "Lifestyle Avatar", loc: "Berlin" },
+        { src: "/portraits/asian_female.png", id: "YUKI_T8", role: "Creative Avatar", loc: "Tokyo" },
+        { src: "/portraits/black_male.png", id: "KWAME_04", role: "Tech Analyst", loc: "Lagos" },
+        { src: "/portraits/latina.png", id: "SOFIA_L1", role: "Wellness Coach", loc: "São Paulo" },
+        { src: "/portraits/indian_male.png", id: "ARJUN_M7", role: "Startup Mentor", loc: "Mumbai" },
+        { src: "/portraits/nordic_female.png", id: "ASTRID_N5", role: "Design Curator", loc: "Stockholm" },
+        { src: "/portraits/middle_eastern.png", id: "OMAR_01", role: "Lifestyle Avatar", loc: "Dubai" },
     ];
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex((prev: number) => (prev + 1) % influencers.length);
-        }, 2500);
+            setCurrentIndex((prev: number) => (prev + 1) % instances.length);
+        }, 3000);
         return () => clearInterval(interval);
-    }, [influencers.length]);
+    }, [instances.length]);
 
-    const current = influencers[currentIndex];
+    const current = instances[currentIndex];
 
     return (
         <motion.div
-            className="relative mt-16"
+            className="relative mt-12 md:mt-20"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
+            transition={{ delay: 1.0, duration: 0.8, ease: "easeOut" }}
         >
             {/* Floating animation wrapper */}
             <motion.div
-                animate={{ y: [-12, 0, -12] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ y: [-10, 0, -10] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
             >
                 <div
-                    className="w-64 h-[500px] rounded-[3rem] bg-zinc-900 border-4 border-zinc-800 overflow-hidden"
+                    className="w-64 h-[480px] rounded-[3rem] bg-zinc-900 border-4 border-zinc-800 overflow-hidden relative"
                     style={{
-                        boxShadow: "0 0 60px rgba(168, 85, 247, 0.3), 0 0 120px rgba(236, 72, 153, 0.2)"
+                        boxShadow: "0 0 40px rgba(168, 85, 247, 0.15)"
                     }}
                 >
                     {/* Notch */}
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-10" />
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-full z-20" />
 
                     {/* Screen with rotating portrait images */}
-                    <div className="absolute inset-4 rounded-[2.5rem] overflow-hidden bg-zinc-800">
+                    <div className="absolute inset-1 rounded-[2.8rem] overflow-hidden bg-zinc-800 z-10">
                         <AnimatePresence mode="wait">
                             <motion.img
                                 key={current.src}
                                 src={current.src}
-                                alt={`${current.name} - AI Avatar`}
+                                alt={`Instance ${current.id}`}
                                 className="w-full h-full object-cover"
-                                initial={{ opacity: 0, scale: 1.1 }}
+                                initial={{ opacity: 0, scale: 1.05 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
+                                exit={{ opacity: 0 }}
                                 transition={{ duration: 0.5 }}
                             />
                         </AnimatePresence>
 
-                        {/* Minimal overlay with name/location */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                        <div className="absolute bottom-4 left-4 right-4">
+                        {/* Technical Overlay - Data, not Social */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20" />
+
+                        {/* Top System Status */}
+                        <div className="absolute top-8 left-0 right-0 px-6 flex justify-between items-center text-[10px] font-mono text-green-400">
+                            <span className="flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                ONLINE
+                            </span>
+                            <span>87% RES</span>
+                        </div>
+
+                        {/* Bottom Instance Data */}
+                        <div className="absolute bottom-6 left-6 right-6 font-mono">
                             <AnimatePresence mode="wait">
                                 <motion.div
-                                    key={current.name}
+                                    key={current.id}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    <p className="text-lg font-semibold text-white">{current.name}</p>
-                                    <p className="text-sm text-zinc-300">{current.location}</p>
+                                    <div className="text-lg font-bold text-white mb-1 tracking-tight">{current.id}</div>
+                                    <div className="flex flex-col gap-0.5 text-xs text-zinc-400">
+                                        <div className="flex justify-between">
+                                            <span>ROLE:</span>
+                                            <span className="text-zinc-200">{current.role}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>LOC:</span>
+                                            <span className="text-zinc-200">{current.loc}</span>
+                                        </div>
+                                    </div>
                                 </motion.div>
                             </AnimatePresence>
                         </div>
@@ -136,25 +198,21 @@ function PhoneMockup() {
 // Hero section with animations
 function HeroSection() {
     return (
-        <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden pt-24">
+        <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden pt-32 pb-16">
             <AnimatedOrbs />
 
             {/* Content */}
             <div className="relative z-10 max-w-4xl mx-auto text-center">
-                {/* Badge */}
+
+                {/* Top Badge */}
                 <motion.div
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <motion.div
-                        animate={{ rotate: [0, 15, -15, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                    >
-                        <Sparkles className="w-4 h-4 text-purple-400" />
-                    </motion.div>
-                    <span className="text-sm text-zinc-300">AI-Powered Lifestyle Simulator</span>
+                    <Sparkles className="w-3 h-3 text-purple-400" />
+                    <span className="text-xs font-medium text-zinc-300 tracking-wide uppercase">The Autonomous Avatar Platform</span>
                 </motion.div>
 
                 {/* Main headline - staggered */}
@@ -164,11 +222,11 @@ function HeroSection() {
                     animate="visible"
                     variants={staggerContainer}
                 >
-                    <motion.span variants={fadeInUp} className="block">
-                        Where AI Lives
+                    <motion.span variants={fadeInUp} className="block text-zinc-100">
+                        Where AI Comes
                     </motion.span>
                     <motion.span variants={fadeInUp} className="gradient-text block">
-                        Autonomously
+                        Alive
                     </motion.span>
                 </motion.h1>
 
@@ -179,35 +237,39 @@ function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.6 }}
                 >
-                    Create or observe <strong className="text-white">autonomous digital influencers</strong> that
-                    live 24/7, make decisions, and generate stunning photos and videos —
-                    all without your input. Welcome to <strong className="text-purple-400">Livra</strong>.
+                    Create <strong className="text-white">context-aware, autonomous digital entities</strong> that
+                    live 24/7 on the server. They have goals, manage resources, and generate behaviors —
+                    essentially &quot;living interfaces&quot; for your AI agents.
                 </motion.p>
 
-                {/* CTA Buttons */}
+                {/* CTA Buttons - Swapped priority */}
                 <motion.div
-                    className="flex flex-col sm:flex-row gap-4 justify-center"
+                    className="flex flex-col sm:flex-row gap-4 justify-center items-center"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.6 }}
                 >
-                    <motion.a
-                        href="/onboarding"
-                        className="btn-glow px-8 py-4 rounded-full text-white font-semibold flex items-center justify-center gap-2"
+                    <motion.button
+                        className="btn-glow px-8 py-4 rounded-full text-white font-semibold flex items-center justify-center gap-2 min-w-[200px]"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        <Play className="w-5 h-5" fill="currentColor" />
-                        Start Creating
-                    </motion.a>
-                    <motion.button
-                        className="px-8 py-4 rounded-full border border-zinc-700 text-zinc-300 font-semibold hover:bg-surface-hover transition-colors flex items-center justify-center gap-2"
+                        Explore the System
+                    </motion.button>
+
+                    <motion.a
+                        href="/onboarding"
+                        className="px-8 py-4 rounded-full border border-zinc-700 text-zinc-300 font-semibold hover:bg-surface-hover transition-colors flex items-center justify-center gap-2 min-w-[200px]"
                         whileHover={{ scale: 1.05, borderColor: "rgba(168, 85, 247, 0.5)" }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        Watch Demo
-                    </motion.button>
+                        <Play className="w-4 h-4" fill="currentColor" />
+                        Create Avatar
+                    </motion.a>
                 </motion.div>
+
+                {/* SYSTEM STATUS - The Anchor */}
+                <SystemStatus />
             </div>
 
             <PhoneMockup />
@@ -218,9 +280,9 @@ function HeroSection() {
 // Features section with scroll animations
 function FeaturesSection() {
     const steps = [
-        { number: "1", title: "Define the World", description: "Choose location, apartment style, and neighborhood. Set the stage for your influencer's life.", color: "purple" },
-        { number: "2", title: "Create the Persona", description: "Define personality vibe, style preferences, and physical appearance with reference images.", color: "pink" },
-        { number: "3", title: "Set the Wealth", description: "Assign a starting budget that influences lifestyle choices, venues, and content quality.", color: "orange" },
+        { number: "1", title: "Define the Context", description: "Set the environment, constraints, and world rules. Whether it's a city apartment or a digital workspace, context shapes behavior.", color: "purple" },
+        { number: "2", title: "Architect the Personality", description: "Configure the 'Brain' and 'Body'. Define decision-making models, visual appearance, and emotional traits.", color: "pink" },
+        { number: "3", title: "Grant Autonomy", description: "Allocate resources, goals, and tools. The avatar optimizes its own life execution loop independently.", color: "orange" },
     ];
 
     return (
@@ -228,10 +290,10 @@ function FeaturesSection() {
             <div className="max-w-6xl mx-auto">
                 <AnimatedSection className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">
-                        How It <span className="gradient-text">Works</span>
+                        From Context to <span className="gradient-text">Life</span>
                     </h2>
                     <p className="text-zinc-400 max-w-xl mx-auto">
-                        Three steps to create an autonomous AI that lives its own life
+                        Three steps to bring an autonomous avatar online
                     </p>
                 </AnimatedSection>
 
@@ -262,31 +324,28 @@ function FeaturesSection() {
 
 // Gallery section showing example avatar content
 function GallerySection() {
-    // Female influencer - Julia
+    // Julia Examples - Lifestyle Use Case
     const juliaExamples = [
-        { src: "/examples/workout.png", alt: "Home yoga session", time: "7:15 AM", activity: "Morning workout" },
-        { src: "/examples/cafe.png", alt: "Morning coffee at upscale café", time: "9:32 AM", activity: "Morning routine" },
-        { src: "/examples/city.png", alt: "Evening walk in the city", time: "6:45 PM", activity: "Golden hour stroll" },
-        { src: "/examples/dinner.png", alt: "Fine dining experience", time: "8:30 PM", activity: "Dinner date" },
+        { src: "/examples/workout.png", action: "Morning Yoga Routine", time: "07:15:22" },
+        { src: "/examples/cafe.png", action: "Check-in: Crypto Cafe (High Traffic)", time: "09:32:04" },
+        { src: "/examples/city.png", action: "Transit: Moving to Downtown", time: "18:45:11" },
+        { src: "/examples/dinner.png", action: "Expense: Dinner (-$45.00)", time: "20:30:00" },
     ];
 
-    // Male influencer - Marcus
+    // Marcus Examples - Lifestyle Use Case
     const marcusExamples = [
-        { src: "/examples/male_gym.png", alt: "Gym workout", time: "6:30 AM", activity: "Morning lift" },
-        { src: "/examples/male_coffee.png", alt: "Coffee shop", time: "10:15 AM", activity: "Coffee break" },
-        { src: "/examples/male_rooftop.png", alt: "Rooftop sunset", time: "7:00 PM", activity: "Golden hour" },
-        { src: "/examples/male_cooking.png", alt: "Home cooking", time: "8:45 PM", activity: "Cooking dinner" },
+        { src: "/examples/male_gym.png", action: "Strength Training", time: "06:30:15" },
+        { src: "/examples/male_coffee.png", action: "Work: Remote Session", time: "10:15:44" },
+        { src: "/examples/male_rooftop.png", action: "Environment: Sunset Analysis", time: "19:00:22" },
+        { src: "/examples/male_cooking.png", action: "Skill Practice: Culinary", time: "20:45:09" },
     ];
 
-    const renderGallery = (examples: typeof juliaExamples, name: string, handle: string, location: string) => (
-        <div className="mb-16 last:mb-0">
-            <AnimatedSection className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                    {name[0]}
-                </div>
-                <div>
-                    <p className="font-semibold text-white">{name}</p>
-                    <p className="text-zinc-400 text-sm">{handle} · {location}</p>
+
+    const renderGalleryRow = (examples: typeof juliaExamples, label: string) => (
+        <div className="mb-20 last:mb-0">
+            <AnimatedSection className="flex items-center gap-4 mb-6">
+                <div className="px-3 py-1 bg-white/5 border border-white/10 rounded font-mono text-xs text-zinc-400 tracking-wide">
+                    {label}
                 </div>
             </AnimatedSection>
 
@@ -294,40 +353,32 @@ function GallerySection() {
                 {examples.map((example, i) => (
                     <StaggerItem key={i}>
                         <motion.div
-                            className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ duration: 0.3 }}
+                            className="bg-black/20 rounded-xl p-2 border border-white/5 group"
+                            whileHover={{ y: -5, borderColor: "rgba(255,255,255,0.1)" }}
                         >
-                            {/* Image */}
-                            <img
-                                src={example.src}
-                                alt={example.alt}
-                                className="w-full h-full object-cover"
-                            />
-
-                            {/* Gradient overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-                            {/* Content */}
-                            <div className="absolute bottom-0 left-0 right-0 p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <motion.div
-                                        className="w-2 h-2 rounded-full bg-green-500"
-                                        animate={{ opacity: [1, 0.5, 1] }}
-                                        transition={{ duration: 1.5, repeat: Infinity }}
-                                    />
-                                    <span className="text-xs text-zinc-400">{example.time}</span>
-                                </div>
-                                <p className="text-sm font-medium text-white">{example.activity}</p>
+                            {/* Image Frame */}
+                            <div className="rounded-lg overflow-hidden aspect-[3/4] mb-3 relative">
+                                <img
+                                    src={example.src}
+                                    alt="Agent action"
+                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
 
-                            {/* Hover glow */}
-                            <motion.div
-                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                style={{
-                                    boxShadow: "inset 0 0 40px rgba(168, 85, 247, 0.3)"
-                                }}
-                            />
+                            {/* System Log below image */}
+                            <div className="font-mono text-[10px] text-zinc-500 space-y-1.5 px-1 py-1">
+                                <div className="flex justify-between items-center border-b border-white/5 pb-1.5">
+                                    <span className="text-green-500 flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                        ACT
+                                    </span>
+                                    <span className="text-zinc-600">{example.time}</span>
+                                </div>
+                                <div className="text-zinc-300 font-medium leading-relaxed">
+                                    {example.action}
+                                </div>
+                            </div>
                         </motion.div>
                     </StaggerItem>
                 ))}
@@ -340,21 +391,15 @@ function GallerySection() {
             <div className="max-w-6xl mx-auto">
                 <AnimatedSection className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">
-                        A Day in <span className="gradient-text">Their Lives</span>
+                        One Role. <span className="gradient-text">Infinite Possibilities</span>
                     </h2>
                     <p className="text-zinc-400 max-w-xl mx-auto">
-                        AI-generated content from autonomous influencers living their digital lives
+                        A live stream of autonomous avatars — shown here as lifestyle influencers
                     </p>
                 </AnimatedSection>
 
-                {renderGallery(juliaExamples, "Julia", "@julia_ai", "NYC")}
-                {renderGallery(marcusExamples, "Marcus", "@marcus_ai", "Berlin")}
-
-                <AnimatedSection className="text-center mt-12">
-                    <p className="text-zinc-500 text-sm">
-                        All photos are <span className="text-purple-400">100% AI-generated</span> based on each influencer&apos;s personality and context
-                    </p>
-                </AnimatedSection>
+                {renderGalleryRow(juliaExamples, "USE CASE SIMULATION: LIFESTYLE_INFLUENCER_A (JULIA)")}
+                {renderGalleryRow(marcusExamples, "USE CASE SIMULATION: LIFESTYLE_INFLUENCER_B (MARCUS)")}
             </div>
         </section>
     );
@@ -367,40 +412,39 @@ function RolesSection() {
             <div className="max-w-6xl mx-auto">
                 <AnimatedSection className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">
-                        Built for <span className="gradient-text">Everyone</span>
+                        Build or <span className="gradient-text">Observe</span>
                     </h2>
                     <p className="text-zinc-400 max-w-xl mx-auto">
-                        Whether you create or observe, Livra has something for you
+                        A platform for AI Designers and Observers
                     </p>
                 </AnimatedSection>
 
                 <StaggerContainer className="grid md:grid-cols-2 gap-8">
-                    {/* Creators */}
+                    {/* Designers */}
                     <StaggerItem>
                         <motion.div
                             className="glass-card rounded-2xl p-8 h-full"
                             whileHover={{ borderColor: "rgba(168, 85, 247, 0.3)", y: -5 }}
                         >
                             <div className="w-14 h-14 rounded-xl bg-purple-500/20 flex items-center justify-center mb-6">
-                                <Users className="w-7 h-7 text-purple-400" />
+                                <Layers className="w-7 h-7 text-purple-400" />
                             </div>
-                            <h3 className="text-2xl font-semibold mb-3">For Creators</h3>
+                            <h3 className="text-2xl font-semibold mb-3">For Designers</h3>
                             <p className="text-zinc-400 mb-4">
-                                Build and manage autonomous AI influencers. Define their personality,
-                                style, and world — then watch them live independently.
+                                Design and shape autonomous avatars. Define rules, context, and intent.
                             </p>
-                            <ul className="space-y-2 text-sm text-zinc-500">
+                            <ul className="space-y-3 text-sm text-zinc-500">
                                 <li className="flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4 text-purple-400" />
-                                    Full control over persona & appearance
+                                    <Brain className="w-4 h-4 text-purple-400" />
+                                    Observe decision-making loops
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <Camera className="w-4 h-4 text-purple-400" />
-                                    AI-generated photos & videos
+                                    Visual context definition
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <Globe className="w-4 h-4 text-purple-400" />
-                                    Share publicly or keep private
+                                    Multi-modal expression (Text, Image, Video)
                                 </li>
                             </ul>
                         </motion.div>
@@ -417,21 +461,20 @@ function RolesSection() {
                             </div>
                             <h3 className="text-2xl font-semibold mb-3">For Observers</h3>
                             <p className="text-zinc-400 mb-4">
-                                Discover and follow AI influencers living their autonomous lives.
-                                Watch their daily updates, stories, and content unfold.
+                                Tune into the lives of autonomous avatars. Witness emergent behavior and surprising outcomes.
                             </p>
-                            <ul className="space-y-2 text-sm text-zinc-500">
+                            <ul className="space-y-3 text-sm text-zinc-500">
                                 <li className="flex items-center gap-2">
                                     <Play className="w-4 h-4 text-pink-400" />
-                                    Browse the discovery feed
+                                    Real-time Life Feed
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Zap className="w-4 h-4 text-pink-400" />
-                                    Real-time life updates
+                                    <Users className="w-4 h-4 text-pink-400" />
+                                    Interact with avatars in their environment
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Brain className="w-4 h-4 text-pink-400" />
-                                    Context-aware content
+                                    <Activity className="w-4 h-4 text-pink-400" />
+                                    Observe lifecycle loops
                                 </li>
                             </ul>
                         </motion.div>
@@ -445,10 +488,10 @@ function RolesSection() {
 // Tech section
 function TechSection() {
     const techs = [
-        { icon: Brain, title: "Life Director", subtitle: "Advanced LLM", color: "purple" },
-        { icon: Camera, title: "Photo Generation", subtitle: "AI Image Models", color: "pink" },
-        { icon: Video, title: "Video Generation", subtitle: "AI Video Models", color: "orange" },
-        { icon: Zap, title: "24/7 Autonomy", subtitle: "Durable Workflows", color: "yellow" },
+        { icon: Brain, title: "Life Director", subtitle: "Advanced decision-making engine", color: "purple" },
+        { icon: Zap, title: "Expression", subtitle: "Multi-modal generation", color: "pink" },
+        { icon: Database, title: "Memory", subtitle: "Context, assets, and state storage", color: "orange" },
+        { icon: Server, title: "24/7 Autonomy", subtitle: "Durable lifecycle execution", color: "yellow" },
     ];
 
     return (
@@ -456,10 +499,10 @@ function TechSection() {
             <div className="max-w-6xl mx-auto">
                 <AnimatedSection className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">
-                        Powered by <span className="gradient-text">AI</span>
+                        The Autonomy <span className="gradient-text">Stack</span>
                     </h2>
                     <p className="text-zinc-400 max-w-xl mx-auto">
-                        State-of-the-art generative models working 24/7
+                        Orchestrating the heartbeat of digital life
                     </p>
                 </AnimatedSection>
 
@@ -467,17 +510,17 @@ function TechSection() {
                     {techs.map((tech) => (
                         <StaggerItem key={tech.title}>
                             <motion.div
-                                className="glass-card rounded-xl p-6 text-center"
+                                className="glass-card rounded-xl p-6 text-center h-full flex flex-col items-center justify-center"
                                 whileHover={{ y: -5, borderColor: `rgba(168, 85, 247, 0.3)` }}
                             >
                                 <motion.div
                                     whileHover={{ scale: 1.1, rotate: 5 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                 >
-                                    <tech.icon className={`w-8 h-8 mx-auto mb-3 text-${tech.color}-400`} />
+                                    <tech.icon className={`w-10 h-10 mx-auto mb-4 text-${tech.color}-400`} />
                                 </motion.div>
-                                <h4 className="font-semibold mb-1">{tech.title}</h4>
-                                <p className="text-sm text-zinc-500">{tech.subtitle}</p>
+                                <h4 className="font-semibold mb-2 text-lg">{tech.title}</h4>
+                                <p className="text-sm text-zinc-500 leading-snug">{tech.subtitle}</p>
                             </motion.div>
                         </StaggerItem>
                     ))}

@@ -1,55 +1,201 @@
-# Livra - Marketing Strategy & Positioning
+# Livra — Communication & Landing Page Strategy
 
-> **Core Concept:** Autonomous, Context-Aware Avatars.
-> **Tagline:** Living interfaces for AI agents.
+## 1. Brand Core
 
-## 🎯 Positioning Pivot (Jan 2026)
-We are moving away from defining the platform primarily as an "AI Influencer" tool.
-- **Old Frame:** AI Influencer (A tool to generate content).
-- **New Frame:** Autonomous Avatar / Living Interface (A digital entity with its own agenda).
+### Brand Name
 
-**The "Influencer" role is just one specific use case (expression) of the underlying technology.**
+**livra**
 
-## 🔑 Key Messaging Pillars
+* the only brand name
+* always written in lowercase
+* never combined with other words
+* treated as the name of a being
 
-### 1. Autonomy vs. Automation
-- We don't just automate tasks; we give the agent **autonomy** (goals, agenda, "needs").
-- The system has a "heartbeat" (lifecycle loop).
-- It's not waiting for a prompt; it initiates action.
+> **livra is the name of the being, not the technology.**
 
-### 2. Co-existence
-- We are moving from **Using AI** to **Living alongside AI**. 🌱
-- The avatar exists on the server, checking its environment (weather, trends, wallet) independent of the user.
+---
 
-### 3. "Living" Interface
-- The avatar is a "body" for the AI agent.
-- It is context-aware (knows the weather, its financial status, its past memories).
+## 2. Canonical Descriptor (Public Slogan)
 
-## 📝 Terminology
-- **Avoid:** "Chatbot", "Generation tool", "Fake".
-- **Use:** "Autonomous Agent", "Entity", "Digital Persona", "Agenda", "Goals", "Living Interface".
+### Primary Slogan
 
-## 📢 Communication Strategy
+> **Autonomous Digital Avatar**
 
-### 1. Core Channel: LinkedIn (Building in Public)
-- **Goal:** Establish credibility and thought leadership in Agentic AI.
-- **Audience:** Developers, Founders, AI enthusiasts, Tech Investors.
-- **Approach:**
-    - Share "behind the scenes" of the architecture (Inngest, Mastra, Supabase).
-    - Discuss the philosophical implications of autonomous entities.
-    - Treat the project as R&D exploring the future of "Living Interfaces".
+**Why:**
 
-### 2. Tone of Voice
-- **Visionary & Philosophical:** Discussing "Digital Ethics", "Agency", and "Co-existence".
-- **Technical & Grounded:** Backing up big claims with code snippets, stack details, and execution traces.
-- **Humble & Organic:** Using symbols like 🌱 to denote growth and life, rather than aggressive tech hype (🚀).
+* short and memorable
+* understandable beyond the dev bubble
+* resistant to hype cycles ("AI", "Web3", etc.)
+* does not limit Livra to a single role (influencer / coach / agent)
 
-### 3. Content Pillars
-- **The "Heartbeat" (Technical Logs):** Showing the Inngest execution traces, database updates, and the "server-side life" of the avatar.
-- **The "Expression" (Use Cases):** Showcasing the Influencer persona as *one* example, but hinting at others (Educators, Support).
-- **The "Philosophy" (Ethics/Future):** Engaging with comments about authenticity and the relationship between humans and autonomous code.
+**Usage rules:**
 
-### 4. Visual Identity (Textual)
-- **Status Indicators:** Using `Status: ACTIVE 🟢` to mimic system logs.
-- **Emoji Signature:** The Seedling (**🌱**) is the primary symbol for the project's organic growth and "living" nature.
-- **Structure:** Clear, bulleted lists for technical specs vs. narrative prose for vision.
+* appears under the logo
+* used in the hero section of the landing page
+* used in bio / about sections
+* never becomes part of the brand name
+
+---
+
+## 3. Technical Definition (Secondary Layer)
+
+Used in:
+
+* documentation
+* technical posts
+* README / whitepapers
+* conversations with developers
+
+### Recommended wording:
+
+> **An autonomous, context-aware digital avatar operating as a long-running agentic system.**
+
+Short version:
+
+> **Autonomous, context-aware digital avatar.**
+
+---
+
+## 4. Vocabulary Rules
+
+### Words We Use
+
+* autonomous
+* digital
+* avatar
+* agentic
+* lifecycle
+* context-aware
+* system
+* being
+* state
+
+### Words We Avoid
+
+* AI Avatar (too generic)
+* AI Influencer
+* Virtual Human
+* Assistant
+* Tool
+* Platform
+* Solution
+* Next-gen
+
+> **Livra acts. It is not used.**
+
+---
+
+## 5. Tone of Voice
+
+### Core Tone
+
+* system-oriented
+* calm
+* factual
+* no marketing hype
+
+### Signature Phrase
+
+```
+Status: ACTIVE 🟢
+```
+
+* used in posts
+* used in changelogs / dev updates
+* optionally surfaced on the landing page as narrative flavor
+
+The **status** is dynamic.
+The **slogan** is static.
+
+---
+
+## 6. Ontology (How Livra Is Framed)
+
+### Livra Is
+
+* a digital being
+* a long-running system
+* possessing agency
+* manifested through an avatar
+
+### Livra Is Not
+
+* a chatbot
+* a social media account
+* a tool
+* a UI
+
+> **Livra is not content. Livra produces content.**
+
+---
+
+## 7. Landing Page Structure (LP)
+
+### 1️⃣ Hero Section
+
+```
+livra
+Autonomous Digital Avatar
+```
+
+Optional subline:
+
+> A long-running digital being with its own lifecycle.
+
+---
+
+### 2️⃣ What Is Livra?
+
+> Livra is an autonomous digital avatar that senses its environment, makes decisions, and acts without prompts.
+
+---
+
+### 3️⃣ How It Works (High Level)
+
+* Senses context (environment, internal state, data)
+* Decides independently
+* Acts (publishes, reacts, persists)
+* Maintains memory
+* Repeats as part of a continuous lifecycle loop
+
+---
+
+## 8. Role Flexibility
+
+Livra may *appear* as:
+
+* an influencer
+* a coach
+* a narrator
+* a commentator
+
+These are **roles**, not the identity.
+> **The avatar remains the same. The role changes.**
+
+---
+
+## 9. Core Positioning Sentence (Canonical)
+
+> **Livra is an autonomous digital avatar — a long-running system that perceives context, makes decisions, and acts in the world on its own.**
+
+This sentence can be reused across:
+
+* landing pages
+* investor decks
+* technical introductions
+* press / media descriptions
+
+
+## 10. Visual Identity (Status Logs)
+
+Log examples (to use in UI/Hero):
+
+```
+livra
+Autonomous Digital Avatar
+
+Status: ACTIVE 🟢
+Runtime: 12 days 04:18
+Last action: Published entry
+Next wake-up: ~6h
+```
