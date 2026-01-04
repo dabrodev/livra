@@ -10,13 +10,13 @@ import { AnimatedSection, StaggerContainer, StaggerItem, fadeInUp, fadeIn, stagg
 function SystemStatus() {
     return (
         <motion.div
-            className="w-full max-w-2xl mx-auto mt-16 p-4 rounded-lg bg-black/60 border border-white/10 font-mono text-xs md:text-sm text-zinc-400 backdrop-blur-sm"
+            className="w-full max-w-3xl mx-auto mt-16 p-4 rounded-lg bg-black/60 border border-white/10 font-mono text-xs md:text-sm text-zinc-400 backdrop-blur-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}
         >
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+                <div className="flex items-center gap-3 whitespace-nowrap">
                     <div className="flex items-center gap-2 text-green-500">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -31,13 +31,13 @@ function SystemStatus() {
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-2 md:gap-6 w-full md:w-auto font-mono text-zinc-500">
+                <div className="flex flex-col md:flex-row gap-2 md:gap-8 w-full md:w-auto font-mono text-zinc-500 whitespace-nowrap">
                     <div className="flex justify-between md:justify-start gap-2">
                         <span>RUNTIME:</span>
                         <span className="text-zinc-300">14d 03h 41m</span>
                     </div>
                     <div className="flex justify-between md:justify-start gap-2">
-                        <span>NEXT CYCLE:</span>
+                        <span>AVG CYCLE TIME:</span>
                         <span className="text-zinc-300">~6h</span>
                     </div>
                 </div>
@@ -94,16 +94,16 @@ function AnimatedOrbs() {
 function PhoneMockup() {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Using diverse instances properly labeled
+    // Using diverse instances with dynamic status based on roughly current world time/role
     const instances = [
-        { src: "/examples/cafe.png", id: "JULIA_X9", role: "Lifestyle Avatar", loc: "NYC" },
-        { src: "/examples/male_cooking.png", id: "MARCUS_B2", role: "Lifestyle Avatar", loc: "Berlin" },
-        { src: "/portraits/asian_female.png", id: "YUKI_T8", role: "Creative Avatar", loc: "Tokyo" },
-        { src: "/portraits/black_male.png", id: "KWAME_04", role: "Tech Analyst", loc: "Lagos" },
-        { src: "/portraits/latina.png", id: "SOFIA_L1", role: "Wellness Coach", loc: "São Paulo" },
-        { src: "/portraits/indian_male.png", id: "ARJUN_M7", role: "Startup Mentor", loc: "Mumbai" },
-        { src: "/portraits/nordic_female.png", id: "ASTRID_N5", role: "Design Curator", loc: "Stockholm" },
-        { src: "/portraits/middle_eastern.png", id: "OMAR_01", role: "Lifestyle Avatar", loc: "Dubai" },
+        { src: "/examples/cafe.png", id: "JULIA_X9", role: "Lifestyle Avatar", loc: "NYC", status: "ACTIVE" },
+        { src: "/examples/male_cooking.png", id: "MARCUS_B2", role: "Lifestyle Avatar", loc: "Berlin", status: "ACTIVE" },
+        { src: "/portraits/asian_female.png", id: "YUKI_T8", role: "Creative Avatar", loc: "Tokyo", status: "SLEEPING" },
+        { src: "/portraits/black_male.png", id: "KWAME_04", role: "Tech Analyst", loc: "Lagos", status: "ANALYZING" },
+        { src: "/portraits/latina.png", id: "SOFIA_L1", role: "Wellness Coach", loc: "São Paulo", status: "ACTIVE" },
+        { src: "/portraits/indian_male.png", id: "ARJUN_M7", role: "Startup Mentor", loc: "Mumbai", status: "ACTIVE" },
+        { src: "/portraits/nordic_female.png", id: "ASTRID_N5", role: "Design Curator", loc: "Stockholm", status: "ACTIVE" },
+        { src: "/portraits/middle_eastern.png", id: "OMAR_01", role: "Lifestyle Avatar", loc: "Dubai", status: "ACTIVE" },
     ];
 
     useEffect(() => {
@@ -114,6 +114,17 @@ function PhoneMockup() {
     }, [instances.length]);
 
     const current = instances[currentIndex];
+
+    // Helper to determine status styling
+    const getStatusStyle = (status: string) => {
+        switch (status) {
+            case "SLEEPING": return { color: "text-indigo-400", bg: "bg-indigo-500", dotAnimation: "" };
+            case "ANALYZING": return { color: "text-amber-400", bg: "bg-amber-500", dotAnimation: "animate-pulse" };
+            default: return { color: "text-green-400", bg: "bg-green-500", dotAnimation: "animate-pulse" };
+        }
+    };
+
+    const statusStyle = getStatusStyle(current.status);
 
     return (
         <motion.div
@@ -144,7 +155,7 @@ function PhoneMockup() {
                                 key={current.src}
                                 src={current.src}
                                 alt={`Instance ${current.id}`}
-                                className="w-full h-full object-cover"
+                                className={`w-full h-full object-cover transition-all duration-700 ${current.status === 'SLEEPING' ? 'grayscale-[0.5] brightness-75' : ''}`}
                                 initial={{ opacity: 0, scale: 1.05 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0 }}
@@ -156,10 +167,10 @@ function PhoneMockup() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20" />
 
                         {/* Top System Status */}
-                        <div className="absolute top-8 left-0 right-0 px-6 flex justify-between items-center text-[10px] font-mono text-green-400">
-                            <span className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                ONLINE
+                        <div className={`absolute top-8 left-0 right-0 px-6 flex justify-between items-center text-[10px] font-mono ${statusStyle.color}`}>
+                            <span className="flex items-center gap-1.5 transition-colors duration-300">
+                                <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.bg} ${statusStyle.dotAnimation}`} />
+                                {current.status}
                             </span>
                             <span>87% RES</span>
                         </div>
