@@ -18,6 +18,39 @@ interface EnvironmentContext {
     trends: TrendsResult
 }
 
+// Simple mapping for demo purposes. Ideally this comes from the DB or an external API.
+const TIMEZONE_MAP: Record<string, string> = {
+    'New York': 'America/New_York',
+    'Los Angeles': 'America/Los_Angeles',
+    'London': 'Europe/London',
+    'Berlin': 'Europe/Berlin',
+    'Paris': 'Europe/Paris',
+    'Dubai': 'Asia/Dubai',
+    'Tokyo': 'Asia/Tokyo',
+    'Mumbai': 'Asia/Kolkata',
+    'Sydney': 'Australia/Sydney',
+    'São Paulo': 'America/Sao_Paulo',
+    'Lagos': 'Africa/Lagos',
+    'Stockholm': 'Europe/Stockholm',
+    'Warsaw': 'Europe/Warsaw',
+}
+
+function getLocalHour(city: string): number {
+    const timeZone = TIMEZONE_MAP[city] || 'UTC';
+    try {
+        const date = new Date();
+        const formatter = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            hour12: false,
+            timeZone
+        });
+        return parseInt(formatter.format(date), 10);
+    } catch (e) {
+        console.warn(`Invalid timezone for city ${city}, defaulting to UTC`);
+        return new Date().getUTCHours();
+    }
+}
+
 export const lifecycleCycle = inngest.createFunction(
     { id: 'lifecycle-cycle' },
     { event: 'livra/cycle.start' },
@@ -44,6 +77,42 @@ export const lifecycleCycle = inngest.createFunction(
             console.log(`Lifecycle for ${influencer.name} is paused.`)
             return { paused: true, influencer: influencer.name }
         }
+
+        // --- TIMEZONE & SLEEP LOGIC START ---
+        const localHour = getLocalHour(influencer.city);
+        const isNight = localHour >= 23 || localHour < 7;
+
+        if (isNight) {
+            // Night Mode: Sleep until approx 7 AM
+            const hoursUntilMorning = localHour >= 23
+                ? (24 - localHour) + 7
+                : 7 - localHour;
+
+            const randomOffset = Math.floor(Math.random() * 60); // 0-60 mins jitter
+            const sleepMinutes = (hoursUntilMorning * 60) + randomOffset;
+            const sleepDuration = `${sleepMinutes}m`;
+
+            console.log(`[Lifecycle] ${influencer.name} in ${influencer.city} (Local: ${localHour}:00). Night mode activated. Sleeping for ${sleepDuration}.`);
+
+            // Sleep
+            await step.sleep('wait-for-morning', sleepDuration);
+
+            // Trigger next cycle
+            await step.sendEvent('trigger-morning-cycle', {
+                name: 'livra/cycle.start',
+                data: { influencerId },
+            })
+
+            return {
+                status: 'sleeping',
+                message: 'Goodnight! See you in the morning.',
+                nextCycleIn: sleepDuration,
+                localTime: `${localHour}:00`
+            }
+        }
+        // --- TIMEZONE & SLEEP LOGIC END ---
+
+        // If we are here, it is DAYTIME. Proceed with Action Loop.
 
         // Step 1: Environmental Check - use utility functions directly
         const environment = await step.run('check-environment', async (): Promise<EnvironmentContext> => {
@@ -211,9 +280,13 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
             }
         })
 
-        // Step 6: Sleep 4-8 hours (randomized for natural feel)
-        const sleepHours = Math.floor(Math.random() * 5) + 4 // 4-8 hours
-        await step.sleep('wait-for-next-cycle', `${sleepHours}h`)
+        // Step 6: Daytime Rest (Siesta / Break)
+        // Since we are in day mode, we just take a short break between activities (2-4 hours)
+        const randomHours = Math.floor(Math.random() * 3) + 2;
+        const sleepDuration = `${randomHours}h`;
+
+        console.log(`[Lifecycle] ${influencer.name} completed activity. Taking a break for ${sleepDuration}.`);
+        await step.sleep('wait-for-next-cycle', sleepDuration);
 
         // Step 7: Production (Video) - Placeholder for Veo 3.1 integration
         const video = await step.run('produce-video', async () => {
@@ -236,10 +309,10 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
             influencer: influencer.name,
             environment,
             plan,
-            memory: memory.id,
             image,
             video,
-            nextCycleIn: `${sleepHours} hours`,
+            nextCycleIn: sleepDuration,
+            localTime: `${localHour}:00`
         }
     }
 )
