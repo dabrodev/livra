@@ -122,6 +122,14 @@ export const lifecycleCycle = inngest.createFunction(
         })
 
         // Step 2: Daily Plan - Agent decides next activity
+        // Determine time of day based on local hour
+        const getTimeOfDay = (hour: number): string => {
+            if (hour >= 5 && hour < 12) return 'morning';
+            if (hour >= 12 && hour < 17) return 'afternoon';
+            return 'evening';
+        };
+        const currentTimeOfDay = getTimeOfDay(localHour);
+
         const plan = await step.run('create-daily-plan', async (): Promise<ActivityPlan> => {
             const recentMemories = influencer.memories
                 .map((m: { description: string }) => m.description)
@@ -131,6 +139,7 @@ export const lifecycleCycle = inngest.createFunction(
 You are planning the next activity for ${influencer.name}, a ${influencer.personalityVibe} influencer living in ${influencer.city}.
 
 Current context:
+- LOCAL TIME: ${localHour}:00 (${currentTimeOfDay}) - THIS IS CRITICAL, plan activities appropriate for this time!
 - Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}
 - Trending: ${environment.trends.trends.slice(0, 3).join(', ')}
 - Current balance: $${influencer.currentBalance}
@@ -139,15 +148,16 @@ Current context:
 - Clothing style: ${influencer.clothingStyle}
 
 Based on this context, plan the next activity. Consider:
-1. The weather conditions
-2. Their budget
-3. Their personality vibe
-4. Whether this would be good content
+1. THE TIME OF DAY - Do not plan morning activities in the evening!
+2. The weather conditions
+3. Their budget
+4. Their personality vibe
+5. Whether this would be good content
 
 Respond with a JSON object containing:
 {
-    "activity": "activity name",
-    "timeOfDay": "morning|afternoon|evening",
+    "activity": "activity name appropriate for ${currentTimeOfDay}",
+    "timeOfDay": "${currentTimeOfDay}",
     "location": "location name or null",
     "isContentWorthy": true or false,
     "estimatedCost": number,
@@ -166,8 +176,8 @@ Respond with a JSON object containing:
                 if (jsonMatch) {
                     const parsed = JSON.parse(jsonMatch[0])
                     return {
-                        activity: parsed.activity || 'Morning Routine',
-                        timeOfDay: parsed.timeOfDay || 'morning',
+                        activity: parsed.activity || `${currentTimeOfDay.charAt(0).toUpperCase() + currentTimeOfDay.slice(1)} Activity`,
+                        timeOfDay: parsed.timeOfDay || currentTimeOfDay,
                         location: parsed.location || null,
                         isContentWorthy: parsed.isContentWorthy ?? true,
                         estimatedCost: parsed.estimatedCost || 0,
@@ -178,13 +188,20 @@ Respond with a JSON object containing:
                 console.error('Failed to parse agent response:', error)
             }
 
-            // Default fallback
+            // Dynamic fallback based on actual time of day
+            const fallbackActivities: Record<string, { activity: string; location: string }> = {
+                morning: { activity: 'Morning Coffee Run', location: 'Local Café' },
+                afternoon: { activity: 'Exploring the neighborhood', location: 'City Center' },
+                evening: { activity: 'Dinner at a trendy restaurant', location: 'Downtown' },
+            };
+            const fallback = fallbackActivities[currentTimeOfDay] || fallbackActivities.evening;
+
             return {
-                activity: 'Morning Coffee Run',
-                timeOfDay: 'morning',
-                location: 'Local Café',
+                activity: fallback.activity,
+                timeOfDay: currentTimeOfDay,
+                location: fallback.location,
                 isContentWorthy: true,
-                estimatedCost: 8,
+                estimatedCost: currentTimeOfDay === 'evening' ? 45 : 12,
                 moodImpact: 'positive',
             }
         })
@@ -221,10 +238,16 @@ Respond with a JSON object containing:
             }
 
             // Build image generation prompt based on activity
+            const styleDetails = [
+                influencer.bottomwear.length > 0 ? `Bottomwear: ${influencer.bottomwear.join(', ')}` : '',
+                influencer.footwear.length > 0 ? `Footwear: ${influencer.footwear.join(', ')}` : '',
+                influencer.signatureItems.length > 0 ? `Signature elements: ${influencer.signatureItems.join(', ')}` : ''
+            ].filter(Boolean).join('. ');
+
             const imagePrompt = `A beautiful, Instagram-worthy photo of a ${influencer.personalityVibe} influencer ${plan.activity} at ${plan.location || 'home'}. 
 The scene is ${plan.timeOfDay}, with ${environment.weather.condition} weather.
 Style: authentic lifestyle photography, natural lighting, warm tones.
-Clothing style: ${influencer.clothingStyle}.
+Clothing style: ${influencer.clothingStyle}. ${styleDetails}
 Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
 
             // Generate image with face and room references

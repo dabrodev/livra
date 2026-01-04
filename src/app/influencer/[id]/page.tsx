@@ -2,9 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import {
-    Sparkles, ArrowLeft, MapPin, Wallet, Play, Pause, Download, Wand2,
-    Coffee, Camera, Utensils, ShoppingBag, Dumbbell, Moon, Sun,
-    Activity, Zap, Heart, Home, Music, BookOpen, type LucideIcon
+    Sparkles, ArrowLeft, MapPin, Wallet, Download, Wand2,
+    Activity, Zap
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
 import AvatarSwap from "@/app/components/AvatarSwap";
@@ -15,21 +14,21 @@ interface TimelinePageProps {
     params: Promise<{ id: string }>;
 }
 
-// Map activity keywords to icons
-function getActivityIcon(description: string): LucideIcon {
+// Map activity keywords to icon names
+function getActivityIconName(description: string): string {
     const lowerDesc = description.toLowerCase();
-    if (lowerDesc.includes('coffee') || lowerDesc.includes('cafe') || lowerDesc.includes('café')) return Coffee;
-    if (lowerDesc.includes('photo') || lowerDesc.includes('content') || lowerDesc.includes('camera')) return Camera;
-    if (lowerDesc.includes('lunch') || lowerDesc.includes('dinner') || lowerDesc.includes('breakfast') || lowerDesc.includes('food') || lowerDesc.includes('restaurant')) return Utensils;
-    if (lowerDesc.includes('shop') || lowerDesc.includes('boutique') || lowerDesc.includes('store')) return ShoppingBag;
-    if (lowerDesc.includes('gym') || lowerDesc.includes('workout') || lowerDesc.includes('exercise') || lowerDesc.includes('yoga')) return Dumbbell;
-    if (lowerDesc.includes('evening') || lowerDesc.includes('night') || lowerDesc.includes('sleep')) return Moon;
-    if (lowerDesc.includes('morning') || lowerDesc.includes('woke') || lowerDesc.includes('sunrise')) return Sun;
-    if (lowerDesc.includes('home') || lowerDesc.includes('apartment')) return Home;
-    if (lowerDesc.includes('relax') || lowerDesc.includes('chill') || lowerDesc.includes('positive')) return Heart;
-    if (lowerDesc.includes('music') || lowerDesc.includes('concert')) return Music;
-    if (lowerDesc.includes('read') || lowerDesc.includes('book') || lowerDesc.includes('study')) return BookOpen;
-    return Activity;
+    if (lowerDesc.includes('coffee') || lowerDesc.includes('cafe') || lowerDesc.includes('café')) return 'Coffee';
+    if (lowerDesc.includes('photo') || lowerDesc.includes('content') || lowerDesc.includes('camera')) return 'Camera';
+    if (lowerDesc.includes('lunch') || lowerDesc.includes('dinner') || lowerDesc.includes('breakfast') || lowerDesc.includes('food') || lowerDesc.includes('restaurant')) return 'Utensils';
+    if (lowerDesc.includes('shop') || lowerDesc.includes('boutique') || lowerDesc.includes('store')) return 'ShoppingBag';
+    if (lowerDesc.includes('gym') || lowerDesc.includes('workout') || lowerDesc.includes('exercise') || lowerDesc.includes('yoga')) return 'Dumbbell';
+    if (lowerDesc.includes('evening') || lowerDesc.includes('night') || lowerDesc.includes('sleep')) return 'Moon';
+    if (lowerDesc.includes('morning') || lowerDesc.includes('woke') || lowerDesc.includes('sunrise')) return 'Sun';
+    if (lowerDesc.includes('home') || lowerDesc.includes('apartment')) return 'Home';
+    if (lowerDesc.includes('relax') || lowerDesc.includes('chill') || lowerDesc.includes('positive')) return 'Heart';
+    if (lowerDesc.includes('music') || lowerDesc.includes('concert')) return 'Music';
+    if (lowerDesc.includes('read') || lowerDesc.includes('book') || lowerDesc.includes('study')) return 'BookOpen';
+    return 'Activity';
 }
 
 // Determine if activity is content-worthy based on description
@@ -90,7 +89,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
         ...influencer.memories.map(memory => ({
             id: memory.id,
             time: memory.createdAt,
-            icon: getActivityIcon(memory.description),
+            icon: getActivityIconName(memory.description),
             action: memory.description.split(' - ')[0] || memory.description.slice(0, 30),
             description: memory.description,
             type: 'life' as const,
@@ -100,7 +99,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
         ...influencer.posts.map(post => ({
             id: post.id,
             time: post.postedAt,
-            icon: Camera,
+            icon: 'Camera',
             action: post.type === 'VIDEO' ? 'Video generated' : 'Photo generated',
             description: post.caption,
             type: 'content' as const,

@@ -319,7 +319,10 @@ function FeaturesSection() {
                                 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <div className={`w-12 h-12 rounded-xl bg-${step.color}-500/20 flex items-center justify-center mb-6`}>
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 
+                                    ${step.color === 'teal' ? 'bg-teal-500/20' :
+                                        step.color === 'emerald' ? 'bg-emerald-500/20' :
+                                            'bg-cyan-500/20'}`}>
                                     <span className="text-2xl font-bold gradient-text">{step.number}</span>
                                 </div>
                                 <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
@@ -528,7 +531,10 @@ function TechSection() {
                                     whileHover={{ scale: 1.1, rotate: 5 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                 >
-                                    <tech.icon className={`w-10 h-10 mx-auto mb-4 text-${tech.color}-400`} />
+                                    <tech.icon className={`w-10 h-10 mx-auto mb-4 
+                                        ${tech.color === 'teal' ? 'text-teal-400' :
+                                            tech.color === 'emerald' ? 'text-emerald-400' :
+                                                'text-cyan-400'}`} />
                                 </motion.div>
                                 <h4 className="font-semibold mb-2 text-lg">{tech.title}</h4>
                                 <p className="text-sm text-zinc-500 leading-snug">{tech.subtitle}</p>

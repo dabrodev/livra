@@ -12,7 +12,7 @@ import ImageLightbox from "@/app/components/ImageLightbox";
 export interface TimelineItem {
     id: string;
     time: Date;
-    icon: LucideIcon;
+    icon: string; // Changed from LucideIcon to string for serialization
     action: string;
     description: string;
     type: 'life' | 'content';
@@ -38,22 +38,27 @@ interface PostRecord {
     postedAt: string;
 }
 
-// Map activity keywords to icons
-function getActivityIcon(description: string): LucideIcon {
+// Map activity keywords to icon names
+function getActivityIconName(description: string): string {
     const lowerDesc = description.toLowerCase();
-    if (lowerDesc.includes('coffee') || lowerDesc.includes('cafe') || lowerDesc.includes('café')) return Coffee;
-    if (lowerDesc.includes('photo') || lowerDesc.includes('content') || lowerDesc.includes('camera')) return Camera;
-    if (lowerDesc.includes('lunch') || lowerDesc.includes('dinner') || lowerDesc.includes('breakfast') || lowerDesc.includes('food') || lowerDesc.includes('restaurant')) return Utensils;
-    if (lowerDesc.includes('shop') || lowerDesc.includes('boutique') || lowerDesc.includes('store')) return ShoppingBag;
-    if (lowerDesc.includes('gym') || lowerDesc.includes('workout') || lowerDesc.includes('exercise') || lowerDesc.includes('yoga')) return Dumbbell;
-    if (lowerDesc.includes('evening') || lowerDesc.includes('night') || lowerDesc.includes('sleep')) return Moon;
-    if (lowerDesc.includes('morning') || lowerDesc.includes('woke') || lowerDesc.includes('sunrise')) return Sun;
-    if (lowerDesc.includes('home') || lowerDesc.includes('apartment')) return Home;
-    if (lowerDesc.includes('relax') || lowerDesc.includes('chill') || lowerDesc.includes('positive')) return Heart;
-    if (lowerDesc.includes('music') || lowerDesc.includes('concert')) return Music;
-    if (lowerDesc.includes('read') || lowerDesc.includes('book') || lowerDesc.includes('study')) return BookOpen;
-    return Activity;
+    if (lowerDesc.includes('coffee') || lowerDesc.includes('cafe') || lowerDesc.includes('café')) return 'Coffee';
+    if (lowerDesc.includes('photo') || lowerDesc.includes('content') || lowerDesc.includes('camera')) return 'Camera';
+    if (lowerDesc.includes('lunch') || lowerDesc.includes('dinner') || lowerDesc.includes('breakfast') || lowerDesc.includes('food') || lowerDesc.includes('restaurant')) return 'Utensils';
+    if (lowerDesc.includes('shop') || lowerDesc.includes('boutique') || lowerDesc.includes('store')) return 'ShoppingBag';
+    if (lowerDesc.includes('gym') || lowerDesc.includes('workout') || lowerDesc.includes('exercise') || lowerDesc.includes('yoga')) return 'Dumbbell';
+    if (lowerDesc.includes('evening') || lowerDesc.includes('night') || lowerDesc.includes('sleep')) return 'Moon';
+    if (lowerDesc.includes('morning') || lowerDesc.includes('woke') || lowerDesc.includes('sunrise')) return 'Sun';
+    if (lowerDesc.includes('home') || lowerDesc.includes('apartment')) return 'Home';
+    if (lowerDesc.includes('relax') || lowerDesc.includes('chill') || lowerDesc.includes('positive')) return 'Heart';
+    if (lowerDesc.includes('music') || lowerDesc.includes('concert')) return 'Music';
+    if (lowerDesc.includes('read') || lowerDesc.includes('book') || lowerDesc.includes('study')) return 'BookOpen';
+    return 'Activity';
 }
+
+const IconMap: Record<string, LucideIcon> = {
+    Coffee, Camera, Utensils, ShoppingBag, Dumbbell, Moon, Sun,
+    Activity, Heart, Home, Music, BookOpen
+};
 
 // Format relative time
 function formatRelativeTime(date: Date): string {
@@ -83,7 +88,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
     const memoryToTimelineItem = useCallback((memory: MemoryRecord): TimelineItem => ({
         id: memory.id,
         time: new Date(memory.createdAt),
-        icon: getActivityIcon(memory.description),
+        icon: getActivityIconName(memory.description),
         action: memory.description.split(' - ')[0] || memory.description.slice(0, 30),
         description: memory.description,
         type: 'life',
@@ -94,7 +99,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
     const postToTimelineItem = useCallback((post: PostRecord): TimelineItem => ({
         id: post.id,
         time: new Date(post.postedAt),
-        icon: Camera,
+        icon: 'Camera',
         action: post.type === 'VIDEO' ? 'Video generated' : 'Photo generated',
         description: post.caption,
         type: 'content',
@@ -201,7 +206,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
                     {/* Timeline items */}
                     <div className="space-y-6">
                         {items.map((item) => {
-                            const Icon = item.icon;
+                            const Icon = IconMap[item.icon] || Activity;
                             const isContent = item.type === "content";
                             const isNew = (new Date().getTime() - new Date(item.time).getTime()) < 10000; // Highlight items < 10s old
 
@@ -212,10 +217,10 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
                                 >
                                     {/* Icon */}
                                     <div className={`relative z-10 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isContent
-                                            ? "bg-gradient-to-br from-teal-500 to-emerald-500"
-                                            : item.importance && item.importance >= 4
-                                                ? "bg-gradient-to-br from-orange-500 to-red-500"
-                                                : "bg-zinc-800"
+                                        ? "bg-gradient-to-br from-teal-500 to-emerald-500"
+                                        : item.importance && item.importance >= 4
+                                            ? "bg-gradient-to-br from-orange-500 to-red-500"
+                                            : "bg-zinc-800"
                                         } ${isNew ? 'ring-2 ring-teal-400 ring-offset-2 ring-offset-zinc-900' : ''}`}>
                                         <Icon className={`w-5 h-5 ${isContent || (item.importance && item.importance >= 4) ? "text-white" : "text-zinc-400"}`} />
                                     </div>
