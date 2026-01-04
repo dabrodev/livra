@@ -237,17 +237,71 @@ Respond with a JSON object containing:
                 return null
             }
 
-            // Build image generation prompt based on activity
-            const styleDetails = [
-                influencer.bottomwear.length > 0 ? `Bottomwear: ${influencer.bottomwear.join(', ')}` : '',
-                influencer.footwear.length > 0 ? `Footwear: ${influencer.footwear.join(', ')}` : '',
-                influencer.signatureItems.length > 0 ? `Signature elements: ${influencer.signatureItems.join(', ')}` : ''
+            // Dynamic mappings for stronger AI instructions
+            const footwearDescriptions: Record<string, string> = {
+                'barefoot': 'barefoot with no shoes or socks, bare feet visible',
+                'sneakers': 'wearing casual sneakers',
+                'heels': 'wearing elegant high heels',
+                'boots': 'wearing stylish boots',
+                'sandals': 'wearing open sandals',
+                'slippers': 'wearing cozy indoor slippers',
+            };
+
+            const signatureDescriptions: Record<string, string> = {
+                'tights': 'MUST be wearing sheer or opaque tights/pantyhose on legs - this is a signature style element',
+                'oversized-sweaters': 'wearing an oversized cozy sweater',
+                'jewelry': 'wearing statement jewelry pieces',
+                'sunglasses': 'wearing stylish sunglasses',
+                'hats': 'wearing a fashionable hat or cap',
+                'layered-looks': 'wearing layered clothing',
+                'crop-tops': 'wearing a crop top',
+                'maxi-dresses': 'wearing a flowing maxi dress',
+            };
+
+            // Build detailed style requirements
+            // Determine if activity is indoors/at home
+            const isAtHome = !plan.location ||
+                plan.location.toLowerCase().includes('home') ||
+                plan.location.toLowerCase().includes('apartment');
+
+            // Filter footwear based on context
+            const contextualFootwear = influencer.footwear.filter(f => {
+                // Barefoot only makes sense at home
+                if (f === 'barefoot' && !isAtHome) return false;
+                // Slippers only at home
+                if (f === 'slippers' && !isAtHome) return false;
+                return true;
+            });
+
+            // If all footwear was filtered out (e.g., only had barefoot but going outside), use default
+            const footwearToUse = contextualFootwear.length > 0
+                ? contextualFootwear
+                : (isAtHome ? influencer.footwear : ['comfortable shoes']);
+
+            const footwearDetails = footwearToUse
+                .map(f => footwearDescriptions[f] || f)
+                .join(', ');
+
+            const signatureDetails = influencer.signatureItems
+                .map(s => signatureDescriptions[s] || s)
+                .join('. ');
+
+            const bottomwearDetails = influencer.bottomwear.length > 0
+                ? `wearing ${influencer.bottomwear.join(' or ')}`
+                : '';
+
+            // Build comprehensive style section
+            const styleRequirements = [
+                bottomwearDetails,
+                footwearDetails,
+                signatureDetails
             ].filter(Boolean).join('. ');
 
             const imagePrompt = `A beautiful, Instagram-worthy photo of a ${influencer.personalityVibe} influencer ${plan.activity} at ${plan.location || 'home'}. 
 The scene is ${plan.timeOfDay}, with ${environment.weather.condition} weather.
 Style: authentic lifestyle photography, natural lighting, warm tones.
-Clothing style: ${influencer.clothingStyle}. ${styleDetails}
+Clothing style: ${influencer.clothingStyle}.
+IMPORTANT CLOTHING REQUIREMENTS: ${styleRequirements || 'casual comfortable attire'}.
 Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
 
             // Generate image with face and room references

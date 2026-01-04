@@ -11,7 +11,7 @@ import ImageLightbox from "@/app/components/ImageLightbox";
 // Timeline item type
 export interface TimelineItem {
     id: string;
-    time: Date;
+    time: Date | string; // Can be Date or ISO string after serialization
     icon: string; // Changed from LucideIcon to string for serialization
     action: string;
     description: string;
@@ -60,10 +60,11 @@ const IconMap: Record<string, LucideIcon> = {
     Activity, Heart, Home, Music, BookOpen
 };
 
-// Format relative time
-function formatRelativeTime(date: Date): string {
+// Format relative time - handles both Date objects and ISO strings
+function formatRelativeTime(date: Date | string): string {
     const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const diff = now.getTime() - dateObj.getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
