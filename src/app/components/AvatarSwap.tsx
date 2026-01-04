@@ -67,7 +67,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
             {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-purple-400 transition-all"
+                className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all"
                 title="Change Avatar"
             >
                 <RefreshCw className="w-5 h-5" />
@@ -87,7 +87,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                             {/* Header */}
                             <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Library className="w-5 h-5 text-purple-400" />
+                                    <Library className="w-5 h-5 text-teal-400" />
                                     <h2 className="font-semibold">Change Avatar</h2>
                                 </div>
                                 <button
@@ -102,7 +102,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                             <div className="p-6 overflow-y-auto flex-1">
                                 {isLoading ? (
                                     <div className="text-center py-12">
-                                        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                        <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                                         <p className="text-zinc-400">Loading avatars...</p>
                                     </div>
                                 ) : avatars.length === 0 ? (
@@ -110,7 +110,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                                         <p className="text-zinc-400 mb-4">No avatars in library</p>
                                         <a
                                             href={`/influencer/${influencerId}/avatar`}
-                                            className="text-purple-400 hover:underline"
+                                            className="text-teal-400 hover:underline"
                                         >
                                             Generate new avatars
                                         </a>
@@ -123,8 +123,8 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                                                 onClick={() => handleSelectAvatar(avatar)}
                                                 disabled={isSaving}
                                                 className={`aspect-square rounded-xl overflow-hidden border-2 transition-all relative group ${currentAvatarUrl === avatar.url
-                                                    ? "border-purple-500 ring-2 ring-purple-500/30"
-                                                    : "border-zinc-800 hover:border-purple-500/50"
+                                                    ? "border-teal-500 ring-2 ring-teal-500/30"
+                                                    : "border-zinc-800 hover:border-teal-500/50"
                                                     } ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
                                             >
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -134,8 +134,8 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                                                     className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                                 />
                                                 {currentAvatarUrl === avatar.url && (
-                                                    <div className="absolute inset-0 bg-purple-500/30 flex items-center justify-center">
-                                                        <div className="bg-purple-500 rounded-full p-1 shadow-lg">
+                                                    <div className="absolute inset-0 bg-teal-500/30 flex items-center justify-center">
+                                                        <div className="bg-teal-500 rounded-full p-1 shadow-lg">
                                                             <Check className="w-5 h-5 text-white" />
                                                         </div>
                                                     </div>
@@ -155,7 +155,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                             <div className="p-4 bg-zinc-900/50 border-t border-zinc-800 flex justify-between items-center bg-zinc-900">
                                 <a
                                     href={`/influencer/${influencerId}/avatar`}
-                                    className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-2"
+                                    className="text-sm font-medium text-teal-400 hover:text-teal-300 transition-colors flex items-center gap-2"
                                 >
                                     <Sparkles className="w-4 h-4" />
                                     + Generate new

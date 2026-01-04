@@ -51,7 +51,7 @@ function AnimatedOrbs() {
     return (
         <>
             <motion.div
-                className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl"
                 animate={{
                     scale: [1, 1.2, 1],
                     opacity: [0.2, 0.3, 0.2],
@@ -63,7 +63,7 @@ function AnimatedOrbs() {
                 }}
             />
             <motion.div
-                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl"
+                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"
                 animate={{
                     scale: [1.2, 1, 1.2],
                     opacity: [0.3, 0.2, 0.3],
@@ -222,7 +222,7 @@ function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <Sparkles className="w-3 h-3 text-purple-400" />
+                    <Sparkles className="w-3 h-3 text-teal-400" />
                     <span className="text-xs font-medium text-zinc-300 tracking-wide uppercase">The Autonomous Avatar Platform</span>
                 </motion.div>
 
@@ -291,9 +291,9 @@ function HeroSection() {
 // Features section with scroll animations
 function FeaturesSection() {
     const steps = [
-        { number: "1", title: "Define the Context", description: "Set the environment, constraints, and world rules. Whether it's a city apartment or a digital workspace, context shapes behavior.", color: "purple" },
-        { number: "2", title: "Architect the Personality", description: "Configure the 'Brain' and 'Body'. Define decision-making models, visual appearance, and emotional traits.", color: "pink" },
-        { number: "3", title: "Grant Autonomy", description: "Allocate resources, goals, and tools. The avatar optimizes its own life execution loop independently.", color: "orange" },
+        { number: "1", title: "Define the Context", description: "Set the environment, constraints, and world rules. Whether it's a city apartment or a digital workspace, context shapes behavior.", color: "teal" },
+        { number: "2", title: "Architect the Personality", description: "Configure the 'Brain' and 'Body'. Define decision-making models, visual appearance, and emotional traits.", color: "emerald" },
+        { number: "3", title: "Grant Autonomy", description: "Allocate resources, goals, and tools. The avatar optimizes its own life execution loop independently.", color: "cyan" },
     ];
 
     return (
@@ -314,7 +314,7 @@ function FeaturesSection() {
                             <motion.div
                                 className={`glass-card rounded-2xl p-8 h-full transition-colors`}
                                 whileHover={{
-                                    borderColor: `rgba(${step.color === 'purple' ? '168, 85, 247' : step.color === 'pink' ? '236, 72, 153' : '249, 115, 22'}, 0.3)`,
+                                    borderColor: `rgba(${step.color === 'teal' ? '20, 184, 166' : step.color === 'emerald' ? '16, 185, 129' : '34, 211, 238'}, 0.3)`,
                                     y: -5
                                 }}
                                 transition={{ duration: 0.2 }}
@@ -435,10 +435,10 @@ function RolesSection() {
                     <StaggerItem>
                         <motion.div
                             className="glass-card rounded-2xl p-8 h-full"
-                            whileHover={{ borderColor: "rgba(168, 85, 247, 0.3)", y: -5 }}
+                            whileHover={{ borderColor: "rgba(20, 184, 166, 0.3)", y: -5 }}
                         >
-                            <div className="w-14 h-14 rounded-xl bg-purple-500/20 flex items-center justify-center mb-6">
-                                <Layers className="w-7 h-7 text-purple-400" />
+                            <div className="w-14 h-14 rounded-xl bg-teal-500/20 flex items-center justify-center mb-6">
+                                <Layers className="w-7 h-7 text-teal-400" />
                             </div>
                             <h3 className="text-2xl font-semibold mb-3">For Designers</h3>
                             <p className="text-zinc-400 mb-4">
@@ -446,15 +446,15 @@ function RolesSection() {
                             </p>
                             <ul className="space-y-3 text-sm text-zinc-500">
                                 <li className="flex items-center gap-2">
-                                    <Brain className="w-4 h-4 text-purple-400" />
+                                    <Brain className="w-4 h-4 text-teal-400" />
                                     Observe decision-making loops
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Camera className="w-4 h-4 text-purple-400" />
+                                    <Camera className="w-4 h-4 text-teal-400" />
                                     Visual context definition
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Globe className="w-4 h-4 text-purple-400" />
+                                    <Globe className="w-4 h-4 text-teal-400" />
                                     Multi-modal expression (Text, Image, Video)
                                 </li>
                             </ul>
@@ -465,10 +465,10 @@ function RolesSection() {
                     <StaggerItem>
                         <motion.div
                             className="glass-card rounded-2xl p-8 h-full"
-                            whileHover={{ borderColor: "rgba(236, 72, 153, 0.3)", y: -5 }}
+                            whileHover={{ borderColor: "rgba(16, 185, 129, 0.3)", y: -5 }}
                         >
-                            <div className="w-14 h-14 rounded-xl bg-pink-500/20 flex items-center justify-center mb-6">
-                                <Eye className="w-7 h-7 text-pink-400" />
+                            <div className="w-14 h-14 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-6">
+                                <Eye className="w-7 h-7 text-emerald-400" />
                             </div>
                             <h3 className="text-2xl font-semibold mb-3">For Observers</h3>
                             <p className="text-zinc-400 mb-4">
@@ -476,15 +476,15 @@ function RolesSection() {
                             </p>
                             <ul className="space-y-3 text-sm text-zinc-500">
                                 <li className="flex items-center gap-2">
-                                    <Play className="w-4 h-4 text-pink-400" />
+                                    <Play className="w-4 h-4 text-emerald-400" />
                                     Real-time Life Feed
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Users className="w-4 h-4 text-pink-400" />
+                                    <Users className="w-4 h-4 text-emerald-400" />
                                     Interact with avatars in their environment
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Activity className="w-4 h-4 text-pink-400" />
+                                    <Activity className="w-4 h-4 text-emerald-400" />
                                     Observe lifecycle loops
                                 </li>
                             </ul>
@@ -499,10 +499,10 @@ function RolesSection() {
 // Tech section
 function TechSection() {
     const techs = [
-        { icon: Brain, title: "Life Director", subtitle: "Advanced decision-making engine", color: "purple" },
-        { icon: Zap, title: "Expression", subtitle: "Multi-modal generation", color: "pink" },
-        { icon: Database, title: "Memory", subtitle: "Context, assets, and state storage", color: "orange" },
-        { icon: Server, title: "24/7 Autonomy", subtitle: "Durable lifecycle execution", color: "yellow" },
+        { icon: Brain, title: "Life Director", subtitle: "Advanced decision-making engine", color: "teal" },
+        { icon: Zap, title: "Expression", subtitle: "Multi-modal generation", color: "emerald" },
+        { icon: Database, title: "Memory", subtitle: "Context, assets, and state storage", color: "cyan" },
+        { icon: Server, title: "24/7 Autonomy", subtitle: "Durable lifecycle execution", color: "teal" },
     ];
 
     return (
@@ -522,7 +522,7 @@ function TechSection() {
                         <StaggerItem key={tech.title}>
                             <motion.div
                                 className="glass-card rounded-xl p-6 text-center h-full flex flex-col items-center justify-center"
-                                whileHover={{ y: -5, borderColor: `rgba(168, 85, 247, 0.3)` }}
+                                whileHover={{ y: -5, borderColor: `rgba(20, 184, 166, 0.3)` }}
                             >
                                 <motion.div
                                     whileHover={{ scale: 1.1, rotate: 5 }}
@@ -554,7 +554,7 @@ function Header() {
                 {/* Logo */}
                 <a href="/" className="flex items-center gap-2">
                     <motion.div
-                        className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"
+                        className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center"
                         whileHover={{ scale: 1.1, rotate: 5 }}
                     >
                         <Sparkles className="w-4 h-4 text-white" />
@@ -611,7 +611,7 @@ function Footer() {
             <footer className="py-12 px-6 border-t border-zinc-800">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-4 h-4 text-white" />
                         </div>
                         <span className="font-semibold">Livra</span>

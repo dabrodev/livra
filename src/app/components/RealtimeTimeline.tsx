@@ -212,11 +212,11 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
                                 >
                                     {/* Icon */}
                                     <div className={`relative z-10 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isContent
-                                            ? "bg-gradient-to-br from-purple-500 to-pink-500"
+                                            ? "bg-gradient-to-br from-teal-500 to-emerald-500"
                                             : item.importance && item.importance >= 4
                                                 ? "bg-gradient-to-br from-orange-500 to-red-500"
                                                 : "bg-zinc-800"
-                                        } ${isNew ? 'ring-2 ring-purple-400 ring-offset-2 ring-offset-zinc-900' : ''}`}>
+                                        } ${isNew ? 'ring-2 ring-teal-400 ring-offset-2 ring-offset-zinc-900' : ''}`}>
                                         <Icon className={`w-5 h-5 ${isContent || (item.importance && item.importance >= 4) ? "text-white" : "text-zinc-400"}`} />
                                     </div>
 
@@ -230,7 +230,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
                                                 {item.action}
                                             </span>
                                             {isNew && (
-                                                <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-purple-500/20 text-purple-400">
+                                                <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-teal-500/20 text-teal-400">
                                                     NEW
                                                 </span>
                                             )}

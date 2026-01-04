@@ -67,7 +67,7 @@ export default async function DashboardPage() {
             <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/5">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-4 h-4 text-white" />
                         </div>
                         <span className="font-semibold text-lg">Livra</span>
@@ -156,7 +156,7 @@ export default async function DashboardPage() {
                                     <Link
                                         key={influencer.id}
                                         href={`/influencer/${influencer.id}`}
-                                        className="glass-card rounded-2xl p-6 hover:border-purple-500/30 transition-all group"
+                                        className="glass-card rounded-2xl p-6 hover:border-teal-500/30 transition-all group"
                                     >
                                         {/* Avatar and status */}
                                         <div className="flex items-start justify-between mb-4">
@@ -167,7 +167,7 @@ export default async function DashboardPage() {
                                                     className="w-14 h-14 rounded-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl font-bold">
+                                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-xl font-bold">
                                                     {influencer.name.charAt(0)}
                                                 </div>
                                             )}
@@ -175,7 +175,7 @@ export default async function DashboardPage() {
                                         </div>
 
                                         {/* Name */}
-                                        <h3 className="text-lg font-semibold group-hover:text-purple-400 transition-colors">
+                                        <h3 className="text-lg font-semibold group-hover:text-teal-400 transition-colors">
                                             {influencer.name}
                                         </h3>
 
@@ -205,7 +205,7 @@ export default async function DashboardPage() {
                                                 {influencer.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
                                             </span>
                                             {!hasAvatar && (
-                                                <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-400">
+                                                <span className="text-xs px-2 py-1 rounded-full bg-teal-500/20 text-teal-400">
                                                     Needs Avatar
                                                 </span>
                                             )}

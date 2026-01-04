@@ -29,7 +29,7 @@ export default async function FeedPage({ params }: FeedPageProps) {
             <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/5">
                 <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
                     <a href="/" className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-3.5 h-3.5 text-white" />
                         </div>
                         <span className="font-semibold">Livra</span>
@@ -41,7 +41,7 @@ export default async function FeedPage({ params }: FeedPageProps) {
             <div className="pt-20 pb-6 px-4 max-w-lg mx-auto">
                 <div className="flex items-center gap-4">
                     {/* Avatar placeholder */}
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-2xl">
                         {influencer.name.charAt(0)}
                     </div>
                     <div className="flex-1">
@@ -94,7 +94,7 @@ export default async function FeedPage({ params }: FeedPageProps) {
                             <div key={post.id} className="border-b border-zinc-800">
                                 {/* Post header */}
                                 <div className="p-4 flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-xs">
                                         {influencer.name.charAt(0)}
                                     </div>
                                     <span className="font-medium text-sm">{influencer.name}</span>

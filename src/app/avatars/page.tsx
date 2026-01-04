@@ -47,7 +47,7 @@ export default function AvatarLibraryPage() {
                         <span className="text-sm">Back to Dashboard</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-4 h-4 text-white" />
                         </div>
                         <span className="font-semibold text-lg">Livra</span>
@@ -69,7 +69,7 @@ export default function AvatarLibraryPage() {
                     {/* Loading state */}
                     {isLoading && (
                         <div className="text-center py-20">
-                            <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                            <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                             <p className="text-zinc-400">Loading library...</p>
                         </div>
                     )}
@@ -103,7 +103,7 @@ export default function AvatarLibraryPage() {
                                         onClick={() => setSelectedAvatar(avatar)}
                                         className="group relative cursor-zoom-in"
                                     >
-                                        <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-purple-500 transition-all">
+                                        <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-teal-500 transition-all">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
                                                 src={avatar.url}

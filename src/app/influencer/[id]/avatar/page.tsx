@@ -245,7 +245,7 @@ export default function AvatarCreationPage() {
                         <span className="text-sm">Back to Timeline</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-3.5 h-3.5 text-white" />
                         </div>
                         <span className="font-semibold">Livra</span>
@@ -260,8 +260,8 @@ export default function AvatarCreationPage() {
                     {step === "configure" && (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
-                                <Wand2 className="w-6 h-6 text-purple-400" />
-                                <span className="text-sm text-purple-400 font-medium">Avatar Creation</span>
+                                <Wand2 className="w-6 h-6 text-teal-400" />
+                                <span className="text-sm text-teal-400 font-medium">Avatar Creation</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Define Appearance</h1>
                             <p className="text-zinc-400 mb-8">Customize your influencer&apos;s look</p>
@@ -276,7 +276,7 @@ export default function AvatarCreationPage() {
                                                 key={color.id}
                                                 onClick={() => updateData({ hairColor: color.id })}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${data.hairColor === color.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -299,7 +299,7 @@ export default function AvatarCreationPage() {
                                                 key={style.id}
                                                 onClick={() => updateData({ hairStyle: style.id })}
                                                 className={`p-3 rounded-xl border text-left transition-all ${data.hairStyle === style.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -319,7 +319,7 @@ export default function AvatarCreationPage() {
                                                 key={color.id}
                                                 onClick={() => updateData({ eyeColor: color.id })}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${data.eyeColor === color.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -342,7 +342,7 @@ export default function AvatarCreationPage() {
                                                 key={tone.id}
                                                 onClick={() => updateData({ skinTone: tone.id })}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${data.skinTone === tone.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -365,7 +365,7 @@ export default function AvatarCreationPage() {
                                                 key={style.id}
                                                 onClick={() => updateData({ lipStyle: style.id })}
                                                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${data.lipStyle === style.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -387,7 +387,7 @@ export default function AvatarCreationPage() {
                                                 key={feature.id}
                                                 onClick={() => toggleFeature(feature.id)}
                                                 className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${data.features.includes(feature.id)
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -407,7 +407,7 @@ export default function AvatarCreationPage() {
                                                 key={height.id}
                                                 onClick={() => updateData({ bodyHeight: height.id })}
                                                 className={`flex-1 p-4 rounded-xl border text-center transition-all ${data.bodyHeight === height.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -428,7 +428,7 @@ export default function AvatarCreationPage() {
                                                 key={type.id}
                                                 onClick={() => updateData({ bodyType: type.id })}
                                                 className={`p-4 rounded-xl border text-center transition-all ${data.bodyType === type.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -480,7 +480,7 @@ export default function AvatarCreationPage() {
                     {/* Generating Step */}
                     {step === "generating" && (
                         <div className="text-center py-20">
-                            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-pulse">
+                            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center animate-pulse">
                                 <Wand2 className="w-12 h-12 text-white animate-bounce" />
                             </div>
                             <h2 className="text-2xl font-bold mb-2">Generating Avatars...</h2>
@@ -489,7 +489,7 @@ export default function AvatarCreationPage() {
                             {/* Progress bar */}
                             <div className="w-64 mx-auto bg-zinc-800 rounded-full h-2 overflow-hidden">
                                 <div
-                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
+                                    className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300"
                                     style={{ width: `${generationProgress}%` }}
                                 />
                             </div>
@@ -509,7 +509,7 @@ export default function AvatarCreationPage() {
                                     <button
                                         key={index}
                                         onClick={() => handleSelectAvatar(index)}
-                                        className="aspect-square rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-purple-500 transition-all group overflow-hidden relative"
+                                        className="aspect-square rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-teal-500 transition-all group overflow-hidden relative"
                                     >
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
@@ -517,7 +517,7 @@ export default function AvatarCreationPage() {
                                             alt={`Avatar option ${index + 1}`}
                                             className="w-full h-full object-cover"
                                         />
-                                        <div className="absolute inset-0 bg-purple-500/0 group-hover:bg-purple-500/20 transition-colors flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-teal-500/0 group-hover:bg-teal-500/20 transition-colors flex items-center justify-center">
                                             <Check className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                                         </div>
                                     </button>
@@ -539,15 +539,15 @@ export default function AvatarCreationPage() {
                     {step === "library" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
-                                <Library className="w-6 h-6 text-purple-400" />
-                                <span className="text-sm text-purple-400 font-medium">Avatar Library</span>
+                                <Library className="w-6 h-6 text-teal-400" />
+                                <span className="text-sm text-teal-400 font-medium">Avatar Library</span>
                             </div>
                             <h1 className="text-3xl font-bold mb-2">Choose from Library</h1>
                             <p className="text-zinc-400 mb-8">Select a previously generated avatar</p>
 
                             {isLoadingLibrary ? (
                                 <div className="text-center py-12">
-                                    <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                    <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                                     <p className="text-zinc-400">Loading library...</p>
                                 </div>
                             ) : libraryAvatars.length === 0 ? (
@@ -560,7 +560,7 @@ export default function AvatarCreationPage() {
                                         <button
                                             key={avatar.id}
                                             onClick={() => handleSelectFromLibrary(avatar)}
-                                            className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 hover:border-purple-500 transition-all group overflow-hidden relative"
+                                            className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 hover:border-teal-500 transition-all group overflow-hidden relative"
                                         >
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
@@ -568,7 +568,7 @@ export default function AvatarCreationPage() {
                                                 alt="Library avatar"
                                                 className="w-full h-full object-cover"
                                             />
-                                            <div className="absolute inset-0 bg-purple-500/0 group-hover:bg-purple-500/20 transition-colors flex items-center justify-center">
+                                            <div className="absolute inset-0 bg-teal-500/0 group-hover:bg-teal-500/20 transition-colors flex items-center justify-center">
                                                 <Check className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                                             </div>
                                         </button>

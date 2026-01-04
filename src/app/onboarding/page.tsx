@@ -158,7 +158,7 @@ export default function OnboardingPage() {
             <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/5">
                 <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
                     <a href="/" className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-4 h-4 text-white" />
                         </div>
                         <span className="font-semibold text-lg">Livra</span>
@@ -170,9 +170,9 @@ export default function OnboardingPage() {
                             <div
                                 key={s}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${s === step
-                                    ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white"
+                                    ? "bg-gradient-to-br from-teal-500 to-emerald-500 text-white"
                                     : s < step
-                                        ? "bg-purple-500/20 text-purple-400"
+                                        ? "bg-teal-500/20 text-teal-400"
                                         : "bg-zinc-800 text-zinc-500"
                                     }`}
                             >
@@ -190,8 +190,8 @@ export default function OnboardingPage() {
                     {step === 1 && (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
-                                <MapPin className="w-6 h-6 text-purple-400" />
-                                <span className="text-sm text-purple-400 font-medium">Step 1 of 4</span>
+                                <MapPin className="w-6 h-6 text-teal-400" />
+                                <span className="text-sm text-teal-400 font-medium">Step 1 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Define the World</h1>
                             <p className="text-zinc-400 mb-8">Where will your influencer live?</p>
@@ -205,7 +205,7 @@ export default function OnboardingPage() {
                                             value={data.country}
                                             onChange={(e) => updateData({ country: e.target.value })}
                                             placeholder="e.g. United States"
-                                            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-teal-500 focus:outline-none transition-colors"
                                         />
                                     </div>
                                     <div>
@@ -215,7 +215,7 @@ export default function OnboardingPage() {
                                             value={data.city}
                                             onChange={(e) => updateData({ city: e.target.value })}
                                             placeholder="e.g. Los Angeles"
-                                            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-teal-500 focus:outline-none transition-colors"
                                         />
                                     </div>
                                 </div>
@@ -227,7 +227,7 @@ export default function OnboardingPage() {
                                         value={data.neighborhood}
                                         onChange={(e) => updateData({ neighborhood: e.target.value })}
                                         placeholder="e.g. Silver Lake"
-                                        className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none transition-colors"
+                                        className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-teal-500 focus:outline-none transition-colors"
                                     />
                                 </div>
 
@@ -242,7 +242,7 @@ export default function OnboardingPage() {
                                                 key={style.id}
                                                 onClick={() => updateData({ apartmentStyle: style.id })}
                                                 className={`p-4 rounded-xl border text-left transition-all ${data.apartmentStyle === style.id
-                                                    ? "border-purple-500 bg-purple-500/10"
+                                                    ? "border-teal-500 bg-teal-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >
@@ -260,8 +260,8 @@ export default function OnboardingPage() {
                     {step === 2 && (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
-                                <User className="w-6 h-6 text-pink-400" />
-                                <span className="text-sm text-pink-400 font-medium">Step 2 of 4</span>
+                                <User className="w-6 h-6 text-emerald-400" />
+                                <span className="text-sm text-emerald-400 font-medium">Step 2 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Create the Persona</h1>
                             <p className="text-zinc-400 mb-8">Who will your influencer be?</p>
@@ -274,7 +274,7 @@ export default function OnboardingPage() {
                                         value={data.name}
                                         onChange={(e) => updateData({ name: e.target.value })}
                                         placeholder="e.g. Luna Martinez"
-                                        className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-pink-500 focus:outline-none transition-colors"
+                                        className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-emerald-500 focus:outline-none transition-colors"
                                     />
                                 </div>
 
@@ -289,7 +289,7 @@ export default function OnboardingPage() {
                                                 key={vibe.id}
                                                 onClick={() => updateData({ personalityVibe: vibe.id })}
                                                 className={`p-4 rounded-xl border text-left transition-all ${data.personalityVibe === vibe.id
-                                                    ? "border-pink-500 bg-pink-500/10"
+                                                    ? "border-emerald-500 bg-emerald-500/10"
                                                     : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                                                     }`}
                                             >

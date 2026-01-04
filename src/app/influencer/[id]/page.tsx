@@ -125,7 +125,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                         <span className="text-sm">Back to Dashboard</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-3.5 h-3.5 text-white" />
                         </div>
                         <span className="font-semibold">Livra</span>
@@ -147,7 +147,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                     className="w-20 h-20 rounded-full object-cover flex-shrink-0"
                                 />
                             ) : (
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl font-bold flex-shrink-0">
+                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-3xl font-bold flex-shrink-0">
                                     {influencer.name.charAt(0)}
                                 </div>
                             )}
@@ -190,7 +190,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                         {/* Generate new */}
                                         <Link
                                             href={`/influencer/${influencer.id}/avatar`}
-                                            className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-purple-400 transition-all"
+                                            className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all"
                                             title="Generate New Avatar"
                                         >
                                             <Wand2 className="w-5 h-5" />
@@ -212,21 +212,21 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                     {influencer.faceReferences.length === 0 && (
                         <Link
                             href={`/influencer/${influencer.id}/avatar`}
-                            className="block glass-card rounded-2xl p-6 mb-8 border border-purple-500/30 hover:border-purple-500/50 transition-all group"
+                            className="block glass-card rounded-2xl p-6 mb-8 border border-teal-500/30 hover:border-teal-500/50 transition-all group"
                         >
                             <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                                    <Sparkles className="w-8 h-8 text-purple-400 group-hover:scale-110 transition-transform" />
+                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-500/20 to-emerald-500/20 flex items-center justify-center">
+                                    <Sparkles className="w-8 h-8 text-teal-400 group-hover:scale-110 transition-transform" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="font-semibold text-lg group-hover:text-purple-400 transition-colors">
+                                    <h3 className="font-semibold text-lg group-hover:text-teal-400 transition-colors">
                                         Create Your Avatar
                                     </h3>
                                     <p className="text-sm text-zinc-400">
                                         Define {influencer.name}&apos;s appearance and generate AI avatar options
                                     </p>
                                 </div>
-                                <div className="text-purple-400">
+                                <div className="text-teal-400">
                                     <ArrowLeft className="w-5 h-5 rotate-180" />
                                 </div>
                             </div>
