@@ -199,6 +199,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                 <LifecycleControls
                                     influencerId={influencer.id}
                                     initialIsActive={(influencer as any).isActive || false}
+                                    hasAvatar={influencer.faceReferences.length > 0}
                                 />
                                 <button className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 transition-all">
                                     <Download className="w-5 h-5" />
