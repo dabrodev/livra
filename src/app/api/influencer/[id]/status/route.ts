@@ -10,20 +10,37 @@ export async function POST(
     const { active } = await req.json();
 
     try {
-        const influencer = await prisma.influencer.update({
+        // Get current influencer state
+        const current = await prisma.influencer.findUnique({
             where: { id },
-            data: { isActive: active } as any,
+            select: { lifecycleStartedAt: true }
         });
 
-        // If activating, trigger the first cycle
-        if (active) {
+        const isFirstStart = active && !current?.lifecycleStartedAt;
+
+        // Update influencer status
+        const influencer = await prisma.influencer.update({
+            where: { id },
+            data: {
+                isActive: active,
+                // Set lifecycleStartedAt only on first start
+                ...(isFirstStart && { lifecycleStartedAt: new Date() })
+            } as any,
+        });
+
+        // Only send event on FIRST start, not on resume
+        if (isFirstStart) {
             await inngest.send({
                 name: 'livra/cycle.start',
                 data: { influencerId: id },
             });
         }
 
-        return NextResponse.json({ success: true, active: (influencer as any).isActive });
+        return NextResponse.json({
+            success: true,
+            active: (influencer as any).isActive,
+            isFirstStart
+        });
     } catch (error) {
         console.error("Failed to update status:", error);
         return NextResponse.json({ error: "Failed to update status" }, { status: 500 });

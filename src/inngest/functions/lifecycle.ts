@@ -247,8 +247,12 @@ Respond with a JSON object containing:
                 'slippers': 'wearing cozy indoor slippers',
             };
 
+            // Random tights color for variety
+            const tightsColors = ['black', 'nude', 'sheer nude', 'white', 'gray', 'navy'];
+            const randomTightsColor = tightsColors[Math.floor(Math.random() * tightsColors.length)];
+
             const signatureDescriptions: Record<string, string> = {
-                'tights': 'MUST be wearing sheer or opaque tights/pantyhose on legs - this is a signature style element',
+                'tights': `MUST be wearing ${randomTightsColor} sheer tights on legs - this is a signature style element`,
                 'oversized-sweaters': 'wearing an oversized cozy sweater',
                 'jewelry': 'wearing statement jewelry pieces',
                 'sunglasses': 'wearing stylish sunglasses',
@@ -297,9 +301,18 @@ Respond with a JSON object containing:
                 signatureDetails
             ].filter(Boolean).join('. ');
 
+            // Generate lighting description based on time of day
+            const lightingByTime: Record<string, string> = {
+                morning: 'soft morning sunlight, golden hour glow',
+                afternoon: 'bright natural daylight, clear sky',
+                evening: 'warm evening lighting, dim ambient light, night time atmosphere, dark outside'
+            };
+            const lightingDescription = lightingByTime[currentTimeOfDay] || lightingByTime.evening;
+
             const imagePrompt = `A beautiful, Instagram-worthy photo of a ${influencer.personalityVibe} influencer ${plan.activity} at ${plan.location || 'home'}. 
-The scene is ${plan.timeOfDay}, with ${environment.weather.condition} weather.
-Style: authentic lifestyle photography, natural lighting, warm tones.
+TIME OF DAY: ${plan.timeOfDay} - LIGHTING: ${lightingDescription}.
+Weather: ${environment.weather.condition}.
+Style: authentic lifestyle photography.
 Clothing style: ${influencer.clothingStyle}.
 IMPORTANT CLOTHING REQUIREMENTS: ${styleRequirements || 'casual comfortable attire'}.
 Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
@@ -316,8 +329,13 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
             )
 
             if (result.success && result.imageBase64) {
-                // Create post with generated image
-                const caption = `${plan.activity} ✨ #${influencer.city.toLowerCase().replace(/\s/g, '')} ${environment.trends.trends.slice(0, 2).join(' ')}`
+                // Create post with generated image - use time-appropriate hashtags
+                const timeHashtags: Record<string, string> = {
+                    morning: '#morningvibes #sunrise',
+                    afternoon: '#afternoonmood #lifestyle',
+                    evening: '#eveningvibes #nightout #nightlife'
+                };
+                const caption = `${plan.activity} ✨ #${influencer.city.toLowerCase().replace(/\s/g, '')} ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
 
                 // Save image to Supabase Storage
                 const imageUrl = await saveGeneratedImage(

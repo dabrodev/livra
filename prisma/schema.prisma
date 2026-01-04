@@ -39,6 +39,7 @@ model Influencer {
   
   posts           Post[]
   memories        Memory[]
+  lifecycleStartedAt DateTime? // Null = never started, set on first start
   createdAt       DateTime @default(now())
 }
 

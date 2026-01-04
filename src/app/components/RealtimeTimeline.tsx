@@ -38,6 +38,15 @@ interface PostRecord {
     postedAt: string;
 }
 
+// Parse timestamp ensuring UTC interpretation
+// Supabase real-time returns timestamps without 'Z', so JS interprets as local time
+function parseTimestamp(timestamp: string | Date): Date {
+    if (timestamp instanceof Date) return timestamp;
+    // If timestamp doesn't end with Z, add it to force UTC interpretation
+    const normalized = timestamp.endsWith('Z') ? timestamp : `${timestamp}Z`;
+    return new Date(normalized);
+}
+
 // Map activity keywords to icon names
 function getActivityIconName(description: string): string {
     const lowerDesc = description.toLowerCase();
@@ -88,7 +97,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
     // Convert memory record to timeline item
     const memoryToTimelineItem = useCallback((memory: MemoryRecord): TimelineItem => ({
         id: memory.id,
-        time: new Date(memory.createdAt),
+        time: parseTimestamp(memory.createdAt),
         icon: getActivityIconName(memory.description),
         action: memory.description.split(' - ')[0] || memory.description.slice(0, 30),
         description: memory.description,
@@ -99,7 +108,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
     // Convert post record to timeline item
     const postToTimelineItem = useCallback((post: PostRecord): TimelineItem => ({
         id: post.id,
-        time: new Date(post.postedAt),
+        time: parseTimestamp(post.postedAt),
         icon: 'Camera',
         action: post.type === 'VIDEO' ? 'Video generated' : 'Photo generated',
         description: post.caption,
