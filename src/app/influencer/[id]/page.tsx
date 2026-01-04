@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import {
     Sparkles, ArrowLeft, MapPin, Wallet, Download, Wand2,
-    Activity, Zap
+    Activity, Zap, Clock
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
 import AvatarSwap from "@/app/components/AvatarSwap";
@@ -45,6 +45,44 @@ function formatTime(date: Date): string {
         minute: '2-digit',
         hour12: false
     });
+}
+
+// Timezone mapping for cities
+const TIMEZONE_MAP: Record<string, string> = {
+    'New York': 'America/New_York',
+    'Los Angeles': 'America/Los_Angeles',
+    'London': 'Europe/London',
+    'Berlin': 'Europe/Berlin',
+    'Paris': 'Europe/Paris',
+    'Dubai': 'Asia/Dubai',
+    'Tokyo': 'Asia/Tokyo',
+    'Mumbai': 'Asia/Kolkata',
+    'Sydney': 'Australia/Sydney',
+    'São Paulo': 'America/Sao_Paulo',
+    'Lagos': 'Africa/Lagos',
+    'Stockholm': 'Europe/Stockholm',
+    'Warsaw': 'Europe/Warsaw',
+    'Krakow': 'Europe/Warsaw',
+    'Krakau': 'Europe/Warsaw',
+};
+
+// Get local time for a city
+function getLocalTimeForCity(city: string): string {
+    const timeZone = TIMEZONE_MAP[city] || 'UTC';
+    try {
+        return new Date().toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone
+        });
+    } catch {
+        return new Date().toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+    }
 }
 
 // Format relative time
@@ -165,6 +203,10 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                                     <span className="flex items-center gap-1">
                                         <MapPin className="w-3.5 h-3.5" />
                                         {influencer.city}, {influencer.country}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-teal-400">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        {getLocalTimeForCity(influencer.city)} local
                                     </span>
                                     <span className="flex items-center gap-1">
                                         <Wallet className="w-3.5 h-3.5" />

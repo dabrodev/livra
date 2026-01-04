@@ -361,17 +361,9 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
                     description: result.description,
                 }
             } else {
-                console.error('Image generation failed:', result.error)
-                // Create post without image (placeholder)
-                const post = await prisma.post.create({
-                    data: {
-                        influencerId,
-                        type: 'IMAGE',
-                        contentUrl: '',
-                        caption: `${plan.activity} ✨ #${influencer.city.toLowerCase().replace(/\s/g, '')}`,
-                    },
-                })
-                return { postId: post.id, contentUrl: '', caption: post.caption, error: result.error }
+                // Throw error to trigger Inngest retry
+                console.error('Image generation failed, will retry:', result.error)
+                throw new Error(`Image generation failed: ${result.error}`)
             }
         })
 
