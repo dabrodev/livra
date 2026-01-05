@@ -18,6 +18,16 @@ interface EnvironmentContext {
     trends: TrendsResult
 }
 
+// Daily outfit that persists through the day
+interface DailyOutfit {
+    top: string           // e.g., "white oversized sweater"
+    bottom: string        // e.g., "black leggings"
+    footwear: string      // e.g., "white sneakers"
+    accessories: string   // e.g., "gold necklace, small earrings"
+    tightsColor: string | null  // e.g., "sheer nude" or null if not wearing
+    outerwear: string | null    // e.g., "beige trench coat" for outdoor
+}
+
 // Activity status types for real-time tracking
 type ActivityStatus = 'sleeping' | 'planning' | 'creating' | 'active' | 'resting';
 
@@ -71,7 +81,15 @@ function getLocalHour(city: string): number {
 }
 
 export const lifecycleCycle = inngest.createFunction(
-    { id: 'lifecycle-cycle' },
+    {
+        id: 'lifecycle-cycle',
+        cancelOn: [
+            {
+                event: 'livra/cycle.stop',
+                match: 'data.influencerId',
+            }
+        ]
+    },
     { event: 'livra/cycle.start' },
     async ({ event, step }) => {
         const influencerId = event.data.influencerId as string
@@ -150,14 +168,100 @@ export const lifecycleCycle = inngest.createFunction(
             return { weather, trends }
         })
 
-        // Step 2: Daily Plan - Agent decides next activity
-        // Determine time of day based on local hour
+        // Step 1.5: Daily Outfit Selection (once per day, persists until next morning)
         const getTimeOfDay = (hour: number): string => {
             if (hour >= 5 && hour < 12) return 'morning';
             if (hour >= 12 && hour < 17) return 'afternoon';
             return 'evening';
         };
         const currentTimeOfDay = getTimeOfDay(localHour);
+
+        // Check if we need a new outfit (first activity of the day or no outfit set)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const needsNewOutfit = !influencer.dailyOutfit ||
+            !influencer.dailyOutfitDate ||
+            new Date(influencer.dailyOutfitDate) < today;
+
+        const dailyOutfit = await step.run('get-or-create-daily-outfit', async (): Promise<DailyOutfit> => {
+            if (!needsNewOutfit && influencer.dailyOutfit) {
+                console.log(`[Lifecycle] ${influencer.name} using existing daily outfit`);
+                return influencer.dailyOutfit as unknown as DailyOutfit;
+            }
+
+            console.log(`[Lifecycle] ${influencer.name} selecting new daily outfit`);
+
+            // Generate outfit based on influencer preferences and weather
+            const tightsColors = ['black', 'nude', 'sheer nude', 'white', 'gray', 'navy'];
+            const hasTights = influencer.signatureItems.includes('tights');
+            const tightsColor = hasTights ? tightsColors[Math.floor(Math.random() * tightsColors.length)] : null;
+
+            // Select bottom based on preferences
+            const bottom = influencer.bottomwear.length > 0
+                ? influencer.bottomwear[Math.floor(Math.random() * influencer.bottomwear.length)]
+                : 'jeans';
+
+            // Select footwear (outdoor default for day)
+            const outdoorFootwear = influencer.footwear.filter(f => f !== 'barefoot' && f !== 'slippers');
+            const footwear = outdoorFootwear.length > 0
+                ? outdoorFootwear[Math.floor(Math.random() * outdoorFootwear.length)]
+                : 'comfortable shoes';
+
+            // Generate top based on clothing style
+            const topsByStyle: Record<string, string[]> = {
+                'casual': ['cozy sweater', 'relaxed t-shirt', 'soft cardigan', 'casual blouse'],
+                'sporty': ['athleisure top', 'fitted tank', 'sporty zip-up', 'performance tee'],
+                'elegant': ['silk blouse', 'fitted turtleneck', 'cashmere sweater', 'structured top'],
+                'streetwear': ['oversized hoodie', 'graphic tee', 'crop top', 'designer sweatshirt'],
+                'bohemian': ['flowy blouse', 'embroidered top', 'off-shoulder top', 'peasant blouse'],
+            };
+            const styleTops = topsByStyle[influencer.clothingStyle] || topsByStyle['casual'];
+            const top = styleTops[Math.floor(Math.random() * styleTops.length)];
+
+            // Outerwear based on weather
+            let outerwear: string | null = null;
+            if (environment.weather.temp < 15) {
+                outerwear = environment.weather.temp < 5 ? 'warm winter coat' : 'light jacket';
+            }
+
+            // Accessories based on signature items
+            const accessories = influencer.signatureItems
+                .filter(s => s !== 'tights')
+                .map(s => {
+                    const accessoryMap: Record<string, string> = {
+                        'jewelry': 'delicate gold jewelry',
+                        'sunglasses': 'stylish sunglasses',
+                        'hats': 'fashionable hat',
+                        'oversized-sweaters': '', // already in top
+                    };
+                    return accessoryMap[s] || '';
+                })
+                .filter(Boolean)
+                .join(', ') || 'minimal accessories';
+
+            const newOutfit: DailyOutfit = {
+                top,
+                bottom,
+                footwear,
+                accessories,
+                tightsColor,
+                outerwear,
+            };
+
+            // Save to database (cast to Prisma-compatible JSON type)
+            await prisma.influencer.update({
+                where: { id: influencerId },
+                data: {
+                    dailyOutfit: JSON.parse(JSON.stringify(newOutfit)),
+                    dailyOutfitDate: new Date(),
+                },
+            });
+
+            return newOutfit;
+        });
+
+        // Step 2: Daily Plan - Agent decides next activity
 
         const plan = await step.run('create-daily-plan', async (): Promise<ActivityPlan> => {
             const recentMemories = influencer.memories
@@ -275,78 +379,67 @@ Respond with a JSON object containing:
             // Update activity status: CREATING
             await updateActivityStatus(influencerId, 'creating', 'Generating content...');
 
-            // Dynamic mappings for stronger AI instructions
-            const footwearDescriptions: Record<string, string> = {
-                'barefoot': 'barefoot with no shoes or socks, bare feet visible',
-                'sneakers': 'wearing casual sneakers',
-                'heels': 'wearing elegant high heels',
-                'boots': 'wearing stylish boots',
-                'sandals': 'wearing open sandals',
-                'slippers': 'wearing cozy indoor slippers',
-            };
-
-            // Random tights color for variety
-            const tightsColors = ['black', 'nude', 'sheer nude', 'white', 'gray', 'navy'];
-            const randomTightsColor = tightsColors[Math.floor(Math.random() * tightsColors.length)];
-
-            const signatureDescriptions: Record<string, string> = {
-                'tights': `MUST be wearing ${randomTightsColor} sheer tights on legs - this is a signature style element`,
-                'oversized-sweaters': 'wearing an oversized cozy sweater',
-                'jewelry': 'wearing statement jewelry pieces',
-                'sunglasses': 'wearing stylish sunglasses',
-                'hats': 'wearing a fashionable hat or cap',
-                'layered-looks': 'wearing layered clothing',
-                'crop-tops': 'wearing a crop top',
-                'maxi-dresses': 'wearing a flowing maxi dress',
-            };
-
-            // Build detailed style requirements
-            // Determine if activity is indoors/at home
+            // Determine context for outfit variations
             const isAtHome = !plan.location ||
                 plan.location.toLowerCase().includes('home') ||
                 plan.location.toLowerCase().includes('apartment');
 
-            // Filter footwear based on context
-            const contextualFootwear = influencer.footwear.filter(f => {
-                // Barefoot only makes sense at home
-                if (f === 'barefoot' && !isAtHome) return false;
-                // Slippers only at home
-                if (f === 'slippers' && !isAtHome) return false;
-                return true;
-            });
+            const isWorkout = plan.activity.toLowerCase().includes('yoga') ||
+                plan.activity.toLowerCase().includes('gym') ||
+                plan.activity.toLowerCase().includes('workout') ||
+                plan.activity.toLowerCase().includes('exercise') ||
+                plan.activity.toLowerCase().includes('fitness');
 
-            // If all footwear was filtered out (e.g., only had barefoot but going outside), use default
-            const footwearToUse = contextualFootwear.length > 0
-                ? contextualFootwear
-                : (isAtHome ? influencer.footwear : ['comfortable shoes']);
+            // Build outfit description based on dailyOutfit with contextual variations
+            let outfitDescription: string;
 
-            const footwearDetails = footwearToUse
-                .map(f => footwearDescriptions[f] || f)
-                .join(', ');
+            if (isWorkout) {
+                // Special workout outfit
+                outfitDescription = `wearing athletic workout clothes: fitted sports top, comfortable leggings${dailyOutfit.tightsColor ? `, ${dailyOutfit.tightsColor} athletic tights underneath` : ''}`;
+            } else {
+                // Regular daily outfit with context variations
+                const topDesc = dailyOutfit.top;
+                const bottomDesc = dailyOutfit.bottom;
 
-            // Check if wearing tights without shoes (needs reinforced toe for realism)
-            const isWithoutShoes = footwearToUse.some(f => f === 'barefoot' || f === 'slippers');
-
-            const signatureDetails = influencer.signatureItems
-                .map(s => {
-                    if (s === 'tights' && isWithoutShoes) {
-                        // When barefoot/slippers, tights need reinforced toe for realistic look
-                        return `MUST be wearing ${randomTightsColor} sheer tights with reinforced toe on legs - visible toes covered by tights fabric`;
+                // Footwear varies by context
+                let footwearDesc: string;
+                if (isAtHome) {
+                    // At home: barefoot or slippers
+                    const homeFootwear = influencer.footwear.find(f => f === 'barefoot' || f === 'slippers');
+                    if (homeFootwear === 'barefoot') {
+                        footwearDesc = 'barefoot with no shoes, bare feet visible';
+                    } else {
+                        footwearDesc = 'wearing cozy indoor slippers';
                     }
-                    return signatureDescriptions[s] || s;
-                })
-                .join('. ');
+                } else {
+                    footwearDesc = `wearing ${dailyOutfit.footwear}`;
+                }
 
-            const bottomwearDetails = influencer.bottomwear.length > 0
-                ? `wearing ${influencer.bottomwear.join(' or ')}`
-                : '';
+                // Tights with reinforced toe if barefoot
+                let tightsDesc = '';
+                if (dailyOutfit.tightsColor) {
+                    const isBarefootOrSlippers = isAtHome && influencer.footwear.some(f => f === 'barefoot' || f === 'slippers');
+                    if (isBarefootOrSlippers) {
+                        tightsDesc = `MUST be wearing ${dailyOutfit.tightsColor} sheer tights with reinforced toe on legs - visible toes covered by tights fabric`;
+                    } else {
+                        tightsDesc = `MUST be wearing ${dailyOutfit.tightsColor} sheer tights on legs`;
+                    }
+                }
 
-            // Build comprehensive style section
-            const styleRequirements = [
-                bottomwearDetails,
-                footwearDetails,
-                signatureDetails
-            ].filter(Boolean).join('. ');
+                // Outerwear only outdoors
+                const outerwearDesc = !isAtHome && dailyOutfit.outerwear
+                    ? `, with ${dailyOutfit.outerwear}`
+                    : '';
+
+                outfitDescription = [
+                    `wearing ${topDesc}`,
+                    bottomDesc,
+                    footwearDesc,
+                    tightsDesc,
+                    dailyOutfit.accessories,
+                    outerwearDesc
+                ].filter(Boolean).join(', ');
+            }
 
             // Generate lighting description based on time of day
             const lightingByTime: Record<string, string> = {
@@ -356,13 +449,26 @@ Respond with a JSON object containing:
             };
             const lightingDescription = lightingByTime[currentTimeOfDay] || lightingByTime.evening;
 
+            // Get current month and season for context
+            const now = new Date();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const currentMonth = monthNames[now.getMonth()];
+
+            // Determine season (Northern Hemisphere - most cities are there)
+            const month = now.getMonth();
+            let season = 'spring';
+            if (month >= 11 || month <= 1) season = 'winter';
+            else if (month >= 2 && month <= 4) season = 'spring';
+            else if (month >= 5 && month <= 7) season = 'summer';
+            else season = 'autumn';
+
             const imagePrompt = `A beautiful, Instagram-worthy photo of a ${influencer.personalityVibe} influencer ${plan.activity} at ${plan.location || 'home'}. 
-TIME OF DAY: ${plan.timeOfDay} - LIGHTING: ${lightingDescription}.
-Weather: ${environment.weather.condition}.
+TIME: ${currentMonth} ${season}, ${localHour}:00 local time (${plan.timeOfDay}) - LIGHTING: ${lightingDescription}.
+Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}.
 Style: authentic lifestyle photography.
-Clothing style: ${influencer.clothingStyle}.
-IMPORTANT CLOTHING REQUIREMENTS: ${styleRequirements || 'casual comfortable attire'}.
+OUTFIT (consistent daily look): ${outfitDescription}.
 Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
+
 
             // Generate image with face and room references
             const result = await generateInfluencerImage(
@@ -382,7 +488,17 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
                     afternoon: '#afternoonmood #lifestyle',
                     evening: '#eveningvibes #nightout #nightlife'
                 };
-                const caption = `${plan.activity} ✨ #${influencer.city.toLowerCase().replace(/\s/g, '')} ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
+
+                // Weather emoji
+                const weatherEmoji: Record<string, string> = {
+                    sunny: '☀️',
+                    cloudy: '☁️',
+                    rainy: '🌧️',
+                    snowy: '❄️',
+                };
+                const emoji = weatherEmoji[environment.weather.condition] || '🌤️';
+
+                const caption = `${plan.activity} ${emoji} ${environment.weather.temp}°C in ${influencer.city} ✨ ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
 
                 // Save image to Supabase Storage
                 const imageUrl = await saveGeneratedImage(
@@ -416,7 +532,7 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
 
         // Step 6: Daytime Rest (Siesta / Break)
         // Since we are in day mode, we just take a short break between activities (2-4 hours)
-        const randomHours = Math.floor(Math.random() * 3) + 2;
+        const randomHours = Math.floor(Math.random() * 3) + 3; // 3-5 hours between activities
         const sleepDuration = `${randomHours}h`;
 
         console.log(`[Lifecycle] ${influencer.name} completed activity. Taking a break for ${sleepDuration}.`);

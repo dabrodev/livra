@@ -47,6 +47,10 @@ model Influencer {
   activityDetails   String?                      // Human-readable description e.g., "Morning Coffee at Café Luna"
   activityStartedAt DateTime?                    // When current activity started
   
+  // Daily Outfit (persists through the day, changes each morning)
+  dailyOutfit       Json?                        // { top, bottom, footwear, accessories, tightsColor }
+  dailyOutfitDate   DateTime?                    // Date when outfit was selected (to reset next day)
+  
   createdAt       DateTime @default(now())
 }
 

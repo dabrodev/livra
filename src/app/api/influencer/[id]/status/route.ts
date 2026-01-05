@@ -96,6 +96,14 @@ export async function POST(
             });
         }
 
+        // Send stop event on pause to cancel running functions
+        if (!active) {
+            await inngest.send({
+                name: 'livra/cycle.stop',
+                data: { influencerId: id },
+            });
+        }
+
         return NextResponse.json({
             success: true,
             active: influencer.isActive,
