@@ -10,21 +10,34 @@ export type WeatherResult = {
 
 // City coordinates for Open-Meteo API
 const CITY_COORDINATES: Record<string, { lat: number; lon: number }> = {
-    'New York': { lat: 40.7128, lon: -74.0060 },
-    'Los Angeles': { lat: 34.0522, lon: -118.2437 },
-    'London': { lat: 51.5074, lon: -0.1278 },
-    'Berlin': { lat: 52.5200, lon: 13.4050 },
-    'Paris': { lat: 48.8566, lon: 2.3522 },
-    'Dubai': { lat: 25.2048, lon: 55.2708 },
-    'Tokyo': { lat: 35.6762, lon: 139.6503 },
-    'Mumbai': { lat: 19.0760, lon: 72.8777 },
-    'Sydney': { lat: -33.8688, lon: 151.2093 },
-    'São Paulo': { lat: -23.5505, lon: -46.6333 },
-    'Lagos': { lat: 6.5244, lon: 3.3792 },
-    'Stockholm': { lat: 59.3293, lon: 18.0686 },
-    'Warsaw': { lat: 52.2297, lon: 21.0122 },
-    'Krakow': { lat: 50.0647, lon: 19.9450 },
+    'new york': { lat: 40.7128, lon: -74.0060 },
+    'los angeles': { lat: 34.0522, lon: -118.2437 },
+    'london': { lat: 51.5074, lon: -0.1278 },
+    'berlin': { lat: 52.5200, lon: 13.4050 },
+    'paris': { lat: 48.8566, lon: 2.3522 },
+    'dubai': { lat: 25.2048, lon: 55.2708 },
+    'tokyo': { lat: 35.6762, lon: 139.6503 },
+    'mumbai': { lat: 19.0760, lon: 72.8777 },
+    'sydney': { lat: -33.8688, lon: 151.2093 },
+    'sao paulo': { lat: -23.5505, lon: -46.6333 },
+    'lagos': { lat: 6.5244, lon: 3.3792 },
+    'stockholm': { lat: 59.3293, lon: 18.0686 },
+    'warsaw': { lat: 52.2297, lon: 21.0122 },
+    'krakow': { lat: 50.0647, lon: 19.9450 },
+    'cracow': { lat: 50.0647, lon: 19.9450 },
 };
+
+/**
+ * Normalize city name for lookup - handles accents and common variations
+ */
+function normalizeCity(city: string): string {
+    return city
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics (ó -> o, etc.)
+        .replace(/ł/g, 'l') // Polish ł -> l
+        .trim();
+}
 
 // WMO Weather interpretation codes
 // https://open-meteo.com/en/docs
@@ -40,7 +53,8 @@ function interpretWeatherCode(code: number): { condition: string; description: s
  * Get real-time weather using Open-Meteo API (free, no API key needed)
  */
 export async function getWeather(city: string): Promise<WeatherResult> {
-    const coords = CITY_COORDINATES[city];
+    const normalizedCity = normalizeCity(city);
+    const coords = CITY_COORDINATES[normalizedCity];
 
     if (!coords) {
         console.warn(`No coordinates for city: ${city}, using default weather`);

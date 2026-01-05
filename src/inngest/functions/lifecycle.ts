@@ -62,6 +62,9 @@ const TIMEZONE_MAP: Record<string, string> = {
     'Lagos': 'Africa/Lagos',
     'Stockholm': 'Europe/Stockholm',
     'Warsaw': 'Europe/Warsaw',
+    'Krakow': 'Europe/Warsaw',
+    'Kraków': 'Europe/Warsaw',
+    'Cracow': 'Europe/Warsaw',
 }
 
 function getLocalHour(city: string): number {
@@ -420,7 +423,7 @@ Respond with a JSON object containing:
                 if (dailyOutfit.tightsColor) {
                     const isBarefootOrSlippers = isAtHome && influencer.footwear.some(f => f === 'barefoot' || f === 'slippers');
                     if (isBarefootOrSlippers) {
-                        tightsDesc = `MUST be wearing ${dailyOutfit.tightsColor} sheer tights with reinforced toe on legs - visible toes covered by tights fabric`;
+                        tightsDesc = `MUST be wearing ${dailyOutfit.tightsColor} sheer tights on legs and feet, with reinforced toes (slightly thicker fabric at the toes but still sheer, toes visible through)`;
                     } else {
                         tightsDesc = `MUST be wearing ${dailyOutfit.tightsColor} sheer tights on legs`;
                     }
@@ -514,6 +517,7 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
                         type: 'IMAGE',
                         contentUrl: imageUrl || '',
                         caption,
+                        prompt: imagePrompt,
                     },
                 })
 

@@ -125,7 +125,8 @@ const TIMEZONE_MAP: Record<string, string> = {
     'Stockholm': 'Europe/Stockholm',
     'Warsaw': 'Europe/Warsaw',
     'Krakow': 'Europe/Warsaw',
-    'Krakau': 'Europe/Warsaw',
+    'Kraków': 'Europe/Warsaw',
+    'Cracow': 'Europe/Warsaw',
 };
 
 // Get local time for a city
