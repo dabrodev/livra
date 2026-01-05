@@ -195,58 +195,109 @@ export const lifecycleCycle = inngest.createFunction(
 
             console.log(`[Lifecycle] ${influencer.name} selecting new daily outfit`);
 
-            // Generate outfit based on influencer preferences and weather
+            // Helper for random selection
+            const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+            // Colors and Materials Arrays
+            const colors = {
+                neutral: ['black', 'white', 'grey', 'beige', 'cream', 'navy', 'camel'],
+                pastel: ['soft pink', 'baby blue', 'mint green', 'lavender', 'pale yellow'],
+                bold: ['emerald green', 'royal blue', 'ruby red', 'mustard yellow', 'deep purple'],
+                earth: ['olive green', 'terracotta', 'rust', 'chocolate brown', 'sage'],
+            };
+            const allColors = [...colors.neutral, ...colors.pastel, ...colors.bold, ...colors.earth];
+
+            const materials = {
+                knit: ['cashmere', 'wool', 'chunky knit', 'ribbed'],
+                top: ['silk', 'cotton', 'linen', 'satin'],
+                bottom: ['denim', 'leather', 'suede', 'corduroy'],
+                coat: ['wool', 'trench', 'faux fur', 'puffer'],
+            };
+
+            // Enhanced Tights Logic
             const tightsColors = ['black', 'nude', 'sheer nude', 'white', 'gray', 'navy'];
+            // Signature items overrides
             const hasTights = influencer.signatureItems.includes('tights');
-            const tightsColor = hasTights ? tightsColors[Math.floor(Math.random() * tightsColors.length)] : null;
+            const tightsColor = hasTights ? pick(tightsColors) : null;
 
-            // Select bottom based on preferences
-            const bottom = influencer.bottomwear.length > 0
-                ? influencer.bottomwear[Math.floor(Math.random() * influencer.bottomwear.length)]
-                : 'jeans';
-
-            // Select footwear (outdoor default for day)
-            const outdoorFootwear = influencer.footwear.filter(f => f !== 'barefoot' && f !== 'slippers');
-            const footwear = outdoorFootwear.length > 0
-                ? outdoorFootwear[Math.floor(Math.random() * outdoorFootwear.length)]
-                : 'comfortable shoes';
-
-            // Generate top based on clothing style
+            // Generate Top
             const topsByStyle: Record<string, string[]> = {
-                'casual': ['cozy sweater', 'relaxed t-shirt', 'soft cardigan', 'casual blouse'],
-                'sporty': ['athleisure top', 'fitted tank', 'sporty zip-up', 'performance tee'],
-                'elegant': ['silk blouse', 'fitted turtleneck', 'cashmere sweater', 'structured top'],
-                'streetwear': ['oversized hoodie', 'graphic tee', 'crop top', 'designer sweatshirt'],
-                'bohemian': ['flowy blouse', 'embroidered top', 'off-shoulder top', 'peasant blouse'],
+                'casual': ['sweater', 'cardigan', 't-shirt', 'blouse'],
+                'sporty': ['tank top', 'zip-up', 'hoodie', 'sports tee'],
+                'elegant': ['blouse', 'turtleneck', 'sweater', 'shirt'],
+                'streetwear': ['hoodie', 'sweatshirt', 'crop top', 'graphic tee'],
+                'bohemian': ['blouse', 'tunic', 'top', 'kimono'],
             };
             const styleTops = topsByStyle[influencer.clothingStyle] || topsByStyle['casual'];
-            const top = styleTops[Math.floor(Math.random() * styleTops.length)];
+            const topItem = pick(styleTops);
 
-            // Outerwear based on weather
+            // Randomize top details
+            let topMaterial = pick(materials.top);
+            let topColor = pick(allColors);
+            if (topItem.includes('sweater') || topItem.includes('cardigan') || topItem.includes('knits')) {
+                topMaterial = pick(materials.knit);
+                topColor = pick([...colors.neutral, ...colors.earth, ...colors.pastel]);
+            }
+            const top = `${topColor} ${topMaterial} ${topItem}`;
+
+            // Generate Bottom
+            const bottomItem = influencer.bottomwear.length > 0
+                ? pick(influencer.bottomwear)
+                : 'jeans';
+
+            let bottomDesc = bottomItem;
+            if (bottomItem === 'jeans') {
+                bottomDesc = `${pick(['light wash', 'dark wash', 'black', 'white'])} denim jeans`;
+            } else if (bottomItem === 'skirts') {
+                bottomDesc = `${pick(allColors)} ${pick(['mini', 'midi', 'maxi'])} ${pick(['pleated', 'pencil', 'a-line'])} skirt`;
+            } else if (bottomItem === 'leggings') {
+                bottomDesc = `${pick(['black', 'navy', 'grey'])} leggings`;
+            } else {
+                bottomDesc = `${pick(allColors)} ${bottomItem}`;
+            }
+
+            // Generate Footwear
+            const outdoorFootwear = influencer.footwear.filter(f => f !== 'barefoot' && f !== 'slippers');
+            const footwearItem = outdoorFootwear.length > 0 ? pick(outdoorFootwear) : 'shoes';
+
+            let footwearDesc = footwearItem;
+            if (footwearItem.includes('heels')) {
+                footwearDesc = `${pick(['black', 'nude', 'red', 'gold', 'silver'])} ${pick(['stiletto', 'block'])} heels`;
+            } else if (footwearItem.includes('boots')) {
+                footwearDesc = `${pick(['black', 'brown', 'cream'])} leather ${pick(['ankle', 'knee-high'])} boots`;
+            } else if (footwearItem.includes('sneakers')) {
+                footwearDesc = `${pick(['white', 'colorful', 'chunky'])} sneakers`;
+            }
+
+            // Generate Outerwear
             let outerwear: string | null = null;
             if (environment.weather.temp < 15) {
-                outerwear = environment.weather.temp < 5 ? 'warm winter coat' : 'light jacket';
+                if (environment.weather.temp < 5) {
+                    outerwear = `${pick(['black', 'camel', 'grey', 'cream'])} ${pick(['wool coat', 'puffer jacket', 'faux fur coat'])}`;
+                } else {
+                    outerwear = `${pick(['beige', 'black', 'sage'])} ${pick(['trench coat', 'leather jacket', 'denim jacket'])}`;
+                }
             }
 
             // Accessories based on signature items
             const accessories = influencer.signatureItems
                 .filter(s => s !== 'tights')
                 .map(s => {
-                    const accessoryMap: Record<string, string> = {
-                        'jewelry': 'delicate gold jewelry',
-                        'sunglasses': 'stylish sunglasses',
-                        'hats': 'fashionable hat',
-                        'oversized-sweaters': '', // already in top
+                    const accessoryMap: Record<string, string[]> = {
+                        'jewelry': ['delicate gold necklace', 'silver hoop earrings', 'layered gold chains', 'pearl earrings'],
+                        'sunglasses': ['oversized sunglasses', 'aviator sunglasses', 'cat-eye sunglasses'],
+                        'hats': ['wide-brim hat', 'beanie', 'baseball cap'],
+                        'oversized-sweaters': [], // handled in top
                     };
-                    return accessoryMap[s] || '';
+                    return accessoryMap[s] ? pick(accessoryMap[s]) : '';
                 })
                 .filter(Boolean)
-                .join(', ') || 'minimal accessories';
+                .join(', ') || 'minimal gold jewelry';
 
             const newOutfit: DailyOutfit = {
                 top,
-                bottom,
-                footwear,
+                bottom: bottomDesc,
+                footwear: footwearDesc,
                 accessories,
                 tightsColor,
                 outerwear,
