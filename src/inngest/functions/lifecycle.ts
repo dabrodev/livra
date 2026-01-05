@@ -324,8 +324,17 @@ Respond with a JSON object containing:
                 .map(f => footwearDescriptions[f] || f)
                 .join(', ');
 
+            // Check if wearing tights without shoes (needs reinforced toe for realism)
+            const isWithoutShoes = footwearToUse.some(f => f === 'barefoot' || f === 'slippers');
+
             const signatureDetails = influencer.signatureItems
-                .map(s => signatureDescriptions[s] || s)
+                .map(s => {
+                    if (s === 'tights' && isWithoutShoes) {
+                        // When barefoot/slippers, tights need reinforced toe for realistic look
+                        return `MUST be wearing ${randomTightsColor} sheer tights with reinforced toe on legs - visible toes covered by tights fabric`;
+                    }
+                    return signatureDescriptions[s] || s;
+                })
                 .join('. ');
 
             const bottomwearDetails = influencer.bottomwear.length > 0
