@@ -1,46 +1,80 @@
 import { prisma } from "@/lib/db";
-import { Sparkles, Plus, MapPin, Wallet, Activity, Moon, Zap, Camera } from "lucide-react";
+import { Sparkles, Plus, MapPin, Wallet, Camera, Moon, Zap, Play, Pause, Brain, Coffee } from "lucide-react";
 import Link from "next/link";
 
-type InfluencerStatus = "generating" | "sleeping" | "active" | "idle";
-
-function getInfluencerStatus(lastActivityTime: Date | null, memoryCount: number): InfluencerStatus {
-    if (memoryCount === 0) return "idle";
-
-    if (!lastActivityTime) return "idle";
-
-    const now = new Date();
-    const diff = now.getTime() - new Date(lastActivityTime).getTime();
-    const hours = diff / (1000 * 60 * 60);
-
-    // If last activity was within 1 hour, consider generating
-    if (hours < 1) return "generating";
-
-    // If within 4 hours, active
-    if (hours < 4) return "active";
-
-    // If between 4-8 hours, sleeping
-    if (hours < 8) return "sleeping";
-
-    // Otherwise idle
-    return "idle";
+// Lifecycle Status (user-controlled: new/running/paused)
+function getLifecycleStatus(lifecycleStatus: string | null, lifecycleStartedAt: Date | null) {
+    if (!lifecycleStartedAt) {
+        return {
+            label: "New",
+            color: "text-zinc-400 bg-zinc-400/10",
+            icon: Sparkles,
+        };
+    }
+    if (lifecycleStatus === 'running') {
+        return {
+            label: "Running",
+            color: "text-green-400 bg-green-400/10",
+            icon: Play,
+        };
+    }
+    return {
+        label: "Paused",
+        color: "text-orange-400 bg-orange-400/10",
+        icon: Pause,
+    };
 }
 
-function StatusBadge({ status }: { status: InfluencerStatus }) {
-    const config = {
-        generating: { icon: Zap, color: "text-yellow-400 bg-yellow-400/10", label: "Generating" },
-        sleeping: { icon: Moon, color: "text-blue-400 bg-blue-400/10", label: "Sleeping" },
-        active: { icon: Activity, color: "text-green-400 bg-green-400/10", label: "Active" },
-        idle: { icon: Activity, color: "text-zinc-400 bg-zinc-400/10", label: "Idle" },
-    };
+// Activity Status (system-controlled: what avatar is doing now)
+function getActivityStatus(currentActivity: string | null) {
+    switch (currentActivity) {
+        case 'sleeping':
+            return { label: "Sleeping", color: "text-indigo-400 bg-indigo-400/10", icon: Moon };
+        case 'planning':
+            return { label: "Planning", color: "text-amber-400 bg-amber-400/10", icon: Brain };
+        case 'creating':
+            return { label: "Creating", color: "text-pink-400 bg-pink-400/10", icon: Camera };
+        case 'active':
+            return { label: "Active", color: "text-green-400 bg-green-400/10", icon: Zap };
+        case 'resting':
+            return { label: "Resting", color: "text-cyan-400 bg-cyan-400/10", icon: Coffee };
+        default:
+            return null;
+    }
+}
 
-    const { icon: Icon, color, label } = config[status];
+function StatusBadges({
+    lifecycleStatus,
+    lifecycleStartedAt,
+    currentActivity
+}: {
+    lifecycleStatus: string | null;
+    lifecycleStartedAt: Date | null;
+    currentActivity: string | null;
+}) {
+    const lifecycle = getLifecycleStatus(lifecycleStatus, lifecycleStartedAt);
+    const activity = lifecycleStatus === 'running' ? getActivityStatus(currentActivity) : null;
+    const LifecycleIcon = lifecycle.icon;
 
     return (
-        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
-            <Icon className="w-3 h-3" />
-            {label}
-        </span>
+        <div className="flex flex-col gap-1">
+            {/* Primary: Lifecycle status */}
+            <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${lifecycle.color}`}>
+                <LifecycleIcon className="w-3 h-3" />
+                {lifecycle.label}
+            </span>
+
+            {/* Secondary: Activity status (only when running) */}
+            {activity && (() => {
+                const ActivityIcon = activity.icon;
+                return (
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${activity.color}`}>
+                        <ActivityIcon className="w-3 h-3" />
+                        {activity.label}
+                    </span>
+                );
+            })()}
+        </div>
     );
 }
 
@@ -148,8 +182,6 @@ export default async function DashboardPage() {
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {influencers.map((influencer) => {
-                                const lastActivity = influencer.memories[0]?.createdAt || null;
-                                const status = getInfluencerStatus(lastActivity, influencer._count.memories);
                                 const hasAvatar = influencer.faceReferences.length > 0;
 
                                 return (
@@ -171,7 +203,11 @@ export default async function DashboardPage() {
                                                     {influencer.name.charAt(0)}
                                                 </div>
                                             )}
-                                            <StatusBadge status={status} />
+                                            <StatusBadges
+                                                lifecycleStatus={influencer.lifecycleStatus}
+                                                lifecycleStartedAt={influencer.lifecycleStartedAt}
+                                                currentActivity={influencer.currentActivity}
+                                            />
                                         </div>
 
                                         {/* Name */}

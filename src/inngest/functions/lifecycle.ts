@@ -18,6 +18,25 @@ interface EnvironmentContext {
     trends: TrendsResult
 }
 
+// Activity status types for real-time tracking
+type ActivityStatus = 'sleeping' | 'planning' | 'creating' | 'active' | 'resting';
+
+// Helper to update activity status in real-time
+async function updateActivityStatus(
+    influencerId: string,
+    activity: ActivityStatus,
+    details?: string
+) {
+    await prisma.influencer.update({
+        where: { id: influencerId },
+        data: {
+            currentActivity: activity,
+            activityDetails: details || null,
+            activityStartedAt: new Date(),
+        },
+    });
+}
+
 // Simple mapping for demo purposes. Ideally this comes from the DB or an external API.
 const TIMEZONE_MAP: Record<string, string> = {
     'New York': 'America/New_York',
@@ -94,6 +113,11 @@ export const lifecycleCycle = inngest.createFunction(
 
             console.log(`[Lifecycle] ${influencer.name} in ${influencer.city} (Local: ${localHour}:00). Night mode activated. Sleeping for ${sleepDuration}.`);
 
+            // Update activity status: SLEEPING
+            await step.run('update-status-sleeping', async () => {
+                await updateActivityStatus(influencerId, 'sleeping', `Sleeping until morning (${influencer.city} local time)`);
+            });
+
             // Sleep
             await step.sleep('wait-for-morning', sleepDuration);
 
@@ -113,6 +137,11 @@ export const lifecycleCycle = inngest.createFunction(
         // --- TIMEZONE & SLEEP LOGIC END ---
 
         // If we are here, it is DAYTIME. Proceed with Action Loop.
+
+        // Update activity status: PLANNING
+        await step.run('update-status-planning', async () => {
+            await updateActivityStatus(influencerId, 'planning', 'Checking environment and planning next activity...');
+        });
 
         // Step 1: Environmental Check - use utility functions directly
         const environment = await step.run('check-environment', async (): Promise<EnvironmentContext> => {
@@ -206,6 +235,12 @@ Respond with a JSON object containing:
             }
         })
 
+        // Update activity status: ACTIVE (doing the activity)
+        await step.run('update-status-active', async () => {
+            const activityDescription = `${plan.activity}${plan.location ? ` at ${plan.location}` : ''}`;
+            await updateActivityStatus(influencerId, 'active', activityDescription);
+        });
+
         // Step 3: Create memory of the activity
         const memory = await step.run('create-memory', async () => {
             return await prisma.memory.create({
@@ -236,6 +271,9 @@ Respond with a JSON object containing:
             if (!plan.isContentWorthy) {
                 return null
             }
+
+            // Update activity status: CREATING
+            await updateActivityStatus(influencerId, 'creating', 'Generating content...');
 
             // Dynamic mappings for stronger AI instructions
             const footwearDescriptions: Record<string, string> = {
@@ -373,6 +411,12 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
         const sleepDuration = `${randomHours}h`;
 
         console.log(`[Lifecycle] ${influencer.name} completed activity. Taking a break for ${sleepDuration}.`);
+
+        // Update activity status: RESTING
+        await step.run('update-status-resting', async () => {
+            await updateActivityStatus(influencerId, 'resting', `Taking a ${randomHours}-hour break`);
+        });
+
         await step.sleep('wait-for-next-cycle', sleepDuration);
 
         // Step 7: Production (Video) - Placeholder for Veo 3.1 integration

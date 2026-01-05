@@ -40,6 +40,13 @@ model Influencer {
   posts           Post[]
   memories        Memory[]
   lifecycleStartedAt DateTime? // Null = never started, set on first start
+  
+  // Real-time Activity Tracking
+  lifecycleStatus   String   @default("new")     // "new" | "running" | "paused"
+  currentActivity   String?                      // "sleeping" | "planning" | "creating" | "active" | "resting"
+  activityDetails   String?                      // Human-readable description e.g., "Morning Coffee at Café Luna"
+  activityStartedAt DateTime?                    // When current activity started
+  
   createdAt       DateTime @default(now())
 }
 

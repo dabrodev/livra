@@ -3,12 +3,74 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import {
     Sparkles, ArrowLeft, MapPin, Wallet, Download, Wand2,
-    Activity, Zap, Clock
+    Zap, Clock, Play, Pause, Moon, Brain, Camera, Coffee
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
 import AvatarSwap from "@/app/components/AvatarSwap";
 import RealtimeTimeline, { TimelineItem } from "@/app/components/RealtimeTimeline";
 import LifecycleControls from "@/app/components/LifecycleControls";
+import RealtimeActivityStatus from "@/app/components/RealtimeActivityStatus";
+
+// Lifecycle Status Badge (user-controlled: new/running/paused)
+function getLifecycleStatusBadge(lifecycleStatus: string | null, lifecycleStartedAt: Date | null) {
+    if (!lifecycleStartedAt) {
+        return {
+            label: "New",
+            color: "text-zinc-400 bg-zinc-400/10",
+            icon: Sparkles,
+        };
+    }
+    if (lifecycleStatus === 'running') {
+        return {
+            label: "Running",
+            color: "text-green-400 bg-green-400/10",
+            icon: Play,
+        };
+    }
+    return {
+        label: "Paused",
+        color: "text-orange-400 bg-orange-400/10",
+        icon: Pause,
+    };
+}
+
+// Activity Status Badge (system-controlled: what avatar is doing now)
+function getActivityStatusBadge(currentActivity: string | null) {
+    switch (currentActivity) {
+        case 'sleeping':
+            return {
+                label: "Sleeping",
+                color: "text-indigo-400 bg-indigo-400/10",
+                icon: Moon,
+            };
+        case 'planning':
+            return {
+                label: "Planning",
+                color: "text-amber-400 bg-amber-400/10",
+                icon: Brain,
+            };
+        case 'creating':
+            return {
+                label: "Creating",
+                color: "text-pink-400 bg-pink-400/10",
+                icon: Camera,
+            };
+        case 'active':
+            return {
+                label: "Active",
+                color: "text-green-400 bg-green-400/10",
+                icon: Zap,
+            };
+        case 'resting':
+            return {
+                label: "Resting",
+                color: "text-cyan-400 bg-cyan-400/10",
+                icon: Coffee,
+            };
+        default:
+            return null;
+    }
+}
 
 interface TimelinePageProps {
     params: Promise<{ id: string }>;
@@ -191,13 +253,17 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
 
                             {/* Info */}
                             <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
+                                <div className="flex items-center gap-3 mb-2 flex-wrap">
                                     <h1 className="text-2xl font-bold">{influencer.name}</h1>
-                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${(influencer as any).isActive ? "text-green-400 bg-green-400/10" : "text-zinc-400 bg-zinc-400/10"
-                                        }`}>
-                                        {(influencer as any).isActive ? <Zap className="w-3 h-3" /> : <Activity className="w-3 h-3" />}
-                                        {(influencer as any).isActive ? "Active" : "Idle"}
-                                    </span>
+
+                                    {/* Realtime Activity Status */}
+                                    <RealtimeActivityStatus
+                                        influencerId={influencer.id}
+                                        initialLifecycleStatus={influencer.lifecycleStatus}
+                                        initialLifecycleStartedAt={influencer.lifecycleStartedAt}
+                                        initialCurrentActivity={influencer.currentActivity}
+                                        initialActivityDetails={influencer.activityDetails}
+                                    />
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-zinc-400">
                                     <span className="flex items-center gap-1">
