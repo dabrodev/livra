@@ -26,6 +26,7 @@ interface DailyOutfit {
     accessories: string   // e.g., "gold necklace, small earrings"
     tightsColor: string | null  // e.g., "sheer nude" or null if not wearing
     outerwear: string | null    // e.g., "beige trench coat" for outdoor
+    isEvening?: boolean   // Flag for evening wear status
 }
 
 // Activity status types for real-time tracking
@@ -456,44 +457,61 @@ Respond with a JSON object containing:
             // Build outfit description based on dailyOutfit with contextual variations
             let outfitDescription: string;
 
-            if (isWorkout) {
-                // Special workout outfit
-                outfitDescription = `wearing athletic workout clothes: fitted sports top, comfortable leggings${dailyOutfit.tightsColor ? `, ${dailyOutfit.tightsColor} athletic tights underneath` : ''}`;
-            } else if (plan.timeOfDay === 'evening' && !isAtHome) {
-                // EVENING NIGHT OUT OVERRIDE
-                // Prevent "Sneakers at the Opera" scenario
+            // Handle Persistent Evening Outfit Change
+            let currentOutfit = { ...dailyOutfit } as any;
+            const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+
+            if (plan.timeOfDay === 'evening' && !isAtHome && !isWorkout && !currentOutfit.isEvening) {
+                // Determine we need to switch to evening wear AND persist it
                 const eveningDresses = ['elegant black evening dress', 'red velvet cocktail dress', 'silk slip dress', 'sequin mini dress', 'off-shoulder evening gown'];
                 const eveningTops = ['silk camisole', 'black velvet body', 'elegant satin blouse', 'sequin top'];
                 const eveningBottoms = ['leather mini skirt', 'long satin skirt', 'tailored wide-leg trousers'];
                 const eveningHeels = ['strappy high heels', 'black stiletto heels', 'silver pumps', 'classic court shoes'];
 
-                const isDress = Math.random() > 0.4; // 60% chance of dress for evening out
+                const isDress = Math.random() > 0.4;
 
-                let eveningWear = "";
+                let newTop = "";
+                let newBottom = "";
+
                 if (isDress) {
-                    eveningWear = pick(eveningDresses);
+                    newTop = pick(eveningDresses);
+                    newBottom = ""; // Dress covers bottom
                 } else {
-                    eveningWear = `${pick(eveningTops)} and ${pick(eveningBottoms)}`;
+                    newTop = pick(eveningTops);
+                    newBottom = pick(eveningBottoms);
                 }
 
-                const eveningShoes = pick(eveningHeels);
-                const eveningAccessories = "statement earrings, evening clutch bag";
-                const eveningTights = dailyOutfit.tightsColor ? `sheer ${dailyOutfit.tightsColor} tights` : 'sheer black pantyhose';
+                currentOutfit = {
+                    ...currentOutfit,
+                    top: newTop,
+                    bottom: newBottom,
+                    footwear: pick(eveningHeels),
+                    accessories: "statement earrings, evening clutch bag",
+                    tightsColor: currentOutfit.tightsColor ? currentOutfit.tightsColor : 'black',
+                    isEvening: true
+                };
 
-                // Coat logic (keep warm if winter)
-                const eveningCoat = dailyOutfit.outerwear ? `, wearing ${dailyOutfit.outerwear} over shoulders` : '';
+                // PERSIST the change to DB so she stays in this outfit
+                await prisma.influencer.update({
+                    where: { id: influencerId },
+                    data: {
+                        dailyOutfit: JSON.parse(JSON.stringify(currentOutfit))
+                    }
+                });
+            }
 
-                outfitDescription = `wearing elegant evening attire: ${eveningWear}, ${eveningTights}, ${eveningShoes}, ${eveningAccessories}${eveningCoat}`;
-
+            if (isWorkout) {
+                // Special workout outfit
+                outfitDescription = `wearing athletic workout clothes: fitted sports top, comfortable leggings${currentOutfit.tightsColor ? `, ${currentOutfit.tightsColor} athletic tights underneath` : ''}`;
             } else {
-                // Regular daily outfit with context variations
-                const topDesc = dailyOutfit.top;
-                const bottomDesc = dailyOutfit.bottom;
+                // Regular daily OR persistent evening outfit using currentOutfit
+                const topDesc = currentOutfit.top;
+                const bottomDesc = currentOutfit.bottom;
 
                 // Footwear varies by context
                 let footwearDesc: string;
                 if (isAtHome) {
-                    // At home: barefoot or slippers
+                    // At home: barefoot or slippers (even in evening wear)
                     const homeFootwear = influencer.footwear.find(f => f === 'barefoot' || f === 'slippers');
                     if (homeFootwear === 'barefoot') {
                         footwearDesc = 'barefoot with no shoes, bare feet visible';
@@ -501,23 +519,23 @@ Respond with a JSON object containing:
                         footwearDesc = 'wearing cozy indoor slippers';
                     }
                 } else {
-                    footwearDesc = `wearing ${dailyOutfit.footwear}`;
+                    footwearDesc = `wearing ${currentOutfit.footwear}`;
                 }
 
                 // Tights with reinforced toe if barefoot
                 let tightsDesc = '';
-                if (dailyOutfit.tightsColor) {
+                if (currentOutfit.tightsColor) {
                     const isBarefootOrSlippers = isAtHome && influencer.footwear.some(f => f === 'barefoot' || f === 'slippers');
                     if (isBarefootOrSlippers) {
-                        tightsDesc = `MUST be wearing ${dailyOutfit.tightsColor} sheer tights on legs and feet, with reinforced toes (slightly thicker fabric at the toes but still sheer, toes visible through)`;
+                        tightsDesc = `MUST be wearing ${currentOutfit.tightsColor} sheer tights on legs and feet, with reinforced toes (slightly thicker fabric at the toes but still sheer, toes visible through)`;
                     } else {
-                        tightsDesc = `MUST be wearing ${dailyOutfit.tightsColor} sheer tights on legs`;
+                        tightsDesc = `MUST be wearing ${currentOutfit.tightsColor} sheer tights on legs`;
                     }
                 }
 
                 // Outerwear only outdoors
-                const outerwearDesc = !isAtHome && dailyOutfit.outerwear
-                    ? `, with ${dailyOutfit.outerwear}`
+                const outerwearDesc = !isAtHome && currentOutfit.outerwear
+                    ? `, with ${currentOutfit.outerwear} over shoulders`
                     : '';
 
                 outfitDescription = [
@@ -525,7 +543,7 @@ Respond with a JSON object containing:
                     bottomDesc,
                     footwearDesc,
                     tightsDesc,
-                    dailyOutfit.accessories,
+                    currentOutfit.accessories,
                     outerwearDesc
                 ].filter(Boolean).join(', ');
             }
