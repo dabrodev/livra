@@ -22,4 +22,4 @@
 - [x] Enhance LP with diverse phone mockup and consistent Marcus gallery
 - [x] Add male influencer (Marcus from Berlin) to gallery
 - [x] Improve hero animations and gallery order
-- [x] Improve outfit specificity (colors, materials)
+- [x] Improve outfit specificity (colors, materials, lengths - maxi/mini/full-length)

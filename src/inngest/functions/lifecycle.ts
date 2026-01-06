@@ -240,20 +240,24 @@ export const lifecycleCycle = inngest.createFunction(
             }
             const top = `${topColor} ${topMaterial} ${topItem}`;
 
-            // Generate Bottom
+            // Generate Bottom with Valid Lengths
             const bottomItem = influencer.bottomwear.length > 0
                 ? pick(influencer.bottomwear)
                 : 'jeans';
 
             let bottomDesc = bottomItem;
             if (bottomItem === 'jeans') {
-                bottomDesc = `${pick(['light wash', 'dark wash', 'black', 'white'])} denim jeans`;
+                const jeansLength = pick(['full-length', 'ankle-length']);
+                bottomDesc = `${jeansLength} ${pick(['light wash', 'dark wash', 'black', 'white'])} denim jeans`;
             } else if (bottomItem === 'skirts') {
                 bottomDesc = `${pick(allColors)} ${pick(['mini', 'midi', 'maxi'])} ${pick(['pleated', 'pencil', 'a-line'])} skirt`;
             } else if (bottomItem === 'leggings') {
-                bottomDesc = `${pick(['black', 'navy', 'grey'])} leggings`;
-            } else {
+                bottomDesc = `full-length ${pick(['black', 'navy', 'grey'])} leggings`;
+            } else if (bottomItem.includes('shorts')) {
                 bottomDesc = `${pick(allColors)} ${bottomItem}`;
+            } else {
+                // Default fallback for other pants/trousers
+                bottomDesc = `full-length ${pick(allColors)} ${bottomItem}`;
             }
 
             // Generate Footwear
