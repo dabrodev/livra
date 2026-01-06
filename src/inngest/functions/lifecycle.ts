@@ -262,7 +262,12 @@ export const lifecycleCycle = inngest.createFunction(
 
             // Generate Footwear
             const outdoorFootwear = influencer.footwear.filter(f => f !== 'barefoot' && f !== 'slippers');
-            const footwearItem = outdoorFootwear.length > 0 ? pick(outdoorFootwear) : 'shoes';
+            const defaultFootwear = ['boots', 'heels', 'sneakers'];
+
+            // If influencer has no outdoor shoes defined, pick from the default set
+            const footwearItem = outdoorFootwear.length > 0
+                ? pick(outdoorFootwear)
+                : pick(defaultFootwear);
 
             let footwearDesc = footwearItem;
             if (footwearItem.includes('heels')) {
