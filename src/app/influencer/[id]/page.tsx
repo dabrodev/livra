@@ -3,13 +3,14 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import {
     Sparkles, ArrowLeft, MapPin, Wallet, Download, Wand2,
-    Zap, Clock, Play, Pause, Moon, Brain, Camera, Coffee, Shirt
+    Zap, Clock, Play, Pause, Moon, Brain, Camera, Coffee
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
 import AvatarSwap from "@/app/components/AvatarSwap";
 import RealtimeTimeline, { TimelineItem } from "@/app/components/RealtimeTimeline";
 import LifecycleControls from "@/app/components/LifecycleControls";
 import RealtimeActivityStatus from "@/app/components/RealtimeActivityStatus";
+import RealtimeOutfit from "@/app/components/RealtimeOutfit";
 
 // Lifecycle Status Badge (user-controlled: new/running/paused)
 function getLifecycleStatusBadge(lifecycleStatus: string | null, lifecycleStartedAt: Date | null) {
@@ -342,52 +343,12 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
                         </Link>
                     )}
 
-                    {/* Daily Outfit */}
-                    {influencer.dailyOutfit && (() => {
-                        const outfit = influencer.dailyOutfit as any;
-                        return (
-                            <div className="mb-8">
-                                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                    <Shirt className="w-5 h-5 text-purple-400" />
-                                    Today's Outfit
-                                </h2>
-                                <div className="glass-card p-5 rounded-xl border border-white/5 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-3">
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Top</span>
-                                            <span className="text-zinc-200">{outfit.top}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Bottom</span>
-                                            <span className="text-zinc-200">{outfit.bottom}</span>
-                                        </div>
-                                        {outfit.tightsColor && (
-                                            <div className="flex flex-col">
-                                                <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Tights</span>
-                                                <span className="text-zinc-200 capitalize">{outfit.tightsColor} sheer</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-3">
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Footwear</span>
-                                            <span className="text-zinc-200">{outfit.footwear}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Accessories</span>
-                                            <span className="text-zinc-200">{outfit.accessories || 'None'}</span>
-                                        </div>
-                                        {outfit.outerwear && (
-                                            <div className="flex flex-col">
-                                                <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Outerwear</span>
-                                                <span className="text-zinc-200">{outfit.outerwear}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })()}
+
+                    {/* Daily Outfit - Realtime Updates */}
+                    <RealtimeOutfit
+                        influencerId={influencer.id}
+                        initialDailyOutfit={influencer.dailyOutfit as any}
+                    />
 
                     {/* Timeline */}
                     <div className="mb-6">
