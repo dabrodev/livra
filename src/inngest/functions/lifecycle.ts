@@ -459,6 +459,32 @@ Respond with a JSON object containing:
             if (isWorkout) {
                 // Special workout outfit
                 outfitDescription = `wearing athletic workout clothes: fitted sports top, comfortable leggings${dailyOutfit.tightsColor ? `, ${dailyOutfit.tightsColor} athletic tights underneath` : ''}`;
+            } else if (plan.timeOfDay === 'evening' && !isAtHome) {
+                // EVENING NIGHT OUT OVERRIDE
+                // Prevent "Sneakers at the Opera" scenario
+                const eveningDresses = ['elegant black evening dress', 'red velvet cocktail dress', 'silk slip dress', 'sequin mini dress', 'off-shoulder evening gown'];
+                const eveningTops = ['silk camisole', 'black velvet body', 'elegant satin blouse', 'sequin top'];
+                const eveningBottoms = ['leather mini skirt', 'long satin skirt', 'tailored wide-leg trousers'];
+                const eveningHeels = ['strappy high heels', 'black stiletto heels', 'silver pumps', 'classic court shoes'];
+
+                const isDress = Math.random() > 0.4; // 60% chance of dress for evening out
+
+                let eveningWear = "";
+                if (isDress) {
+                    eveningWear = pick(eveningDresses);
+                } else {
+                    eveningWear = `${pick(eveningTops)} and ${pick(eveningBottoms)}`;
+                }
+
+                const eveningShoes = pick(eveningHeels);
+                const eveningAccessories = "statement earrings, evening clutch bag";
+                const eveningTights = dailyOutfit.tightsColor ? `sheer ${dailyOutfit.tightsColor} tights` : 'sheer black pantyhose';
+
+                // Coat logic (keep warm if winter)
+                const eveningCoat = dailyOutfit.outerwear ? `, wearing ${dailyOutfit.outerwear} over shoulders` : '';
+
+                outfitDescription = `wearing elegant evening attire: ${eveningWear}, ${eveningTights}, ${eveningShoes}, ${eveningAccessories}${eveningCoat}`;
+
             } else {
                 // Regular daily outfit with context variations
                 const topDesc = dailyOutfit.top;
