@@ -201,7 +201,9 @@ export default function AvatarCreationPage() {
         }));
     };
 
-    const canGenerate = data.hairColor && data.hairStyle && data.eyeColor && data.skinTone && data.lipStyle && data.bodyHeight && data.bodyType;
+    const canGenerate = data.hairColor && data.hairStyle && data.eyeColor && data.skinTone &&
+        (influencerGender === "male" || data.lipStyle) && // lipStyle only required for females
+        data.bodyHeight && data.bodyType;
 
     const handleGenerate = async () => {
         setIsGenerating(true);
