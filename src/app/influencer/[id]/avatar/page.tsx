@@ -68,12 +68,43 @@ const bodyTypes = [
     { id: "plus-size", label: "Plus Size", emoji: "🌸" },
 ];
 
+// Gender-specific hair styles
+const femaleHairStyles = hairStyles;
+const maleHairStyles = [
+    { id: "short", label: "Short", emoji: "💈" },
+    { id: "buzz-cut", label: "Buzz Cut", emoji: "✂️" },
+    { id: "crew-cut", label: "Crew Cut", emoji: "👨" },
+    { id: "slicked-back", label: "Slicked Back", emoji: "💼" },
+    { id: "messy", label: "Messy", emoji: "🌪️" },
+    { id: "bald", label: "Bald", emoji: "🥚" },
+];
+
+// Facial hair options (for males)
+const facialHairOptions = [
+    { id: "none", label: "Clean Shaven", emoji: "😊" },
+    { id: "stubble", label: "Stubble", emoji: "🧔" },
+    { id: "beard", label: "Full Beard", emoji: "🧔‍♂️" },
+    { id: "goatee", label: "Goatee", emoji: "🎭" },
+    { id: "mustache", label: "Mustache", emoji: "🥸" },
+];
+
+// Gender-specific body types
+const femaleBodyTypes = bodyTypes;
+const maleBodyTypes = [
+    { id: "slim", label: "Slim", emoji: "🏃" },
+    { id: "athletic", label: "Athletic", emoji: "💪" },
+    { id: "muscular", label: "Muscular", emoji: "🏋️" },
+    { id: "stocky", label: "Stocky", emoji: "🐻" },
+];
+
+
 interface AvatarData {
     hairColor: string;
     hairStyle: string;
     eyeColor: string;
     skinTone: string;
     lipStyle: string;
+    facialHair: string;
     features: string[];
     bodyHeight: string;
     bodyType: string;
@@ -102,10 +133,12 @@ export default function AvatarCreationPage() {
         eyeColor: "",
         skinTone: "",
         lipStyle: "",
+        facialHair: "none",
         features: [],
         bodyHeight: "",
         bodyType: "",
     });
+    const [influencerGender, setInfluencerGender] = useState<string>("female");
     const [step, setStep] = useState<"configure" | "generating" | "select" | "library">("configure");
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedAvatars, setGeneratedAvatars] = useState<GeneratedAvatar[]>([]);

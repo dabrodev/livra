@@ -24,9 +24,10 @@ model Influencer {
   eyeColor        String   @default("brown")   // blue, green, brown, hazel, gray
   skinTone        String   @default("medium")  // light, fair, medium, tan, olive, dark
   lipStyle        String   @default("natural") // full, thin, natural
+  facialHair      String   @default("none")    // none, stubble, beard, goatee, mustache (for males)
   features        String[] // freckles, glasses, dimples, beauty-mark, etc.
   bodyHeight      String   @default("average") // petite, average, tall
-  bodyType        String   @default("slim")    // slim, athletic, curvy, plus-size
+  bodyType        String   @default("slim")    // slim, athletic, curvy, plus-size, muscular, stocky
   
   // Clothing Style Preferences
   clothingStyle   String   @default("casual") // casual, sporty, elegant, streetwear, bohemian
