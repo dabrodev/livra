@@ -460,7 +460,7 @@ export default function AvatarCreationPage() {
                                         }`}
                                 >
                                     <Wand2 className="w-5 h-5" />
-                                    Generate Avatar Options
+                                    Generate Options
                                 </button>
 
                                 {/* Browse Library Button */}
