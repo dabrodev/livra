@@ -147,10 +147,23 @@ export default function AvatarCreationPage() {
     const [libraryAvatars, setLibraryAvatars] = useState<LibraryAvatar[]>([]);
     const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
 
-    // Fetch library avatars on mount
+    // Fetch influencer gender and library avatars on mount
     useEffect(() => {
+        fetchInfluencerGender();
         fetchLibraryAvatars();
-    }, []);
+    }, [influencerId]);
+
+    const fetchInfluencerGender = async () => {
+        try {
+            const response = await fetch(`/api/influencer/${influencerId}`);
+            if (response.ok) {
+                const influencer = await response.json();
+                setInfluencerGender(influencer.gender || "female");
+            }
+        } catch (error) {
+            console.error("Failed to fetch influencer gender:", error);
+        }
+    };
 
     const fetchLibraryAvatars = async () => {
         setIsLoadingLibrary(true);
@@ -327,7 +340,7 @@ export default function AvatarCreationPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-zinc-300 mb-3">Hair Style</label>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                        {hairStyles.map((style) => (
+                                        {(influencerGender === "male" ? maleHairStyles : femaleHairStyles).map((style) => (
                                             <button
                                                 key={style.id}
                                                 onClick={() => updateData({ hairStyle: style.id })}
@@ -409,6 +422,28 @@ export default function AvatarCreationPage() {
                                     </div>
                                 </div>
 
+                                {/* Facial Hair (Males only) */}
+                                {influencerGender === "male" && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-zinc-300 mb-3">Facial Hair</label>
+                                        <div className="flex flex-wrap gap-3">
+                                            {facialHairOptions.map((option) => (
+                                                <button
+                                                    key={option.id}
+                                                    onClick={() => updateData({ facialHair: option.id })}
+                                                    className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${data.facialHair === option.id
+                                                        ? "border-teal-500 bg-teal-500/10"
+                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                        }`}
+                                                >
+                                                    <span className="text-xl">{option.emoji}</span>
+                                                    <span className="text-sm">{option.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Features */}
                                 <div>
                                     <label className="block text-sm font-medium text-zinc-300 mb-3">
@@ -456,7 +491,7 @@ export default function AvatarCreationPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-zinc-300 mb-3">Body Type</label>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                        {bodyTypes.map((type) => (
+                                        {(influencerGender === "male" ? maleBodyTypes : femaleBodyTypes).map((type) => (
                                             <button
                                                 key={type.id}
                                                 onClick={() => updateData({ bodyType: type.id })}

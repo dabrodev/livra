@@ -50,8 +50,15 @@ export async function POST(
         };
         const clothingDescription = clothingStyleMap[influencer.clothingStyle] || 'wearing casual clothing';
 
+        // Add facial hair description for males
+        const facialHairLabel = influencer.facialHair || 'none';
+        const facialHairText = influencer.gender === 'male' && facialHairLabel !== 'none'
+            ? `Facial hair: ${facialHairLabel}.`
+            : '';
+
         const basePrompt = `Professional portrait photo of a ${bodyTypeLabel} ${bodyHeightLabel} height ${genderTerm}, ${clothingDescription}. 
 Hair: ${hairColorLabel} color, ${hairStyleLabel} style.
+${facialHairText}
 Eyes: ${eyeColorLabel}.
 Skin: ${skinToneLabel} tone.
 Lips: ${lipStyleLabel}.
