@@ -23,7 +23,7 @@ export interface TimelineItem {
 // Database types matching Prisma
 interface MemoryRecord {
     id: string;
-    influencerId: string;
+    personaId: string;
     description: string;
     importance: number;
     createdAt: string;
@@ -31,7 +31,7 @@ interface MemoryRecord {
 
 interface PostRecord {
     id: string;
-    influencerId: string;
+    personaId: string;
     type: string;
     contentUrl: string;
     caption: string;
@@ -86,11 +86,11 @@ function formatRelativeTime(date: Date | string): string {
 }
 
 interface RealtimeTimelineProps {
-    influencerId: string;
+    personaId: string;
     initialItems: TimelineItem[];
 }
 
-export default function RealtimeTimeline({ influencerId, initialItems }: RealtimeTimelineProps) {
+export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTimelineProps) {
     const [items, setItems] = useState<TimelineItem[]>(initialItems);
     const [isConnected, setIsConnected] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -141,7 +141,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
         setIsLoadingMore(true);
         try {
             const response = await fetch(
-                `/api/influencer/${influencerId}/timeline?postsOffset=${postsOffset}&memoriesOffset=${memoriesOffset}`
+                `/api/persona/${personaId}/timeline?postsOffset=${postsOffset}&memoriesOffset=${memoriesOffset}`
             );
             const data = await response.json();
 
@@ -175,22 +175,22 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
         } finally {
             setIsLoadingMore(false);
         }
-    }, [influencerId, postsOffset, memoriesOffset, isLoadingMore, hasMore, memoryToTimelineItem, postToTimelineItem]);
+    }, [personaId, postsOffset, memoriesOffset, isLoadingMore, hasMore, memoryToTimelineItem, postToTimelineItem]);
 
     // Subscribe to real-time updates
     useEffect(() => {
-        console.log('[RealtimeTimeline] Setting up subscriptions for influencer:', influencerId);
+        console.log('[RealtimeTimeline] Setting up subscriptions for persona:', personaId);
 
         // Channel for Memory table
         const memoryChannel = supabase
-            .channel(`memory-${influencerId}`)
+            .channel(`memory-${personaId}`)
             .on(
                 'postgres_changes',
                 {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'Memory',
-                    filter: `influencerId=eq.${influencerId}`,
+                    filter: `personaId=eq.${personaId}`,
                 },
                 (payload) => {
                     console.log('[RealtimeTimeline] New memory received:', payload);
@@ -207,14 +207,14 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
 
         // Channel for Post table
         const postChannel = supabase
-            .channel(`post-${influencerId}`)
+            .channel(`post-${personaId}`)
             .on(
                 'postgres_changes',
                 {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'Post',
-                    filter: `influencerId=eq.${influencerId}`,
+                    filter: `personaId=eq.${personaId}`,
                 },
                 (payload) => {
                     console.log('[RealtimeTimeline] New post received:', payload);
@@ -232,7 +232,7 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
             supabase.removeChannel(memoryChannel);
             supabase.removeChannel(postChannel);
         };
-    }, [influencerId, addItem, memoryToTimelineItem, postToTimelineItem]);
+    }, [personaId, addItem, memoryToTimelineItem, postToTimelineItem]);
 
     // Update relative times every minute
     useEffect(() => {

@@ -3,19 +3,19 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 
 /**
- * Update an influencer's wallet balance
+ * Update an persona's wallet balance
  */
-export async function updateWallet(influencerId: string, amount: number, reason: string) {
+export async function updateWallet(personaId: string, amount: number, reason: string) {
     try {
-        const influencer = await prisma.influencer.update({
-            where: { id: influencerId },
+        const persona = await prisma.persona.update({
+            where: { id: personaId },
             data: {
                 currentBalance: { increment: amount },
             },
         });
         return {
             success: true,
-            newBalance: influencer.currentBalance,
+            newBalance: persona.currentBalance,
             transaction: { amount, reason },
         };
     } catch {
@@ -25,9 +25,9 @@ export async function updateWallet(influencerId: string, amount: number, reason:
 
 export const walletTool = createTool({
     id: "update-wallet",
-    description: "Update the influencer's wallet balance after spending or earning money.",
+    description: "Update the persona's wallet balance after spending or earning money.",
     inputSchema: z.object({
-        influencerId: z.string().describe("The influencer's ID"),
+        personaId: z.string().describe("The persona's ID"),
         amount: z.number().describe("Amount to add (positive) or subtract (negative)"),
         reason: z.string().describe("Reason for the transaction"),
     }),
@@ -41,6 +41,6 @@ export const walletTool = createTool({
         error: z.string().optional(),
     }),
     execute: async ({ context }) => {
-        return updateWallet(context.influencerId, context.amount, context.reason);
+        return updateWallet(context.personaId, context.amount, context.reason);
     },
 });

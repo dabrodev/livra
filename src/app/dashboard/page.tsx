@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/db";
-import { Sparkles, Plus, MapPin, Wallet, Camera, Moon, Zap, Play, Pause, Brain, Coffee } from "lucide-react";
+import { Sparkles, Plus, MapPin, Wallet, Camera, Moon, Zap, Play, Pause, Brain, Coffee, LogOut } from "lucide-react";
 import Link from "next/link";
+import { getOrCreateUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { LogoutButton } from "@/components/LogoutButton";
 
 // Lifecycle Status (user-controlled: new/running/paused)
 function getLifecycleStatus(lifecycleStatus: string | null, lifecycleStartedAt: Date | null) {
@@ -79,7 +82,16 @@ function StatusBadges({
 }
 
 export default async function DashboardPage() {
-    const influencers = await prisma.influencer.findMany({
+    // Require authentication
+    let user;
+    try {
+        user = await getOrCreateUser();
+    } catch (error) {
+        redirect('/login');
+    }
+
+    const personas = await prisma.persona.findMany({
+        where: { userId: user.id }, // Only show user's personas
         orderBy: { createdAt: "desc" },
         include: {
             _count: {
@@ -106,14 +118,18 @@ export default async function DashboardPage() {
                         </div>
                         <span className="font-semibold text-lg">Livra</span>
                     </Link>
-                    {avatarCount > 0 && (
-                        <Link
-                            href="/avatars"
-                            className="text-sm text-zinc-400 hover:text-white transition-colors"
-                        >
-                            📚 Avatar Library ({avatarCount})
-                        </Link>
-                    )}
+                    <div className="flex items-center gap-4">
+                        {avatarCount > 0 && (
+                            <Link
+                                href="/avatars"
+                                className="text-sm text-zinc-400 hover:text-white transition-colors"
+                            >
+                                📚 Avatar Library ({avatarCount})
+                            </Link>
+                        )}
+                        <div className="text-sm text-zinc-400">{user.email}</div>
+                        <LogoutButton />
+                    </div>
                 </div>
             </header>
 
@@ -123,8 +139,8 @@ export default async function DashboardPage() {
                     {/* Page header */}
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h1 className="text-3xl font-bold">Your Influencers</h1>
-                            <p className="text-zinc-400 mt-1">Manage your AI-powered digital personas</p>
+                            <h1 className="text-3xl font-bold">Your AI Avatars</h1>
+                            <p className="text-zinc-400 mt-1">Manage your AI-powered digital avatars</p>
                         </div>
                         <Link
                             href="/onboarding"
@@ -136,89 +152,89 @@ export default async function DashboardPage() {
                     </div>
 
                     {/* Stats summary */}
-                    {influencers.length > 0 && (
+                    {personas.length > 0 && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                             <div className="glass-card rounded-xl p-4">
-                                <span className="text-2xl font-bold gradient-text">{influencers.length}</span>
-                                <span className="text-sm text-zinc-400 block">Influencers</span>
+                                <span className="text-2xl font-bold gradient-text">{personas.length}</span>
+                                <span className="text-sm text-zinc-400 block">Avatars</span>
                             </div>
                             <div className="glass-card rounded-xl p-4">
                                 <span className="text-2xl font-bold gradient-text">
-                                    {influencers.reduce((sum, i) => sum + i._count.posts, 0)}
+                                    {personas.reduce((sum: number, i: any) => sum + i._count.posts, 0)}
                                 </span>
                                 <span className="text-sm text-zinc-400 block">Total Posts</span>
                             </div>
                             <div className="glass-card rounded-xl p-4">
                                 <span className="text-2xl font-bold gradient-text">
-                                    {influencers.reduce((sum, i) => sum + i._count.memories, 0)}
+                                    {personas.reduce((sum: number, i: any) => sum + i._count.memories, 0)}
                                 </span>
-                                <span className="text-sm text-zinc-400 block">Memories Created</span>
+                                <span className="text-sm text-zinc-400 block">Activities Logged</span>
                             </div>
                             <div className="glass-card rounded-xl p-4">
                                 <span className="text-2xl font-bold gradient-text">
-                                    ${influencers.reduce((sum, i) => sum + i.currentBalance, 0).toLocaleString()}
+                                    {personas.reduce((sum: number, i: any) => sum + i.currentBalance, 0).toLocaleString()}
                                 </span>
                                 <span className="text-sm text-zinc-400 block">Total Balance</span>
                             </div>
                         </div>
                     )}
 
-                    {/* Influencer grid */}
-                    {influencers.length === 0 ? (
+                    {/* Persona grid */}
+                    {personas.length === 0 ? (
                         <div className="text-center py-20">
                             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-zinc-800 flex items-center justify-center">
                                 <Sparkles className="w-10 h-10 text-zinc-600" />
                             </div>
-                            <h2 className="text-xl font-semibold mb-2">No influencers yet</h2>
-                            <p className="text-zinc-400 mb-6">Create your first AI influencer to get started</p>
+                            <h2 className="text-xl font-semibold mb-2">No avatars yet</h2>
+                            <p className="text-zinc-400 mb-6">Create your first AI avatar to get started</p>
                             <Link
                                 href="/onboarding"
                                 className="btn-glow px-6 py-3 rounded-full text-white font-medium inline-flex items-center gap-2"
                             >
                                 <Plus className="w-4 h-4" />
-                                Create Influencer
+                                Create Avatar
                             </Link>
                         </div>
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {influencers.map((influencer) => {
-                                const hasAvatar = influencer.faceReferences.length > 0;
+                            {personas.map((persona: any) => {
+                                const hasAvatar = persona.faceReferences.length > 0;
 
                                 return (
                                     <Link
-                                        key={influencer.id}
-                                        href={`/influencer/${influencer.id}`}
+                                        key={persona.id}
+                                        href={`/persona/${persona.id}`}
                                         className="glass-card rounded-2xl p-6 hover:border-teal-500/30 transition-all group"
                                     >
                                         {/* Avatar and status */}
                                         <div className="flex items-start justify-between mb-4">
                                             {hasAvatar ? (
                                                 <img
-                                                    src={influencer.faceReferences[0]}
-                                                    alt={influencer.name}
+                                                    src={persona.faceReferences[0]}
+                                                    alt={persona.name}
                                                     className="w-14 h-14 rounded-full object-cover"
                                                 />
                                             ) : (
                                                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-xl font-bold">
-                                                    {influencer.name.charAt(0)}
+                                                    {persona.name.charAt(0)}
                                                 </div>
                                             )}
                                             <StatusBadges
-                                                lifecycleStatus={influencer.lifecycleStatus}
-                                                lifecycleStartedAt={influencer.lifecycleStartedAt}
-                                                currentActivity={influencer.currentActivity}
+                                                lifecycleStatus={persona.lifecycleStatus}
+                                                lifecycleStartedAt={persona.lifecycleStartedAt}
+                                                currentActivity={persona.currentActivity}
                                             />
                                         </div>
 
                                         {/* Name */}
                                         <h3 className="text-lg font-semibold group-hover:text-teal-400 transition-colors">
-                                            {influencer.name}
+                                            {persona.name}
                                         </h3>
 
                                         {/* Location */}
                                         <div className="flex items-center gap-1.5 text-sm text-zinc-400 mt-1">
                                             <MapPin className="w-3.5 h-3.5" />
-                                            <span>{influencer.city}, {influencer.country}</span>
+                                            <span>{persona.city}, {persona.country}</span>
                                         </div>
 
                                         {/* Stats */}
@@ -226,19 +242,19 @@ export default async function DashboardPage() {
                                             <div className="flex items-center gap-1.5 text-sm">
                                                 <Wallet className="w-3.5 h-3.5 text-zinc-500" />
                                                 <span className="gradient-text font-medium">
-                                                    ${influencer.currentBalance.toLocaleString()}
+                                                    ${persona.currentBalance.toLocaleString()}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-1.5 text-sm text-zinc-400">
                                                 <Camera className="w-3.5 h-3.5" />
-                                                {influencer._count.posts} posts
+                                                {persona._count.posts} posts
                                             </div>
                                         </div>
 
                                         {/* Vibe tag + avatar indicator */}
                                         <div className="flex items-center gap-2 mt-3">
                                             <span className="text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-400">
-                                                {influencer.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                                                {persona.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}
                                             </span>
                                             {!hasAvatar && (
                                                 <span className="text-xs px-2 py-1 rounded-full bg-teal-500/20 text-teal-400">

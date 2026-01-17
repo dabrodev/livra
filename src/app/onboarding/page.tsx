@@ -11,8 +11,9 @@ interface OnboardingData {
     city: string;
     neighborhood: string;
     apartmentStyle: string;
-    // Step 2: Persona
+    // Step 2: Avatar Profile
     name: string;
+    type: string;
     gender: string;
     personalityVibe: string;
     // Step 3: Style
@@ -30,6 +31,7 @@ const initialData: OnboardingData = {
     neighborhood: "",
     apartmentStyle: "",
     name: "",
+    type: "INFLUENCER",
     gender: "female",
     personalityVibe: "",
     clothingStyle: "",
@@ -225,7 +227,7 @@ export default function OnboardingPage() {
 
     const canProceed = () => {
         if (step === 1) return data.country && data.city && data.apartmentStyle;
-        if (step === 2) return data.name && data.gender && data.personalityVibe;
+        if (step === 2) return data.name && data.type && data.gender && data.personalityVibe;
         if (step === 3) return data.clothingStyle && data.bottomwear.length > 0 && data.footwear.length > 0;
         if (step === 4) return data.currentBalance > 0;
         return false;
@@ -239,7 +241,7 @@ export default function OnboardingPage() {
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const res = await fetch("/api/influencer", {
+            const res = await fetch("/api/persona", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
@@ -247,11 +249,11 @@ export default function OnboardingPage() {
 
             if (res.ok) {
                 const { id } = await res.json();
-                // Redirect to avatar creation instead of influencer page
-                router.push(`/influencer/${id}/avatar`);
+                // Redirect to avatar creation instead of persona page
+                router.push(`/persona/${id}/avatar`);
             }
         } catch (error) {
-            console.error("Failed to create influencer:", error);
+            console.error("Failed to create persona:", error);
         } finally {
             setIsSubmitting(false);
         }
@@ -299,7 +301,7 @@ export default function OnboardingPage() {
                                 <span className="text-sm text-teal-400 font-medium">Step 1 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Define the World</h1>
-                            <p className="text-zinc-400 mb-8">Where will your influencer live?</p>
+                            <p className="text-zinc-400 mb-8">Where will your avatar live?</p>
 
                             <div className="space-y-6">
                                 <div className="grid md:grid-cols-2 gap-4">
@@ -361,15 +363,15 @@ export default function OnboardingPage() {
                         </div>
                     )}
 
-                    {/* Step 2: Persona */}
+                    {/* Step 2: Avatar */}
                     {step === 2 && (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="flex items-center gap-3 mb-2">
                                 <User className="w-6 h-6 text-emerald-400" />
                                 <span className="text-sm text-emerald-400 font-medium">Step 2 of 4</span>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-bold mb-2">Create the Persona</h1>
-                            <p className="text-zinc-400 mb-8">Who will your influencer be?</p>
+                            <h1 className="text-3xl md:text-4xl font-bold mb-2">Create the Avatar</h1>
+                            <p className="text-zinc-400 mb-8">Who will your AI avatar be?</p>
 
                             <div className="space-y-6">
                                 <div>
@@ -381,6 +383,34 @@ export default function OnboardingPage() {
                                         placeholder="e.g. Luna Martinez"
                                         className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-emerald-500 focus:outline-none transition-colors"
                                     />
+                                </div>
+
+                                {/* Avatar Type Selection */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-4">Avatar Type</label>
+                                    <div className="grid grid-cols-2 gap-3 mb-2">
+                                        <button
+                                            onClick={() => updateData({ type: "INFLUENCER" })}
+                                            className={`p-4 rounded-xl border text-center transition-all ${data.type === "INFLUENCER"
+                                                ? "border-emerald-500 bg-emerald-500/10"
+                                                : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                }`}
+                                        >
+                                            <span className="text-2xl mb-2 block">📱</span>
+                                            <span className="text-sm font-medium">Influencer</span>
+                                        </button>
+                                        <button
+                                            onClick={() => updateData({ type: "MODEL" })}
+                                            className={`p-4 rounded-xl border text-center transition-all ${data.type === "MODEL"
+                                                ? "border-emerald-500 bg-emerald-500/10"
+                                                : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                }`}
+                                        >
+                                            <span className="text-2xl mb-2 block">📸</span>
+                                            <span className="text-sm font-medium">Model / Modelka</span>
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-zinc-500 italic text-center">More types coming soon...</p>
                                 </div>
 
                                 {/* Gender Selection */}
@@ -443,7 +473,7 @@ export default function OnboardingPage() {
                                 <span className="text-sm text-cyan-400 font-medium">Step 3 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Define the Style</h1>
-                            <p className="text-zinc-400 mb-8">How does your influencer dress?</p>
+                            <p className="text-zinc-400 mb-8">How does your avatar dress?</p>
 
                             <div className="space-y-8">
                                 {/* Clothing Style */}
@@ -658,7 +688,7 @@ export default function OnboardingPage() {
                             ) : (
                                 <>
                                     <Sparkles className="w-4 h-4" />
-                                    Create Influencer
+                                    Save and define Avatar Look
                                 </>
                             )}
                         </button>

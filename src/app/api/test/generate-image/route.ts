@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { generateInfluencerImage, saveGeneratedImage } from "@/lib/image-generation";
+import { generatePersonaImage, saveGeneratedImage } from "@/lib/image-generation";
 
 /**
  * Test endpoint for image generation
@@ -9,33 +9,33 @@ import { generateInfluencerImage, saveGeneratedImage } from "@/lib/image-generat
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { influencerId, prompt } = body;
+        const { personaId, prompt } = body;
 
-        if (!influencerId) {
-            return NextResponse.json({ error: "influencerId required" }, { status: 400 });
+        if (!personaId) {
+            return NextResponse.json({ error: "personaId required" }, { status: 400 });
         }
 
-        // Get influencer
-        const influencer = await prisma.influencer.findUnique({
-            where: { id: influencerId },
+        // Get persona
+        const persona = await prisma.persona.findUnique({
+            where: { id: personaId },
         });
 
-        if (!influencer) {
-            return NextResponse.json({ error: "Influencer not found" }, { status: 404 });
+        if (!persona) {
+            return NextResponse.json({ error: "Persona not found" }, { status: 404 });
         }
 
         // Build prompt
-        const imagePrompt = prompt || `A beautiful lifestyle photo of a ${influencer.personalityVibe} influencer in their ${influencer.apartmentStyle} apartment in ${influencer.city}. Authentic Instagram style, natural lighting.`;
+        const imagePrompt = prompt || `A beautiful lifestyle photo of a ${persona.personalityVibe} persona in their ${persona.apartmentStyle} apartment in ${persona.city}. Authentic Instagram style, natural lighting.`;
 
         console.log("Generating image with prompt:", imagePrompt);
-        console.log("Face references:", influencer.faceReferences.length);
-        console.log("Room references:", influencer.roomReferences.length);
+        console.log("Face references:", persona.faceReferences.length);
+        console.log("Room references:", persona.roomReferences.length);
 
         // Generate image
-        const result = await generateInfluencerImage(
+        const result = await generatePersonaImage(
             imagePrompt,
-            influencer.faceReferences,
-            influencer.roomReferences,
+            persona.faceReferences,
+            persona.roomReferences,
             {
                 aspectRatio: "4:5",
                 resolution: "1K", // Use 1K for faster testing
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
         const imageUrl = await saveGeneratedImage(
             result.imageBase64!,
             result.mimeType!,
-            influencerId,
+            personaId,
             `test-${Date.now()}`
         );
 

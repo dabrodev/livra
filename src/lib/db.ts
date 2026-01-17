@@ -19,6 +19,26 @@ function createPrismaClient() {
   return new PrismaClient({ adapter })
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+// Invalidate stale global prisma if models changed
+if (globalForPrisma.prisma) {
+  const p = globalForPrisma.prisma as any;
+  if (!p.persona) {
+    console.error('CRITICAL: Stale Prisma client detected (missing .persona). Invalidating cache...');
+    globalForPrisma.prisma = undefined;
+  } else if (p.influencer) {
+    console.warn('CRITICAL: Prisma client still has .influencer. This is unexpected but invalidating...');
+    globalForPrisma.prisma = undefined;
+  }
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+
+// Debug log to console
+if (process.env.NODE_ENV !== 'production') {
+  const p = prisma as any;
+  const models = ['user', 'persona', 'post', 'memory', 'avatarLibrary'];
+  const status = models.map(m => `${m}: ${!!p[m]}`).join(', ');
+  console.log(`Prisma Status: ${status}`);
+}
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

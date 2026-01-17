@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Play, Pause, Sparkles, Moon, Brain, Camera, Zap, Coffee, type LucideIcon } from "lucide-react";
 
 interface RealtimeActivityStatusProps {
-    influencerId: string;
+    personaId: string;
     initialLifecycleStatus: string | null;
     initialLifecycleStartedAt: Date | null;
     initialCurrentActivity: string | null;
@@ -42,7 +42,7 @@ function getActivityStatusConfig(currentActivity: string | null): { label: strin
 }
 
 export default function RealtimeActivityStatus({
-    influencerId,
+    personaId,
     initialLifecycleStatus,
     initialLifecycleStartedAt,
     initialCurrentActivity,
@@ -54,19 +54,19 @@ export default function RealtimeActivityStatus({
     const [activityDetails, setActivityDetails] = useState(initialActivityDetails);
     const [isConnected, setIsConnected] = useState(false);
 
-    // Subscribe to real-time updates on Influencer table
+    // Subscribe to real-time updates on Persona table
     useEffect(() => {
-        console.log('[RealtimeActivityStatus] Setting up subscription for influencer:', influencerId);
+        console.log('[RealtimeActivityStatus] Setting up subscription for persona:', personaId);
 
         const channel = supabase
-            .channel(`influencer-status-${influencerId}`)
+            .channel(`persona-status-${personaId}`)
             .on(
                 'postgres_changes',
                 {
                     event: 'UPDATE',
                     schema: 'public',
-                    table: 'Influencer',
-                    filter: `id=eq.${influencerId}`,
+                    table: 'Persona',
+                    filter: `id=eq.${personaId}`,
                 },
                 (payload) => {
                     console.log('[RealtimeActivityStatus] Update received:', payload);
@@ -103,7 +103,7 @@ export default function RealtimeActivityStatus({
             console.log('[RealtimeActivityStatus] Cleaning up subscription');
             supabase.removeChannel(channel);
         };
-    }, [influencerId]);
+    }, [personaId]);
 
     const lifecycleConfig = getLifecycleStatusConfig(lifecycleStatus, lifecycleStartedAt);
     const activityConfig = lifecycleStatus === 'running' ? getActivityStatusConfig(currentActivity) : null;

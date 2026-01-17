@@ -5,12 +5,12 @@ import { Play, Pause, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface LifecycleControlsProps {
-    influencerId: string;
+    personaId: string;
     initialIsActive: boolean;
     hasAvatar: boolean;
 }
 
-export default function LifecycleControls({ influencerId, initialIsActive, hasAvatar }: LifecycleControlsProps) {
+export default function LifecycleControls({ personaId, initialIsActive, hasAvatar }: LifecycleControlsProps) {
     const [isActive, setIsActive] = useState(initialIsActive);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -23,7 +23,7 @@ export default function LifecycleControls({ influencerId, initialIsActive, hasAv
 
         setIsLoading(true);
         try {
-            const response = await fetch(`/api/influencer/${influencerId}/status`, {
+            const response = await fetch(`/api/persona/${personaId}/status`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

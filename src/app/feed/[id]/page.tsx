@@ -9,7 +9,7 @@ interface FeedPageProps {
 export default async function FeedPage({ params }: FeedPageProps) {
     const { id } = await params;
 
-    const influencer = await prisma.influencer.findUnique({
+    const persona = await prisma.persona.findUnique({
         where: { id },
         include: {
             posts: {
@@ -19,7 +19,7 @@ export default async function FeedPage({ params }: FeedPageProps) {
         },
     });
 
-    if (!influencer) {
+    if (!persona) {
         notFound();
     }
 
@@ -42,24 +42,24 @@ export default async function FeedPage({ params }: FeedPageProps) {
                 <div className="flex items-center gap-4">
                     {/* Avatar placeholder */}
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-2xl">
-                        {influencer.name.charAt(0)}
+                        {persona.name.charAt(0)}
                     </div>
                     <div className="flex-1">
-                        <h1 className="text-xl font-bold">{influencer.name}</h1>
+                        <h1 className="text-xl font-bold">{persona.name}</h1>
                         <div className="flex items-center gap-1 text-sm text-zinc-400">
                             <MapPin className="w-3.5 h-3.5" />
-                            <span>{influencer.city}, {influencer.country}</span>
+                            <span>{persona.city}, {persona.country}</span>
                         </div>
                         <div className="flex items-center gap-1 text-sm text-zinc-400 mt-1">
                             <Wallet className="w-3.5 h-3.5" />
-                            <span className="gradient-text font-medium">${influencer.currentBalance.toLocaleString()}</span>
+                            <span className="gradient-text font-medium">${persona.currentBalance.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-4 flex gap-6 text-sm">
                     <div className="text-center">
-                        <span className="font-bold text-lg">{influencer.posts.length}</span>
+                        <span className="font-bold text-lg">{persona.posts.length}</span>
                         <span className="text-zinc-400 block">posts</span>
                     </div>
                     <div className="text-center">
@@ -69,20 +69,20 @@ export default async function FeedPage({ params }: FeedPageProps) {
                 </div>
 
                 <p className="mt-4 text-sm text-zinc-400">
-                    {influencer.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())} • {influencer.apartmentStyle.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                    {persona.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())} • {persona.apartmentStyle.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
                 </p>
             </div>
 
             {/* Posts feed */}
             <div className="border-t border-zinc-800">
-                {influencer.posts.length === 0 ? (
+                {persona.posts.length === 0 ? (
                     <div className="px-4 py-16 text-center max-w-lg mx-auto">
                         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-zinc-800 flex items-center justify-center">
                             <Sparkles className="w-8 h-8 text-zinc-600" />
                         </div>
                         <h2 className="text-lg font-semibold mb-2">No posts yet</h2>
                         <p className="text-zinc-400 text-sm">
-                            {influencer.name} is getting ready. First content coming soon!
+                            {persona.name} is getting ready. First content coming soon!
                         </p>
                         <p className="text-zinc-500 text-xs mt-4">
                             The AI is generating the first day of content...
@@ -90,14 +90,14 @@ export default async function FeedPage({ params }: FeedPageProps) {
                     </div>
                 ) : (
                     <div className="max-w-lg mx-auto">
-                        {influencer.posts.map((post) => (
+                        {persona.posts.map((post) => (
                             <div key={post.id} className="border-b border-zinc-800">
                                 {/* Post header */}
                                 <div className="p-4 flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-xs">
-                                        {influencer.name.charAt(0)}
+                                        {persona.name.charAt(0)}
                                     </div>
-                                    <span className="font-medium text-sm">{influencer.name}</span>
+                                    <span className="font-medium text-sm">{persona.name}</span>
                                 </div>
 
                                 {/* Post image */}
@@ -120,7 +120,7 @@ export default async function FeedPage({ params }: FeedPageProps) {
                                         </button>
                                     </div>
                                     <p className="text-sm">
-                                        <span className="font-medium">{influencer.name}</span>{" "}
+                                        <span className="font-medium">{persona.name}</span>{" "}
                                         {post.caption}
                                     </p>
                                     <p className="text-xs text-zinc-500 mt-2">

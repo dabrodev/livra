@@ -14,12 +14,12 @@ interface DailyOutfit {
 }
 
 interface RealtimeOutfitProps {
-    influencerId: string;
+    personaId: string;
     initialDailyOutfit: DailyOutfit | null;
 }
 
 export default function RealtimeOutfit({
-    influencerId,
+    personaId,
     initialDailyOutfit,
 }: RealtimeOutfitProps) {
     const [outfit, setOutfit] = useState<DailyOutfit | null>(initialDailyOutfit);
@@ -32,16 +32,16 @@ export default function RealtimeOutfit({
     }, [outfit]);
 
     useEffect(() => {
-        // Subscribe to real-time updates on Influencer table
+        // Subscribe to real-time updates on Persona table
         const channel = supabase
-            .channel(`influencer-outfit-${influencerId}`)
+            .channel(`persona-outfit-${personaId}`)
             .on(
                 'postgres_changes',
                 {
                     event: 'UPDATE',
                     schema: 'public',
-                    table: 'Influencer',
-                    filter: `id=eq.${influencerId}`,
+                    table: 'Persona',
+                    filter: `id=eq.${personaId}`,
                 },
                 (payload) => {
                     const updated = payload.new as { dailyOutfit?: DailyOutfit };
@@ -55,7 +55,7 @@ export default function RealtimeOutfit({
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [influencerId]);
+    }, [personaId]);
 
     if (!outfit) return null;
 

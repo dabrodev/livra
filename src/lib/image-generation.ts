@@ -112,7 +112,7 @@ export async function generateImage(
 }
 
 /**
- * Generate an influencer image with face and room references
+ * Generate an persona image with face and room references
  * Uses the 14-slot reference stack as per specs
  * 
  * Slots:
@@ -120,7 +120,7 @@ export async function generateImage(
  * - 7-12: Environment/location consistency  
  * - 13-14: Object/clothing consistency
  */
-export async function generateInfluencerImage(
+export async function generatePersonaImage(
     prompt: string,
     faceReferences: string[], // URLs or base64
     roomReferences: string[], // URLs or base64
@@ -152,7 +152,7 @@ export async function generateInfluencerImage(
         // Generate with references
         return generateImage(prompt, referenceImages, options);
     } catch (error) {
-        console.error("Influencer image generation failed:", error);
+        console.error("Persona image generation failed:", error);
         return {
             success: false,
             error: error instanceof Error ? error.message : "Unknown error",
@@ -203,7 +203,7 @@ async function fetchImageAsBase64(urlOrBase64: string): Promise<ReferenceImage |
 export async function saveGeneratedImage(
     imageBase64: string,
     mimeType: string,
-    influencerId: string,
+    personaId: string,
     postId: string
 ): Promise<string | null> {
     try {
@@ -213,7 +213,7 @@ export async function saveGeneratedImage(
         // Determine file extension from mime type
         const extension = mimeType.split("/")[1] || "png";
         const timestamp = Date.now();
-        const fileName = `${influencerId}/${postId}-${timestamp}.${extension}`;
+        const fileName = `${personaId}/${postId}-${timestamp}.${extension}`;
 
         // Convert base64 to buffer
         const buffer = Buffer.from(imageBase64, "base64");

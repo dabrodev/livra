@@ -82,13 +82,13 @@ export default function AvatarLibraryPage() {
                             </div>
                             <h2 className="text-xl font-semibold mb-2">No avatars yet</h2>
                             <p className="text-zinc-400 mb-6">
-                                Generate avatars for your influencers to build your library
+                                Generate avatars for your personas to build your library
                             </p>
                             <Link
                                 href="/onboarding"
                                 className="btn-glow px-5 py-2.5 rounded-full text-white font-medium inline-flex items-center gap-2"
                             >
-                                Create Influencer
+                                Create Persona
                             </Link>
                         </div>
                     )}
@@ -133,7 +133,7 @@ export default function AvatarLibraryPage() {
                             {/* Info */}
                             <div className="mt-8 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
                                 <p className="text-sm text-zinc-400">
-                                    💡 Click on any avatar to view full size. These avatars are automatically available when creating new influencers.
+                                    💡 Click on any avatar to view full size. These avatars are automatically available when creating new personas.
                                 </p>
                             </div>
                         </>

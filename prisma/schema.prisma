@@ -6,8 +6,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Influencer {
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String?
+  createdAt   DateTime  @default(now())
+  personas    Persona[]
+}
+
+model Persona {
+  userId          String
   id              String   @id @default(uuid())
+  type            String   @default("INFLUENCER") // "INFLUENCER", "ASSISTANT", etc.
   name            String
   country         String
   city            String
@@ -53,27 +63,31 @@ model Influencer {
   dailyOutfit       Json?                        // { top, bottom, footwear, accessories, tightsColor }
   dailyOutfitDate   DateTime?                    // Date when outfit was selected (to reset next day)
   
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
   createdAt       DateTime @default(now())
+  
+  @@index([userId])
 }
 
 model Post {
-  id           String     @id @default(uuid())
-  influencerId String
-  influencer   Influencer @relation(fields: [influencerId], references: [id])
-  type         String     // "IMAGE" or "VIDEO"
-  contentUrl   String
-  caption      String
-  prompt       String?
-  postedAt     DateTime   @default(now())
+  id        String   @id @default(uuid())
+  personaId String
+  persona   Persona  @relation(fields: [personaId], references: [id])
+  type      String   // "IMAGE" or "VIDEO"
+  contentUrl String
+  caption    String
+  prompt     String?
+  postedAt   DateTime @default(now())
 }
 
 model Memory {
-  id           String     @id @default(uuid())
-  influencerId String
-  influencer   Influencer @relation(fields: [influencerId], references: [id])
-  description  String     // Short-term memory of recent events
-  importance   Int        @default(1)
-  createdAt    DateTime   @default(now())
+  id          String   @id @default(uuid())
+  personaId   String
+  persona     Persona  @relation(fields: [personaId], references: [id])
+  description String   // Short-term memory of recent events
+  importance  Int      @default(1)
+  createdAt   DateTime @default(now())
 }
 
 // Global avatar library for reuse across influencers
@@ -93,7 +107,7 @@ model AvatarLibrary {
   bodyType    String?
   
   // Usage tracking
-  usedBy      String[] // IDs of influencers using this avatar
+  usedBy      String[] // IDs of personas using this avatar
   createdAt   DateTime @default(now())
 }
 

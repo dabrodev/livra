@@ -13,11 +13,11 @@ interface Avatar {
 }
 
 interface AvatarSwapProps {
-    influencerId: string;
+    personaId: string;
     currentAvatarUrl?: string;
 }
 
-export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwapProps) {
+export default function AvatarSwap({ personaId, currentAvatarUrl }: AvatarSwapProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [avatars, setAvatars] = useState<Avatar[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +48,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
     const handleSelectAvatar = async (avatar: Avatar) => {
         setIsSaving(true);
         try {
-            await fetch(`/api/influencer/${influencerId}/avatar`, {
+            await fetch(`/api/persona/${personaId}/avatar`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ avatarUrl: avatar.url }),
@@ -109,7 +109,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                                     <div className="text-center py-12">
                                         <p className="text-zinc-400 mb-4">No avatars in library</p>
                                         <a
-                                            href={`/influencer/${influencerId}/avatar`}
+                                            href={`/persona/${personaId}/avatar`}
                                             className="text-teal-400 hover:underline"
                                         >
                                             Generate new avatars
@@ -154,7 +154,7 @@ export default function AvatarSwap({ influencerId, currentAvatarUrl }: AvatarSwa
                             {/* Footer */}
                             <div className="p-4 bg-zinc-900/50 border-t border-zinc-800 flex justify-between items-center bg-zinc-900">
                                 <a
-                                    href={`/influencer/${influencerId}/avatar`}
+                                    href={`/persona/${personaId}/avatar`}
                                     className="text-sm font-medium text-teal-400 hover:text-teal-300 transition-colors flex items-center gap-2"
                                 >
                                     <Sparkles className="w-4 h-4" />

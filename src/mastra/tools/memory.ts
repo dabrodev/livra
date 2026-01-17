@@ -3,12 +3,12 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 
 /**
- * Create a memory for an influencer
+ * Create a memory for an persona
  */
-export async function createMemory(influencerId: string, description: string, importance: number) {
+export async function createMemory(personaId: string, description: string, importance: number) {
     try {
         const memory = await prisma.memory.create({
-            data: { influencerId, description, importance },
+            data: { personaId, description, importance },
         });
         return { success: true, memoryId: memory.id };
     } catch {
@@ -18,9 +18,9 @@ export async function createMemory(influencerId: string, description: string, im
 
 export const memoryTool = createTool({
     id: "create-memory",
-    description: "Store a memory of an event or experience for the influencer.",
+    description: "Store a memory of an event or experience for the persona.",
     inputSchema: z.object({
-        influencerId: z.string().describe("The influencer's ID"),
+        personaId: z.string().describe("The persona's ID"),
         description: z.string().describe("Description of the memory/event"),
         importance: z.number().min(1).max(5).describe("Importance level 1-5"),
     }),
@@ -30,6 +30,6 @@ export const memoryTool = createTool({
         error: z.string().optional(),
     }),
     execute: async ({ context }) => {
-        return createMemory(context.influencerId, context.description, context.importance);
+        return createMemory(context.personaId, context.description, context.importance);
     },
 });

@@ -1,7 +1,7 @@
 import { inngest } from '../client'
 import { prisma } from '@/lib/db'
 import { lifeDirectorAgent, getWeather, getTrends, type WeatherResult, type TrendsResult } from '@/mastra'
-import { generateInfluencerImage, saveGeneratedImage } from '@/lib/image-generation'
+import { generatePersonaImage, saveGeneratedImage } from '@/lib/image-generation'
 
 // Types for better structure
 interface ActivityPlan {
@@ -34,12 +34,12 @@ type ActivityStatus = 'sleeping' | 'planning' | 'creating' | 'active' | 'resting
 
 // Helper to update activity status in real-time
 async function updateActivityStatus(
-    influencerId: string,
+    personaId: string,
     activity: ActivityStatus,
     details?: string
 ) {
-    await prisma.influencer.update({
-        where: { id: influencerId },
+    await prisma.persona.update({
+        where: { id: personaId },
         data: {
             currentActivity: activity,
             activityDetails: details || null,
@@ -90,18 +90,18 @@ export const lifecycleCycle = inngest.createFunction(
         cancelOn: [
             {
                 event: 'livra/cycle.stop',
-                match: 'data.influencerId',
+                match: 'data.personaId',
             }
         ]
     },
     { event: 'livra/cycle.start' },
     async ({ event, step }) => {
-        const influencerId = event.data.influencerId as string
+        const personaId = event.data.personaId as string
 
-        // Get the influencer data
-        const influencer = await step.run('fetch-influencer', async () => {
-            const data = await prisma.influencer.findUnique({
-                where: { id: influencerId },
+        // Get the persona data
+        const persona = await step.run('fetch-persona', async () => {
+            const data = await prisma.persona.findUnique({
+                where: { id: personaId },
                 include: {
                     memories: {
                         orderBy: { createdAt: 'desc' },
@@ -109,18 +109,29 @@ export const lifecycleCycle = inngest.createFunction(
                     },
                 },
             })
-            if (!data) throw new Error(`Influencer ${influencerId} not found`)
+            if (!data) throw new Error(`Persona ${personaId} not found`)
             return data
         })
 
+        // Handle Manual Retry from memory
+        const retryMemoryId = event.data.retryMemoryId as string | undefined;
+        let retryMemory = null;
+        if (retryMemoryId) {
+            retryMemory = await step.run('fetch-retry-memory', async () => {
+                return await prisma.memory.findUnique({
+                    where: { id: retryMemoryId }
+                });
+            });
+        }
+
         // Check if lifecycle is active
-        if (!(influencer as any).isActive) {
-            console.log(`Lifecycle for ${influencer.name} is paused.`)
-            return { paused: true, influencer: influencer.name }
+        if (!(persona as any).isActive) {
+            console.log(`Lifecycle for ${persona.name} is paused.`)
+            return { paused: true, persona: persona.name }
         }
 
         // --- TIMEZONE & SLEEP LOGIC START ---
-        const localHour = getLocalHour(influencer.city);
+        const localHour = getLocalHour(persona.city);
         const isNight = localHour >= 23 || localHour < 7;
 
         if (isNight) {
@@ -133,11 +144,11 @@ export const lifecycleCycle = inngest.createFunction(
             const sleepMinutes = (hoursUntilMorning * 60) + randomOffset;
             const sleepDuration = `${sleepMinutes}m`;
 
-            console.log(`[Lifecycle] ${influencer.name} in ${influencer.city} (Local: ${localHour}:00). Night mode activated. Sleeping for ${sleepDuration}.`);
+            console.log(`[Lifecycle] ${persona.name} in ${persona.city} (Local: ${localHour}:00). Night mode activated. Sleeping for ${sleepDuration}.`);
 
             // Update activity status: SLEEPING
             await step.run('update-status-sleeping', async () => {
-                await updateActivityStatus(influencerId, 'sleeping', `Sleeping until morning (${influencer.city} local time)`);
+                await updateActivityStatus(personaId, 'sleeping', `Sleeping until morning (${persona.city} local time)`);
             });
 
             // Sleep
@@ -146,7 +157,7 @@ export const lifecycleCycle = inngest.createFunction(
             // Trigger next cycle
             await step.sendEvent('trigger-morning-cycle', {
                 name: 'livra/cycle.start',
-                data: { influencerId },
+                data: { personaId },
             })
 
             return {
@@ -162,12 +173,12 @@ export const lifecycleCycle = inngest.createFunction(
 
         // Update activity status: PLANNING
         await step.run('update-status-planning', async () => {
-            await updateActivityStatus(influencerId, 'planning', 'Checking environment and planning next activity...');
+            await updateActivityStatus(personaId, 'planning', 'Checking environment and planning next activity...');
         });
 
         // Step 1: Environmental Check - use utility functions directly
         const environment = await step.run('check-environment', async (): Promise<EnvironmentContext> => {
-            const weather = await getWeather(influencer.city)
+            const weather = await getWeather(persona.city)
             const trends = await getTrends('lifestyle')
             return { weather, trends }
         })
@@ -184,17 +195,17 @@ export const lifecycleCycle = inngest.createFunction(
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const needsNewOutfit = !influencer.dailyOutfit ||
-            !influencer.dailyOutfitDate ||
-            new Date(influencer.dailyOutfitDate) < today;
+        const needsNewOutfit = !persona.dailyOutfit ||
+            !persona.dailyOutfitDate ||
+            new Date(persona.dailyOutfitDate) < today;
 
         const dailyOutfit = await step.run('get-or-create-daily-outfit', async (): Promise<DailyOutfit> => {
-            if (!needsNewOutfit && influencer.dailyOutfit) {
-                console.log(`[Lifecycle] ${influencer.name} using existing daily outfit`);
-                return influencer.dailyOutfit as unknown as DailyOutfit;
+            if (!needsNewOutfit && persona.dailyOutfit) {
+                console.log(`[Lifecycle] ${persona.name} using existing daily outfit`);
+                return persona.dailyOutfit as unknown as DailyOutfit;
             }
 
-            console.log(`[Lifecycle] ${influencer.name} selecting new daily outfit`);
+            console.log(`[Lifecycle] ${persona.name} selecting new daily outfit`);
 
             // Helper for random selection
             const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -215,14 +226,14 @@ export const lifecycleCycle = inngest.createFunction(
                 coat: ['wool', 'trench', 'faux fur', 'puffer'],
             };
 
-            const isMale = influencer.gender === 'male';
+            const isMale = persona.gender === 'male';
 
             // Gender-specific logic
             let tightsColor: string | null = null;
             if (!isMale) {
                 // Tights only for females
                 const tightsColors = ['black', 'nude', 'sheer nude', 'white', 'gray', 'navy'];
-                const hasTights = influencer.signatureItems.includes('tights');
+                const hasTights = (persona.signatureItems as string[]).includes('tights');
                 tightsColor = hasTights ? pick(tightsColors) : null;
             }
 
@@ -241,7 +252,7 @@ export const lifecycleCycle = inngest.createFunction(
                 'bohemian': ['blouse', 'tunic', 'top', 'kimono'],
             };
 
-            const styleTops = topsByStyle[influencer.clothingStyle] || topsByStyle['casual'];
+            const styleTops = topsByStyle[persona.clothingStyle] || topsByStyle['casual'];
             const topItem = pick(styleTops);
 
             // Randomize top details
@@ -254,8 +265,8 @@ export const lifecycleCycle = inngest.createFunction(
             const top = `${topColor} ${topMaterial} ${topItem}`;
 
             // Generate Bottom with Valid Lengths
-            const bottomItem = influencer.bottomwear.length > 0
-                ? pick(influencer.bottomwear)
+            const bottomItem = (persona.bottomwear as string[]).length > 0
+                ? pick(persona.bottomwear as string[])
                 : 'jeans';
 
             let bottomDesc = bottomItem;
@@ -282,10 +293,10 @@ export const lifecycleCycle = inngest.createFunction(
             }
 
             // Generate Footwear
-            const outdoorFootwear = influencer.footwear.filter(f => f !== 'barefoot' && f !== 'slippers');
+            const outdoorFootwear = (persona.footwear as string[]).filter((f: string) => f !== 'barefoot' && f !== 'slippers');
             const defaultFootwear = isMale ? ['boots', 'sneakers', 'dress-shoes'] : ['boots', 'heels', 'sneakers'];
 
-            // If influencer has no outdoor shoes defined, pick from the default set
+            // If persona has no outdoor shoes defined, pick from the default set
             const footwearItem = outdoorFootwear.length > 0
                 ? pick(outdoorFootwear)
                 : pick(defaultFootwear);
@@ -328,9 +339,9 @@ export const lifecycleCycle = inngest.createFunction(
                 'tights': [], // handled separately
             };
 
-            const accessories = influencer.signatureItems
-                .filter(s => s !== 'tights' && s !== 'watches') // Filter out items handled separately
-                .map(s => {
+            const accessories = (persona.signatureItems as string[])
+                .filter((s: string) => s !== 'tights' && s !== 'watches') // Filter out items handled separately
+                .map((s: string) => {
                     return accessoryMap[s] ? pick(accessoryMap[s]) : '';
                 })
                 .filter(Boolean)
@@ -346,8 +357,8 @@ export const lifecycleCycle = inngest.createFunction(
             };
 
             // Save to database (cast to Prisma-compatible JSON type)
-            await prisma.influencer.update({
-                where: { id: influencerId },
+            await prisma.persona.update({
+                where: { id: personaId },
                 data: {
                     dailyOutfit: JSON.parse(JSON.stringify(newOutfit)),
                     dailyOutfitDate: new Date(),
@@ -360,28 +371,40 @@ export const lifecycleCycle = inngest.createFunction(
         // Step 2: Daily Plan - Agent decides next activity
 
         const plan = await step.run('create-daily-plan', async (): Promise<ActivityPlan> => {
-            const recentMemories = influencer.memories
+            // If this is a retry, reconstruct the plan from memory
+            if (retryMemory) {
+                return {
+                    activity: retryMemory.description.split(' - ')[0],
+                    timeOfDay: currentTimeOfDay, // Approximate
+                    location: retryMemory.description.includes('at') ? retryMemory.description.split('at ')[1].split(' - ')[0] : 'home',
+                    isContentWorthy: true, // Force content for retry
+                    estimatedCost: 0,
+                    moodImpact: 'positive',
+                };
+            }
+
+            const recentMemories = persona.memories
                 .map((m: { description: string }) => m.description)
                 .join(', ')
 
             const prompt = `
-You are planning the next activity for ${influencer.name}, a ${influencer.personalityVibe} influencer living in ${influencer.city}.
+You are planning the next activity for ${persona.name}, a ${persona.personalityVibe} persona living in ${persona.city}.
 
 Current context:
 - LOCAL TIME: ${localHour}:00 (${currentTimeOfDay}) - THIS IS CRITICAL, plan activities appropriate for this time!
 - Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}
 - Trending: ${environment.trends.trends.slice(0, 3).join(', ')}
-- Current balance: $${influencer.currentBalance}
+- Current balance: $${persona.currentBalance}
 - Recent activities: ${recentMemories || 'Just starting their day'}
-- Apartment style: ${influencer.apartmentStyle}
-- Clothing style: ${influencer.clothingStyle}
+- Apartment style: ${persona.apartmentStyle}
+- Clothing style: ${persona.clothingStyle}
 
 Based on this context, plan the next activity. Consider:
 1. THE TIME OF DAY - Do not plan morning activities in the evening!
 2. The weather conditions
 3. Their budget
 4. Their personality vibe
-5. Whether this would be good content
+5. Whether this would be good content (aesthetic lifestyle moments at home ARE content-worthy!)
 
 Respond with a JSON object containing:
 {
@@ -438,14 +461,14 @@ Respond with a JSON object containing:
         // Update activity status: ACTIVE (doing the activity)
         await step.run('update-status-active', async () => {
             const activityDescription = `${plan.activity}${plan.location ? ` at ${plan.location}` : ''}`;
-            await updateActivityStatus(influencerId, 'active', activityDescription);
+            await updateActivityStatus(personaId, 'active', activityDescription);
         });
 
         // Step 3: Create memory of the activity
         const memory = await step.run('create-memory', async () => {
             return await prisma.memory.create({
                 data: {
-                    influencerId,
+                    personaId,
                     description: `${plan.activity} at ${plan.location || 'home'} - ${plan.moodImpact} vibes`,
                     importance: plan.isContentWorthy ? 4 : 2,
                 },
@@ -455,8 +478,8 @@ Respond with a JSON object containing:
         // Step 4: Update wallet if there was spending
         if (plan.estimatedCost > 0) {
             await step.run('update-wallet', async () => {
-                return await prisma.influencer.update({
-                    where: { id: influencerId },
+                return await prisma.persona.update({
+                    where: { id: personaId },
                     data: {
                         currentBalance: {
                             decrement: plan.estimatedCost,
@@ -473,7 +496,7 @@ Respond with a JSON object containing:
             }
 
             // Update activity status: CREATING
-            await updateActivityStatus(influencerId, 'creating', 'Generating content...');
+            await updateActivityStatus(personaId, 'creating', 'Generating content...');
 
             // Determine context for outfit variations
             const isAtHome = !plan.location ||
@@ -524,8 +547,8 @@ Respond with a JSON object containing:
                 };
 
                 // PERSIST the change to DB so she stays in this outfit
-                await prisma.influencer.update({
-                    where: { id: influencerId },
+                await prisma.persona.update({
+                    where: { id: personaId },
                     data: {
                         dailyOutfit: JSON.parse(JSON.stringify(currentOutfit))
                     }
@@ -544,7 +567,7 @@ Respond with a JSON object containing:
                 let footwearDesc: string;
                 if (isAtHome) {
                     // At home: barefoot or slippers (even in evening wear)
-                    const homeFootwear = influencer.footwear.find(f => f === 'barefoot' || f === 'slippers');
+                    const homeFootwear = (persona.footwear as string[]).find((f: string) => f === 'barefoot' || f === 'slippers');
                     if (homeFootwear === 'barefoot') {
                         footwearDesc = 'barefoot with no shoes, bare feet visible';
                     } else {
@@ -557,7 +580,7 @@ Respond with a JSON object containing:
                 // Tights with reinforced toe if barefoot
                 let tightsDesc = '';
                 if (currentOutfit.tightsColor) {
-                    const isBarefootOrSlippers = isAtHome && influencer.footwear.some(f => f === 'barefoot' || f === 'slippers');
+                    const isBarefootOrSlippers = isAtHome && (persona.footwear as string[]).some((f: string) => f === 'barefoot' || f === 'slippers');
                     if (isBarefootOrSlippers) {
                         tightsDesc = `MUST be wearing ${currentOutfit.tightsColor} sheer tights on legs and feet, with reinforced toes (slightly thicker fabric at the toes but still sheer, toes visible through)`;
                     } else {
@@ -601,19 +624,19 @@ Respond with a JSON object containing:
             else if (month >= 5 && month <= 7) season = 'summer';
             else season = 'autumn';
 
-            const imagePrompt = `A beautiful, Instagram-worthy photo of a ${influencer.personalityVibe} influencer ${plan.activity} at ${plan.location || 'home'}. 
+            const imagePrompt = `A beautiful, Instagram-worthy photo of a ${persona.personalityVibe} persona ${plan.activity} at ${plan.location || 'home'}. 
 TIME: ${currentMonth} ${season}, ${localHour}:00 local time (${plan.timeOfDay}) - LIGHTING: ${lightingDescription}.
 Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}.
 Style: authentic lifestyle photography.
 OUTFIT (consistent daily look): ${outfitDescription}.
-Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
+Location: ${persona.city}, in a ${persona.apartmentStyle} setting.`
 
 
             // Generate image with face and room references
-            const result = await generateInfluencerImage(
+            const result = await generatePersonaImage(
                 imagePrompt,
-                influencer.faceReferences,
-                influencer.roomReferences,
+                persona.faceReferences,
+                persona.roomReferences,
                 {
                     aspectRatio: '4:5', // Instagram portrait
                     resolution: '2K',
@@ -637,19 +660,19 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
                 };
                 const emoji = weatherEmoji[environment.weather.condition] || '🌤️';
 
-                const caption = `${plan.activity} ${emoji} ${environment.weather.temp}°C in ${influencer.city} ✨ ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
+                const caption = `${plan.activity} ${emoji} ${environment.weather.temp}°C in ${persona.city} ✨ ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
 
                 // Save image to Supabase Storage
                 const imageUrl = await saveGeneratedImage(
                     result.imageBase64,
                     result.mimeType || 'image/png',
-                    influencerId,
+                    personaId,
                     'pending'
                 )
 
                 const post = await prisma.post.create({
                     data: {
-                        influencerId,
+                        personaId,
                         type: 'IMAGE',
                         contentUrl: imageUrl || '',
                         caption,
@@ -675,11 +698,11 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
         const randomHours = Math.floor(Math.random() * 3) + 3; // 3-5 hours between activities
         const sleepDuration = `${randomHours}h`;
 
-        console.log(`[Lifecycle] ${influencer.name} completed activity. Taking a break for ${sleepDuration}.`);
+        console.log(`[Lifecycle] ${persona.name} completed activity. Taking a break for ${sleepDuration}.`);
 
         // Update activity status: RESTING
         await step.run('update-status-resting', async () => {
-            await updateActivityStatus(influencerId, 'resting', `Taking a ${randomHours}-hour break`);
+            await updateActivityStatus(personaId, 'resting', `Taking a ${randomHours}-hour break`);
         });
 
         await step.sleep('wait-for-next-cycle', sleepDuration);
@@ -698,11 +721,11 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
         // Trigger next cycle to keep the autonomous loop going
         await step.sendEvent('trigger-next-cycle', {
             name: 'livra/cycle.start',
-            data: { influencerId },
+            data: { personaId },
         })
 
         return {
-            influencer: influencer.name,
+            persona: persona.name,
             environment,
             plan,
             image,
@@ -713,18 +736,18 @@ Location: ${influencer.city}, in a ${influencer.apartmentStyle} setting.`
     }
 )
 
-// Function to start the lifecycle for a new influencer
+// Function to start the lifecycle for a new persona
 export const startLifecycle = inngest.createFunction(
     { id: 'start-lifecycle' },
-    { event: 'livra/influencer.created' },
+    { event: 'livra/persona.created' },
     async ({ event, step }) => {
-        const influencerId = event.data.influencerId as string
+        const personaId = event.data.personaId as string
 
         // Create initial memory
         await step.run('create-initial-memory', async () => {
             return await prisma.memory.create({
                 data: {
-                    influencerId,
+                    personaId,
                     description: 'Started a new chapter in life - feeling excited about the journey ahead!',
                     importance: 5,
                 },
@@ -734,10 +757,10 @@ export const startLifecycle = inngest.createFunction(
         // Trigger the first lifecycle cycle
         await step.sendEvent('trigger-first-cycle', {
             name: 'livra/cycle.start',
-            data: { influencerId },
+            data: { personaId },
         })
 
-        return { started: true, influencerId }
+        return { started: true, personaId }
     }
 )
 

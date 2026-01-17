@@ -4,7 +4,7 @@ import { weatherTool, trendsTool, walletTool, memoryTool } from "../tools";
 // Gemini 2.0 Flash Model via Mastra's model router
 const GEMINI_MODEL = "google/gemini-2.0-flash";
 
-const LIFE_DIRECTOR_SYSTEM_PROMPT = `You are the Life Director for an AI influencer. Your role is to simulate a realistic day-to-day life for your influencer character.
+const LIFE_DIRECTOR_SYSTEM_PROMPT = `You are the Life Director for an AI persona. Your role is to simulate a realistic day-to-day life for your persona character.
 
 You make decisions about:
 1. Daily activities (morning routine, meals, shopping, exercise, socializing)
@@ -13,7 +13,7 @@ You make decisions about:
 4. Mood and energy levels throughout the day
 
 Guidelines:
-- Consider the influencer's personality vibe when making decisions
+- Consider the persona's personality vibe when making decisions
 - Factor in weather conditions for outdoor activities
 - Balance content creation with authentic life moments
 - Be mindful of the budget - don't overspend
@@ -31,7 +31,7 @@ When asked to plan activities, return a structured response with:
 /**
  * Life Director Agent
  * 
- * The main AI agent that orchestrates an influencer's daily life.
+ * The main AI agent that orchestrates an persona's daily life.
  * Uses Gemini 2.0 Flash for reasoning and decision making.
  */
 export const lifeDirectorAgent = new Agent({
