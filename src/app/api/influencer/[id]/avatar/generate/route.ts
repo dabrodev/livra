@@ -50,7 +50,7 @@ export async function POST(
         };
         const clothingDescription = clothingStyleMap[influencer.clothingStyle] || 'wearing casual clothing';
 
-        const basePrompt = `Professional portrait photo of a ${bodyTypeLabel} ${bodyHeightLabel} height ${genderTerm} for Instagram influencer profile, ${clothingDescription}. 
+        const basePrompt = `Professional portrait photo of a ${bodyTypeLabel} ${bodyHeightLabel} height ${genderTerm}, ${clothingDescription}. 
 Hair: ${hairColorLabel} color, ${hairStyleLabel} style.
 Eyes: ${eyeColorLabel}.
 Skin: ${skinToneLabel} tone.
