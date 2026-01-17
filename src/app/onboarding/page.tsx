@@ -13,6 +13,7 @@ interface OnboardingData {
     apartmentStyle: string;
     // Step 2: Persona
     name: string;
+    gender: string;
     personalityVibe: string;
     // Step 3: Style
     clothingStyle: string;
@@ -29,6 +30,7 @@ const initialData: OnboardingData = {
     neighborhood: "",
     apartmentStyle: "",
     name: "",
+    gender: "female",
     personalityVibe: "",
     clothingStyle: "",
     bottomwear: [],
@@ -58,13 +60,14 @@ const personalityVibes = [
 const clothingStyles = [
     { id: "casual", label: "Casual", emoji: "👕" },
     { id: "sporty", label: "Sporty", emoji: "🏃" },
-    { id: "elegant", label: "Elegant", emoji: "👗" },
+    { id: "elegant", label: "Elegant", emoji: "👔" },
     { id: "streetwear", label: "Streetwear", emoji: "🧢" },
     { id: "bohemian", label: "Bohemian", emoji: "🌻" },
     { id: "minimalist", label: "Minimalist", emoji: "⚪" },
 ];
 
-const bottomwearOptions = [
+// Female bottomwear options
+const femaleBottomwearOptions = [
     { id: "jeans", label: "Jeans", emoji: "👖" },
     { id: "skirts", label: "Skirts", emoji: "👗" },
     { id: "shorts", label: "Shorts", emoji: "🩳" },
@@ -73,7 +76,18 @@ const bottomwearOptions = [
     { id: "sweatpants", label: "Sweatpants", emoji: "🏠" },
 ];
 
-const footwearOptions = [
+// Male bottomwear options
+const maleBottomwearOptions = [
+    { id: "jeans", label: "Jeans", emoji: "👖" },
+    { id: "chinos", label: "Chinos", emoji: "👔" },
+    { id: "shorts", label: "Shorts", emoji: "🩳" },
+    { id: "joggers", label: "Joggers", emoji: "🏃" },
+    { id: "sweatpants", label: "Sweatpants", emoji: "🏠" },
+    { id: "dress-pants", label: "Dress Pants", emoji: "👞" },
+];
+
+// Female footwear options
+const femaleFootwearOptions = [
     { id: "sneakers", label: "Sneakers", emoji: "👟" },
     { id: "heels", label: "Heels", emoji: "👠" },
     { id: "boots", label: "Boots", emoji: "🥾" },
@@ -82,7 +96,18 @@ const footwearOptions = [
     { id: "barefoot", label: "Often Barefoot", emoji: "🦶" },
 ];
 
-const signatureItemOptions = [
+// Male footwear options
+const maleFootwearOptions = [
+    { id: "sneakers", label: "Sneakers", emoji: "👟" },
+    { id: "dress-shoes", label: "Dress Shoes", emoji: "👞" },
+    { id: "boots", label: "Boots", emoji: "🥾" },
+    { id: "sandals", label: "Sandals", emoji: "🩴" },
+    { id: "slippers", label: "Slippers", emoji: "🥿" },
+    { id: "barefoot", label: "Often Barefoot", emoji: "🦶" },
+];
+
+// Female signature items
+const femaleSignatureItems = [
     { id: "tights", label: "Always wears tights", emoji: "🩱" },
     { id: "oversized-sweaters", label: "Oversized sweaters", emoji: "🧥" },
     { id: "jewelry", label: "Statement jewelry", emoji: "💍" },
@@ -91,6 +116,18 @@ const signatureItemOptions = [
     { id: "layered-looks", label: "Layered looks", emoji: "🧣" },
     { id: "crop-tops", label: "Crop tops", emoji: "👙" },
     { id: "maxi-dresses", label: "Maxi dresses", emoji: "👗" },
+];
+
+// Male signature items
+const maleSignatureItems = [
+    { id: "watches", label: "Always wears watch", emoji: "⌚" },
+    { id: "oversized-hoodies", label: "Oversized hoodies", emoji: "🧥" },
+    { id: "jewelry", label: "Statement jewelry", emoji: "💍" },
+    { id: "sunglasses", label: "Sunglasses always", emoji: "🕶️" },
+    { id: "hats", label: "Hats & caps", emoji: "🧢" },
+    { id: "layered-looks", label: "Layered looks", emoji: "🧣" },
+    { id: "leather-jackets", label: "Leather jackets", emoji: "🧥" },
+    { id: "ties", label: "Ties & bow ties", emoji: "👔" },
 ];
 
 const budgetPresets = [
@@ -126,11 +163,16 @@ export default function OnboardingPage() {
 
     const canProceed = () => {
         if (step === 1) return data.country && data.city && data.apartmentStyle;
-        if (step === 2) return data.name && data.personalityVibe;
+        if (step === 2) return data.name && data.gender && data.personalityVibe;
         if (step === 3) return data.clothingStyle && data.bottomwear.length > 0 && data.footwear.length > 0;
         if (step === 4) return data.currentBalance > 0;
         return false;
     };
+
+    // Get gender-specific options
+    const getBottomwearOptions = () => data.gender === "male" ? maleBottomwearOptions : femaleBottomwearOptions;
+    const getFootwearOptions = () => data.gender === "male" ? maleFootwearOptions : femaleFootwearOptions;
+    const getSignatureItems = () => data.gender === "male" ? maleSignatureItems : femaleSignatureItems;
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -278,6 +320,33 @@ export default function OnboardingPage() {
                                     />
                                 </div>
 
+                                {/* Gender Selection */}
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-4">Gender</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            onClick={() => updateData({ gender: "female" })}
+                                            className={`p-4 rounded-xl border text-center transition-all ${data.gender === "female"
+                                                ? "border-emerald-500 bg-emerald-500/10"
+                                                : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                }`}
+                                        >
+                                            <span className="text-2xl mb-2 block">👩</span>
+                                            <span className="text-sm font-medium">Female</span>
+                                        </button>
+                                        <button
+                                            onClick={() => updateData({ gender: "male" })}
+                                            className={`p-4 rounded-xl border text-center transition-all ${data.gender === "male"
+                                                ? "border-emerald-500 bg-emerald-500/10"
+                                                : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                }`}
+                                        >
+                                            <span className="text-2xl mb-2 block">👨</span>
+                                            <span className="text-sm font-medium">Male</span>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label className="block text-sm font-medium text-zinc-300 mb-4">
                                         <Palette className="w-4 h-4 inline mr-2" />
@@ -340,7 +409,7 @@ export default function OnboardingPage() {
                                         Preferred Bottomwear <span className="text-zinc-500">(select multiple)</span>
                                     </label>
                                     <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                                        {bottomwearOptions.map((item) => (
+                                        {getBottomwearOptions().map((item) => (
                                             <button
                                                 key={item.id}
                                                 onClick={() => toggleArrayItem('bottomwear', item.id)}
@@ -362,7 +431,7 @@ export default function OnboardingPage() {
                                         Preferred Footwear <span className="text-zinc-500">(select multiple)</span>
                                     </label>
                                     <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                                        {footwearOptions.map((item) => (
+                                        {getFootwearOptions().map((item) => (
                                             <button
                                                 key={item.id}
                                                 onClick={() => toggleArrayItem('footwear', item.id)}
@@ -384,7 +453,7 @@ export default function OnboardingPage() {
                                         Signature Elements <span className="text-zinc-500">(optional)</span>
                                     </label>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                        {signatureItemOptions.map((item) => (
+                                        {getSignatureItems().map((item) => (
                                             <button
                                                 key={item.id}
                                                 onClick={() => toggleArrayItem('signatureItems', item.id)}

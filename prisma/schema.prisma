@@ -15,6 +15,7 @@ model Influencer {
   apartmentStyle  String
   currentBalance  Float    @default(5000)
   personalityVibe String   // e.g., "Minimalist Glam", "Streetwear Rebel"
+  gender          String   @default("female") // "male" or "female"
   isActive        Boolean  @default(false)
   
   // Appearance
@@ -78,6 +79,7 @@ model Memory {
 model AvatarLibrary {
   id          String   @id @default(uuid())
   url         String   // URL to the stored avatar image
+  gender      String?  // "male" or "female"
   
   // Appearance traits for filtering
   hairColor   String?

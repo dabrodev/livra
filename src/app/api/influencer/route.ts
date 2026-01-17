@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
             neighborhood,
             apartmentStyle,
             name,
+            gender,
             personalityVibe,
             clothingStyle,
             bottomwear,
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
         const influencer = await prisma.influencer.create({
             data: {
                 name,
+                gender: gender || "female",
                 country,
                 city,
                 neighborhood: neighborhood || null,
