@@ -36,7 +36,10 @@ export async function POST(
             ? `with ${features.join(", ")}`
             : "";
 
-        const basePrompt = `Professional portrait photo of a beautiful ${bodyTypeLabel} ${bodyHeightLabel} height woman for Instagram influencer profile. 
+        // Use gender for appropriate avatar generation
+        const genderTerm = influencer.gender === 'male' ? 'man' : 'woman';
+
+        const basePrompt = `Professional portrait photo of a ${bodyTypeLabel} ${bodyHeightLabel} height ${genderTerm} for Instagram influencer profile. 
 Hair: ${hairColorLabel} color, ${hairStyleLabel} style.
 Eyes: ${eyeColorLabel}.
 Skin: ${skinToneLabel} tone.
@@ -90,6 +93,7 @@ Expression: Confident, friendly, approachable.`;
                     await prisma.avatarLibrary.create({
                         data: {
                             url: finalUrl,
+                            gender: influencer.gender || 'female',
                             hairColor: hairColorLabel,
                             hairStyle: hairStyleLabel,
                             eyeColor: eyeColorLabel,

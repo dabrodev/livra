@@ -49,11 +49,9 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Trigger the autonomous lifecycle via Inngest
-        await inngest.send({
-            name: "livra/influencer.created",
-            data: { influencerId: influencer.id },
-        });
+        // NOTE: Lifecycle is NOT triggered automatically
+        // User must manually start it via the "Start Lifecycle" button
+        // after creating an avatar (enforced by UI)
 
         return NextResponse.json({ id: influencer.id }, { status: 201 });
     } catch (error) {
