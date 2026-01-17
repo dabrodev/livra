@@ -61,6 +61,14 @@ const bodyHeights = [
     { id: "tall", label: "Tall", desc: "Over 5'7\" / 170cm", emoji: "🔷" },
 ];
 
+// Gender-specific body heights
+const femaleBodyHeights = bodyHeights;
+const maleBodyHeights = [
+    { id: "short", label: "Short", desc: "Under 5'9\" / 175cm", emoji: "🔹" },
+    { id: "average", label: "Average", desc: "5'9\" - 6'1\" / 175-185cm", emoji: "➖" },
+    { id: "tall", label: "Tall", desc: "Over 6'1\" / 185cm", emoji: "🔷" },
+];
+
 const bodyTypes = [
     { id: "slim", label: "Slim", emoji: "🩰" },
     { id: "athletic", label: "Athletic", emoji: "💪" },
@@ -402,25 +410,27 @@ export default function AvatarCreationPage() {
                                     </div>
                                 </div>
 
-                                {/* Lip Style */}
-                                <div>
-                                    <label className="block text-sm font-medium text-zinc-300 mb-3">Lip Style</label>
-                                    <div className="flex gap-3">
-                                        {lipStyles.map((style) => (
-                                            <button
-                                                key={style.id}
-                                                onClick={() => updateData({ lipStyle: style.id })}
-                                                className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${data.lipStyle === style.id
-                                                    ? "border-teal-500 bg-teal-500/10"
-                                                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
-                                                    }`}
-                                            >
-                                                <span className="text-xl">{style.emoji}</span>
-                                                <span className="text-sm">{style.label}</span>
-                                            </button>
-                                        ))}
+                                {/* Lip Style (Females only) */}
+                                {influencerGender === "female" && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-zinc-300 mb-3">Lip Style</label>
+                                        <div className="flex gap-3">
+                                            {lipStyles.map((style) => (
+                                                <button
+                                                    key={style.id}
+                                                    onClick={() => updateData({ lipStyle: style.id })}
+                                                    className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${data.lipStyle === style.id
+                                                        ? "border-teal-500 bg-teal-500/10"
+                                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                                                        }`}
+                                                >
+                                                    <span className="text-xl">{style.emoji}</span>
+                                                    <span className="text-sm">{style.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Facial Hair (Males only) */}
                                 {influencerGender === "male" && (
@@ -470,7 +480,7 @@ export default function AvatarCreationPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-zinc-300 mb-3">Body Height</label>
                                     <div className="flex gap-3">
-                                        {bodyHeights.map((height) => (
+                                        {(influencerGender === "male" ? maleBodyHeights : femaleBodyHeights).map((height) => (
                                             <button
                                                 key={height.id}
                                                 onClick={() => updateData({ bodyHeight: height.id })}
