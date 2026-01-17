@@ -93,6 +93,10 @@ interface RealtimeTimelineProps {
 export default function RealtimeTimeline({ influencerId, initialItems }: RealtimeTimelineProps) {
     const [items, setItems] = useState<TimelineItem[]>(initialItems);
     const [isConnected, setIsConnected] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [postsOffset, setPostsOffset] = useState(20); // Initial load is 20
+    const [memoriesOffset, setMemoriesOffset] = useState(20);
 
     // Convert memory record to timeline item
     const memoryToTimelineItem = useCallback((memory: MemoryRecord): TimelineItem => ({
@@ -129,6 +133,49 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
             );
         });
     }, []);
+
+    // Load more items
+    const loadMore = useCallback(async () => {
+        if (isLoadingMore || !hasMore) return;
+
+        setIsLoadingMore(true);
+        try {
+            const response = await fetch(
+                `/api/influencer/${influencerId}/timeline?postsOffset=${postsOffset}&memoriesOffset=${memoriesOffset}`
+            );
+            const data = await response.json();
+
+            if (data.posts || data.memories) {
+                const newItems: TimelineItem[] = [
+                    ...(data.memories || []).map(memoryToTimelineItem),
+                    ...(data.posts || []).map(postToTimelineItem),
+                ];
+
+                setItems(prev => {
+                    // Merge and deduplicate
+                    const merged = [...prev, ...newItems];
+                    const unique = merged.filter((item, index, self) =>
+                        index === self.findIndex(t => t.id === item.id)
+                    );
+                    // Sort by time (newest first)
+                    return unique.sort((a, b) =>
+                        new Date(b.time).getTime() - new Date(a.time).getTime()
+                    );
+                });
+
+                // Update offsets
+                setPostsOffset(prev => prev + 20);
+                setMemoriesOffset(prev => prev + 20);
+
+                // Check if there's more data
+                setHasMore(data.hasMorePosts || data.hasMoreMemories);
+            }
+        } catch (error) {
+            console.error('Error loading more timeline items:', error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }, [influencerId, postsOffset, memoriesOffset, isLoadingMore, hasMore, memoryToTimelineItem, postToTimelineItem]);
 
     // Subscribe to real-time updates
     useEffect(() => {
@@ -270,6 +317,19 @@ export default function RealtimeTimeline({ influencerId, initialItems }: Realtim
                             );
                         })}
                     </div>
+
+                    {/* Load More Button */}
+                    {hasMore && (
+                        <div className="mt-8 text-center">
+                            <button
+                                onClick={loadMore}
+                                disabled={isLoadingMore}
+                                className="px-6 py-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoadingMore ? 'Loading...' : 'Load More'}
+                            </button>
+                        </div>
+                    )}
                 </>
             ) : (
                 <div className="glass-card rounded-2xl p-12 text-center">

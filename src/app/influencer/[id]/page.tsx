@@ -172,7 +172,7 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
         include: {
             posts: {
                 orderBy: { postedAt: "desc" },
-                take: 10,
+                take: 20,
             },
             memories: {
                 orderBy: { createdAt: "desc" },
