@@ -209,8 +209,9 @@ export default async function InfluencerTimelinePage({ params }: TimelinePagePro
         })),
     ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
-    // Check if there are any real activities
-    const hasRealActivity = timelineItems.length > 0;
+    // Check if lifecycle has actually started (not just if there are timeline items)
+    // This allows avatar editing even if there are initial memories before lifecycle starts
+    const hasRealActivity = influencer.lifecycleStartedAt !== null;
 
     // For visual status badge
     const isRecentlyActive = hasRealActivity &&

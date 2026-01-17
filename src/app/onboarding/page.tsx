@@ -133,8 +133,70 @@ const maleSignatureItems = [
 const budgetPresets = [
     { amount: 1000, label: "Starter", desc: "Budget lifestyle" },
     { amount: 5000, label: "Comfortable", desc: "Mid-range choices" },
-    { amount: 15000, label: "Affluent", desc: "Premium experiences" },
-    { amount: 50000, label: "Luxury", desc: "No limits" },
+    { amount: 15000, label: "Affluent", desc: "Premium lifestyle" },
+];
+
+// Appearance options for Step 5
+const hairColors = [
+    { id: "blonde", label: "Blonde", color: "#F4D03F" },
+    { id: "brunette", label: "Brunette", color: "#8B4513" },
+    { id: "black", label: "Black", color: "#1C1C1C" },
+    { id: "red", label: "Red", color: "#C0392B" },
+    { id: "auburn", label: "Auburn", color: "#A0522D" },
+    { id: "gray", label: "Gray/Silver", color: "#A0A0A0" },
+];
+
+const hairStyles = [
+    { id: "long-straight", label: "Long & Straight", emoji: "💇‍♀️" },
+    { id: "long-wavy", label: "Long & Wavy", emoji: "🌊" },
+    { id: "long-curly", label: "Long & Curly", emoji: "➰" },
+    { id: "medium", label: "Medium Length", emoji: "✂️" },
+    { id: "short", label: "Short", emoji: "💈" },
+    { id: "pixie", label: "Pixie Cut", emoji: "⭐" },
+];
+
+const eyeColors = [
+    { id: "brown", label: "Brown", color: "#8B4513" },
+    { id: "blue", label: "Blue", color: "#4A90D9" },
+    { id: "green", label: "Green", color: "#2E8B57" },
+    { id: "hazel", label: "Hazel", color: "#8E7618" },
+    { id: "gray", label: "Gray", color: "#708090" },
+];
+
+const skinTones = [
+    { id: "light", label: "Light", color: "#FFE4C4" },
+    { id: "fair", label: "Fair", color: "#FFDAB9" },
+    { id: "medium", label: "Medium", color: "#DEB887" },
+    { id: "tan", label: "Tan", color: "#CD853F" },
+    { id: "olive", label: "Olive", color: "#C4A484" },
+    { id: "dark", label: "Dark", color: "#8B4513" },
+];
+
+const lipStyles = [
+    { id: "natural", label: "Natural", emoji: "👄" },
+    { id: "full", label: "Full", emoji: "💋" },
+    { id: "thin", label: "Thin", emoji: "〰️" },
+];
+
+const featureOptions = [
+    { id: "freckles", label: "Freckles", emoji: "🔸" },
+    { id: "glasses", label: "Glasses", emoji: "👓" },
+    { id: "dimples", label: "Dimples", emoji: "😊" },
+    { id: "beauty-mark", label: "Beauty Mark", emoji: "✨" },
+    { id: "high-cheekbones", label: "High Cheekbones", emoji: "💎" },
+];
+
+const bodyHeights = [
+    { id: "petite", label: "Petite", desc: "Under 5'4\" / 160cm", emoji: "🔹" },
+    { id: "average", label: "Average", desc: "5'4\" - 5'7\" / 160-170cm", emoji: "➖" },
+    { id: "tall", label: "Tall", desc: "Over 5'7\" / 170cm", emoji: "🔷" },
+];
+
+const bodyTypes = [
+    { id: "slim", label: "Slim", emoji: "🩰" },
+    { id: "athletic", label: "Athletic", emoji: "💪" },
+    { id: "curvy", label: "Curvy", emoji: "⏳" },
+    { id: "plus-size", label: "Plus Size", emoji: "🌸" },
 ];
 
 export default function OnboardingPage() {
@@ -185,7 +247,8 @@ export default function OnboardingPage() {
 
             if (res.ok) {
                 const { id } = await res.json();
-                router.push(`/influencer/${id}`);
+                // Redirect to avatar creation instead of influencer page
+                router.push(`/influencer/${id}/avatar`);
             }
         } catch (error) {
             console.error("Failed to create influencer:", error);
@@ -480,7 +543,7 @@ export default function OnboardingPage() {
                                 <span className="text-sm text-orange-400 font-medium">Step 4 of 4</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">Set the Wealth</h1>
-                            <p className="text-zinc-400 mb-8">How much will they start with?</p>
+                            <p className="text-zinc-400 mb-8">How much will they start with? Next: Create their avatar!</p>
 
                             <div className="space-y-6">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
