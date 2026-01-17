@@ -39,7 +39,18 @@ export async function POST(
         // Use gender for appropriate avatar generation
         const genderTerm = influencer.gender === 'male' ? 'man' : 'woman';
 
-        const basePrompt = `Professional portrait photo of a ${bodyTypeLabel} ${bodyHeightLabel} height ${genderTerm} for Instagram influencer profile. 
+        // Map clothing style to outfit description
+        const clothingStyleMap: Record<string, string> = {
+            'casual': 'wearing casual, relaxed clothing (t-shirt, jeans, or comfortable everyday wear)',
+            'sporty': 'wearing athletic, sporty attire (activewear, sports clothing)',
+            'elegant': 'wearing elegant, sophisticated clothing (dress shirt, blazer, or refined attire)',
+            'streetwear': 'wearing trendy streetwear style (urban fashion, modern street style)',
+            'bohemian': 'wearing bohemian, free-spirited clothing (flowing, artistic style)',
+            'minimalist': 'wearing minimalist, clean-cut clothing (simple, modern basics)',
+        };
+        const clothingDescription = clothingStyleMap[influencer.clothingStyle] || 'wearing casual clothing';
+
+        const basePrompt = `Professional portrait photo of a ${bodyTypeLabel} ${bodyHeightLabel} height ${genderTerm} for Instagram influencer profile, ${clothingDescription}. 
 Hair: ${hairColorLabel} color, ${hairStyleLabel} style.
 Eyes: ${eyeColorLabel}.
 Skin: ${skinToneLabel} tone.
