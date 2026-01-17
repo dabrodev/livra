@@ -154,6 +154,7 @@ export default function AvatarCreationPage() {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [libraryAvatars, setLibraryAvatars] = useState<LibraryAvatar[]>([]);
     const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
+    const [isSavingAvatar, setIsSavingAvatar] = useState(false);
 
     // Fetch influencer gender and library avatars on mount
     useEffect(() => {
@@ -255,6 +256,7 @@ export default function AvatarCreationPage() {
         const selectedAvatar = generatedAvatars[avatarIndex];
         if (!selectedAvatar) return;
 
+        setIsSavingAvatar(true);
         try {
             // Save selected avatar URL to faceReferences
             await fetch(`/api/influencer/${influencerId}/avatar`, {
@@ -269,6 +271,8 @@ export default function AvatarCreationPage() {
             router.push(`/influencer/${influencerId}`);
         } catch (error) {
             console.error("Failed to save avatar:", error);
+        } finally {
+            setIsSavingAvatar(false);
         }
     };
 
