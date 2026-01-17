@@ -215,20 +215,32 @@ export const lifecycleCycle = inngest.createFunction(
                 coat: ['wool', 'trench', 'faux fur', 'puffer'],
             };
 
-            // Enhanced Tights Logic
-            const tightsColors = ['black', 'nude', 'sheer nude', 'white', 'gray', 'navy'];
-            // Signature items overrides
-            const hasTights = influencer.signatureItems.includes('tights');
-            const tightsColor = hasTights ? pick(tightsColors) : null;
+            const isMale = influencer.gender === 'male';
+
+            // Gender-specific logic
+            let tightsColor: string | null = null;
+            if (!isMale) {
+                // Tights only for females
+                const tightsColors = ['black', 'nude', 'sheer nude', 'white', 'gray', 'navy'];
+                const hasTights = influencer.signatureItems.includes('tights');
+                tightsColor = hasTights ? pick(tightsColors) : null;
+            }
 
             // Generate Top
-            const topsByStyle: Record<string, string[]> = {
+            const topsByStyle: Record<string, string[]> = isMale ? {
+                'casual': ['t-shirt', 'polo shirt', 'henley', 'casual shirt'],
+                'sporty': ['tank top', 'athletic shirt', 'hoodie', 'sports tee'],
+                'elegant': ['dress shirt', 'button-down', 'sweater', 'blazer'],
+                'streetwear': ['hoodie', 'sweatshirt', 'graphic tee', 'oversized tee'],
+                'bohemian': ['linen shirt', 'loose shirt', 'tunic', 'casual shirt'],
+            } : {
                 'casual': ['sweater', 'cardigan', 't-shirt', 'blouse'],
                 'sporty': ['tank top', 'zip-up', 'hoodie', 'sports tee'],
                 'elegant': ['blouse', 'turtleneck', 'sweater', 'shirt'],
                 'streetwear': ['hoodie', 'sweatshirt', 'crop top', 'graphic tee'],
                 'bohemian': ['blouse', 'tunic', 'top', 'kimono'],
             };
+
             const styleTops = topsByStyle[influencer.clothingStyle] || topsByStyle['casual'];
             const topItem = pick(styleTops);
 
@@ -250,10 +262,18 @@ export const lifecycleCycle = inngest.createFunction(
             if (bottomItem === 'jeans') {
                 const jeansLength = pick(['full-length', 'ankle-length']);
                 bottomDesc = `${jeansLength} ${pick(['light wash', 'dark wash', 'black', 'white'])} denim jeans`;
+            } else if (bottomItem === 'chinos') {
+                bottomDesc = `${pick(['beige', 'navy', 'khaki', 'grey'])} chinos`;
+            } else if (bottomItem === 'joggers') {
+                bottomDesc = `${pick(['black', 'grey', 'navy'])} joggers`;
+            } else if (bottomItem === 'dress-pants') {
+                bottomDesc = `${pick(['black', 'navy', 'charcoal'])} dress pants`;
             } else if (bottomItem === 'skirts') {
                 bottomDesc = `${pick(allColors)} ${pick(['mini', 'midi', 'maxi'])} ${pick(['pleated', 'pencil', 'a-line'])} skirt`;
             } else if (bottomItem === 'leggings') {
                 bottomDesc = `full-length ${pick(['black', 'navy', 'grey'])} leggings`;
+            } else if (bottomItem === 'dresses') {
+                bottomDesc = `${pick(allColors)} ${pick(['mini', 'midi', 'maxi'])} dress`;
             } else if (bottomItem.includes('shorts')) {
                 bottomDesc = `${pick(allColors)} ${bottomItem}`;
             } else {
@@ -263,7 +283,7 @@ export const lifecycleCycle = inngest.createFunction(
 
             // Generate Footwear
             const outdoorFootwear = influencer.footwear.filter(f => f !== 'barefoot' && f !== 'slippers');
-            const defaultFootwear = ['boots', 'heels', 'sneakers'];
+            const defaultFootwear = isMale ? ['boots', 'sneakers', 'dress-shoes'] : ['boots', 'heels', 'sneakers'];
 
             // If influencer has no outdoor shoes defined, pick from the default set
             const footwearItem = outdoorFootwear.length > 0
@@ -273,6 +293,8 @@ export const lifecycleCycle = inngest.createFunction(
             let footwearDesc = footwearItem;
             if (footwearItem.includes('heels')) {
                 footwearDesc = `${pick(['black', 'nude', 'red', 'gold', 'silver'])} ${pick(['stiletto', 'block'])} heels`;
+            } else if (footwearItem.includes('dress-shoes')) {
+                footwearDesc = `${pick(['black', 'brown', 'oxford'])} dress shoes`;
             } else if (footwearItem.includes('boots')) {
                 footwearDesc = `${pick(['black', 'brown', 'cream'])} leather ${pick(['ankle', 'knee-high'])} boots`;
             } else if (footwearItem.includes('sneakers')) {
@@ -290,19 +312,29 @@ export const lifecycleCycle = inngest.createFunction(
             }
 
             // Accessories based on signature items
+            const accessoryMap: Record<string, string[]> = isMale ? {
+                'watches': ['silver watch', 'leather strap watch', 'smart watch', 'gold watch'],
+                'jewelry': ['silver chain', 'leather bracelet', 'ring'],
+                'sunglasses': ['aviator sunglasses', 'wayfarer sunglasses', 'sport sunglasses'],
+                'hats': ['baseball cap', 'beanie', 'fedora'],
+                'oversized-hoodies': [], // handled in top
+                'leather-jackets': [], // handled in outerwear
+                'ties': ['silk tie', 'bow tie', 'knit tie'],
+            } : {
+                'jewelry': ['delicate gold necklace', 'silver hoop earrings', 'layered gold chains', 'pearl earrings'],
+                'sunglasses': ['oversized sunglasses', 'aviator sunglasses', 'cat-eye sunglasses'],
+                'hats': ['wide-brim hat', 'beanie', 'baseball cap'],
+                'oversized-sweaters': [], // handled in top
+                'tights': [], // handled separately
+            };
+
             const accessories = influencer.signatureItems
-                .filter(s => s !== 'tights')
+                .filter(s => s !== 'tights' && s !== 'watches') // Filter out items handled separately
                 .map(s => {
-                    const accessoryMap: Record<string, string[]> = {
-                        'jewelry': ['delicate gold necklace', 'silver hoop earrings', 'layered gold chains', 'pearl earrings'],
-                        'sunglasses': ['oversized sunglasses', 'aviator sunglasses', 'cat-eye sunglasses'],
-                        'hats': ['wide-brim hat', 'beanie', 'baseball cap'],
-                        'oversized-sweaters': [], // handled in top
-                    };
                     return accessoryMap[s] ? pick(accessoryMap[s]) : '';
                 })
                 .filter(Boolean)
-                .join(', ') || 'minimal gold jewelry';
+                .join(', ') || (isMale ? 'minimal accessories' : 'minimal gold jewelry');
 
             const newOutfit: DailyOutfit = {
                 top,
