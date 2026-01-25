@@ -29,6 +29,18 @@ export async function GET(
                 lifecycleStartedAt: true,
                 currentActivity: true,
                 activityDetails: true,
+                hairColor: true,
+                hairStyle: true,
+                eyeColor: true,
+                skinTone: true,
+                lipStyle: true,
+                features: true,
+                bodyHeight: true,
+                bodyType: true,
+                bottomwear: true,
+                footwear: true,
+                signatureItems: true,
+                apartmentStyle: true,
                 userId: true, // Include userId to verify ownership
             },
         });
