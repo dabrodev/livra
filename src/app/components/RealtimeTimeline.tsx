@@ -7,6 +7,7 @@ import {
     Activity, Heart, Home, Music, BookOpen, LayoutGrid, List, type LucideIcon
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
+import ImageGallery from "@/app/components/ImageGallery";
 
 // Timeline item type
 export interface TimelineItem {
@@ -93,6 +94,7 @@ interface RealtimeTimelineProps {
 export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTimelineProps) {
     const [items, setItems] = useState<TimelineItem[]>(initialItems);
     const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline');
+    const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
@@ -349,11 +351,16 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                                                 <p className="text-sm text-zinc-400">{item.description}</p>
 
                                                 {isContent && item.contentUrl && (
-                                                    <div className="mt-3 aspect-video rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden">
-                                                        <ImageLightbox
+                                                    <div className="mt-3 aspect-video rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden cursor-zoom-in group/img">
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img
                                                             src={item.contentUrl}
                                                             alt="Generated content"
-                                                            className="w-full h-full object-cover text-zinc-600 text-sm"
+                                                            className="w-full h-full object-cover transition-opacity group-hover:opacity-90"
+                                                            onClick={() => {
+                                                                const idx = photoItems.findIndex(p => p.id === item.id);
+                                                                if (idx !== -1) setGalleryIndex(idx);
+                                                            }}
                                                         />
                                                     </div>
                                                 )}
@@ -367,9 +374,14 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                         /* Grid View */
                         photoItems.length > 0 ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {photoItems.map((item) => (
-                                    <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden glass-card">
-                                        <ImageLightbox
+                                {photoItems.map((item, index) => (
+                                    <div
+                                        key={item.id}
+                                        className="group relative aspect-square rounded-xl overflow-hidden glass-card cursor-zoom-in"
+                                        onClick={() => setGalleryIndex(index)}
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
                                             src={item.contentUrl!}
                                             alt={item.description}
                                             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
@@ -418,6 +430,18 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                         Activities will appear here as they happen throughout the day.
                     </p>
                 </div>
+            )}
+
+            {/* Gallery Overlay */}
+            {galleryIndex !== null && (
+                <ImageGallery
+                    images={photoItems.map(item => ({
+                        url: item.contentUrl!,
+                        description: item.description
+                    }))}
+                    initialIndex={galleryIndex}
+                    onClose={() => setGalleryIndex(null)}
+                />
             )}
         </div>
     );
