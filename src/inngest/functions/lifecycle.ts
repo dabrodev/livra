@@ -504,7 +504,7 @@ Respond with a JSON object containing:
             }
 
             // Update activity status: CREATING
-            await updateActivityStatus(personaId, 'creating', 'Generating content for manual activity...');
+            await updateActivityStatus(personaId, 'creating', `Generating content for: ${plan.activity}...`);
 
             // Determine context for outfit variations
             const isAtHome = !plan.location ||
