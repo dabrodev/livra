@@ -1,6 +1,8 @@
+import { createBrowserClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 
-// Client-side Supabase client (uses anon key, respects RLS)
+// Client-side Supabase client WITH session awareness
+// Uses @supabase/ssr to properly sync with auth cookies
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -8,7 +10,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.error('Supabase URL or Anon Key is missing. Check your .env.local file.')
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '')
+// Browser client that syncs with auth session from cookies
+// This is required for Realtime subscriptions to work with auth
+export const supabase = createBrowserClient(
+    supabaseUrl || '',
+    supabaseAnonKey || ''
+)
 
 // Server-side Supabase client (uses service role key if available, bypasses RLS)
 // Falls back to anon client if service role key is not set

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { Play, Pause, Sparkles, Moon, Brain, Camera, Zap, Coffee, type LucideIcon } from "lucide-react";
 
@@ -54,10 +54,28 @@ export default function RealtimeActivityStatus({
     const [activityDetails, setActivityDetails] = useState(initialActivityDetails);
     const [isConnected, setIsConnected] = useState(false);
 
+    // Load latest status (to catch up after disconnect)
+    const refreshStatus = useCallback(async () => {
+        console.log('[RealtimeActivityStatus] Refreshing status to catch up...');
+        try {
+            const response = await fetch(`/api/persona/${personaId}`, {
+                credentials: 'include',
+            });
+            const data = await response.json();
+            if (data.success && data.persona) {
+                const p = data.persona;
+                setLifecycleStatus(p.lifecycleStatus);
+                setLifecycleStartedAt(p.lifecycleStartedAt ? new Date(p.lifecycleStartedAt) : null);
+                setCurrentActivity(p.currentActivity);
+                setActivityDetails(p.activityDetails);
+            }
+        } catch (error) {
+            console.error('[RealtimeActivityStatus] Refresh failed:', error);
+        }
+    }, [personaId]);
+
     // Subscribe to real-time updates on Persona table
     useEffect(() => {
-        console.log('[RealtimeActivityStatus] Setting up subscription for persona:', personaId);
-
         const channel = supabase
             .channel(`persona-status-${personaId}`)
             .on(
@@ -66,10 +84,19 @@ export default function RealtimeActivityStatus({
                     event: 'UPDATE',
                     schema: 'public',
                     table: 'Persona',
-                    filter: `id=eq.${personaId}`,
+                    // Note: Server-side filter removed as it doesn't work reliably with UUIDs
+                    // Client-side filtering is used instead
                 },
                 (payload) => {
-                    console.log('[RealtimeActivityStatus] Update received:', payload);
+                    const receivedId = (payload.new as { id?: string })?.id;
+
+                    // Client-side filtering - only process our persona
+                    if (receivedId !== personaId) {
+                        return;
+                    }
+
+
+                    if (payload.eventType !== 'UPDATE') return;
                     const updated = payload.new as {
                         lifecycleStatus?: string;
                         lifecycleStartedAt?: string;
@@ -91,19 +118,23 @@ export default function RealtimeActivityStatus({
                     }
                 }
             )
-            .subscribe((status) => {
-                console.log('[RealtimeActivityStatus] Channel status:', status);
+            .subscribe(async (status, err) => {
+                if (err) console.error('[RealtimeActivityStatus] Subscription error:', err);
+
                 if (status === 'SUBSCRIBED') {
                     setIsConnected(true);
+                    // Refresh when (re)subscribed
+                    await refreshStatus();
+                } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                    setIsConnected(false);
                 }
             });
 
         // Cleanup on unmount
         return () => {
-            console.log('[RealtimeActivityStatus] Cleaning up subscription');
             supabase.removeChannel(channel);
         };
-    }, [personaId]);
+    }, [personaId, refreshStatus]);
 
     const lifecycleConfig = getLifecycleStatusConfig(lifecycleStatus, lifecycleStartedAt);
     const activityConfig = lifecycleStatus === 'running' ? getActivityStatusConfig(currentActivity) : null;

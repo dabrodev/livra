@@ -14,7 +14,7 @@ interface ActivityPlan {
 }
 
 interface EnvironmentContext {
-    weather: WeatherResult
+    weather: WeatherResult | null
     trends: TrendsResult
 }
 
@@ -312,10 +312,11 @@ export const lifecycleCycle = inngest.createFunction(
                 footwearDesc = `${pick(['white', 'colorful', 'chunky'])} sneakers`;
             }
 
-            // Generate Outerwear
+            // Generate Outerwear (assume mild weather if unknown)
             let outerwear: string | null = null;
-            if (environment.weather.temp < 15) {
-                if (environment.weather.temp < 5) {
+            const temp = environment.weather?.temp ?? 10; // Default to mild if unknown
+            if (temp < 15) {
+                if (temp < 5) {
                     outerwear = `${pick(['black', 'camel', 'grey', 'cream'])} ${pick(['wool coat', 'puffer jacket', 'faux fur coat'])}`;
                 } else {
                     outerwear = `${pick(['beige', 'black', 'sage'])} ${pick(['trench coat', 'leather jacket', 'denim jacket'])}`;
@@ -392,7 +393,7 @@ You are planning the next activity for ${persona.name}, a ${persona.personalityV
 
 Current context:
 - LOCAL TIME: ${localHour}:00 (${currentTimeOfDay}) - THIS IS CRITICAL, plan activities appropriate for this time!
-- Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}
+${environment.weather ? `- Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}` : '- Weather: Unknown (plan for indoor activities if unsure)'}
 - Trending: ${environment.trends.trends.slice(0, 3).join(', ')}
 - Current balance: $${persona.currentBalance}
 - Recent activities: ${recentMemories || 'Just starting their day'}
@@ -624,9 +625,13 @@ Respond with a JSON object containing:
             else if (month >= 5 && month <= 7) season = 'summer';
             else season = 'autumn';
 
+            const weatherLine = environment.weather
+                ? `Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}.`
+                : '';
+
             const imagePrompt = `A beautiful, Instagram-worthy photo of a ${persona.personalityVibe} persona ${plan.activity} at ${plan.location || 'home'}. 
 TIME: ${currentMonth} ${season}, ${localHour}:00 local time (${plan.timeOfDay}) - LIGHTING: ${lightingDescription}.
-Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}.
+${weatherLine}
 Style: authentic lifestyle photography.
 OUTFIT (consistent daily look): ${outfitDescription}.
 Location: ${persona.city}, in a ${persona.apartmentStyle} setting.`
@@ -658,9 +663,11 @@ Location: ${persona.city}, in a ${persona.apartmentStyle} setting.`
                     rainy: '🌧️',
                     snowy: '❄️',
                 };
-                const emoji = weatherEmoji[environment.weather.condition] || '🌤️';
+                const emoji = environment.weather ? (weatherEmoji[environment.weather.condition] || '🌤️') : '🌤️';
 
-                const caption = `${plan.activity} ${emoji} ${environment.weather.temp}°C in ${persona.city} ✨ ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
+                const caption = environment.weather
+                    ? `${plan.activity} ${emoji} ${environment.weather.temp}°C in ${persona.city} ✨ ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
+                    : `${plan.activity} in ${persona.city} ✨ ${timeHashtags[currentTimeOfDay] || '#lifestyle'}`
 
                 // Save image to Supabase Storage
                 const imageUrl = await saveGeneratedImage(

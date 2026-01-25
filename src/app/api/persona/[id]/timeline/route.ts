@@ -25,7 +25,7 @@ export async function GET(
         const searchParams = request.nextUrl.searchParams;
         const postsOffset = parseInt(searchParams.get('postsOffset') || '0');
         const memoriesOffset = parseInt(searchParams.get('memoriesOffset') || '0');
-        const limit = 20; // Load 20 items per request
+        const limit = parseInt(searchParams.get('limit') || '20'); // Support custom limit for refresh
 
         const [posts, memories] = await Promise.all([
             prisma.post.findMany({
@@ -50,6 +50,12 @@ export async function GET(
         });
     } catch (error) {
         console.error('Error fetching timeline:', error);
+
+        // Handle auth errors properly
+        if (error instanceof Error && error.message === 'Unauthorized') {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         return NextResponse.json(
             { error: 'Failed to fetch timeline' },
             { status: 500 }

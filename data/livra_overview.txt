@@ -1,0 +1,73 @@
+LIVRA — Platforma Autonomicznych AI Awatarów
+
+Livra to platforma, na której tworzysz cyfrowe osobowości (Persony), które żyją własnym życiem 24/7 — bez ciągłej interakcji użytkownika.
+
+
+NAJWAŻNIEJSZE INNOWACYJNE FUNKCJE
+
+1. Autonomiczny Lifecycle
+   Persona sama planuje dzień, podejmuje decyzje, "śpi" i budzi się w pętli 24/7.
+   Nie czeka na prompty — ma własny "heartbeat" oparty na Inngest durable workflows.
+
+2. Context-Aware AI
+   Pobiera realną pogodę i trendy dla miasta persony.
+   Decyzje i generowany content są osadzone w rzeczywistym kontekście świata.
+
+3. Persistent Daily Outfit
+   Raz dziennie persona wybiera strój, który nosi przez cały dzień.
+   Zapewnia spójność wizualną i logikę "prawdziwego życia".
+
+4. Multi-Type Personas
+   Wspierane typy: Influencer, Model.
+   Planowane: Companion, Ambassador, Creator.
+   Uniwersalny silnik autonomii, różne use case'y.
+
+5. 14-Slot Reference Stack
+   System utrzymuje spójność twarzy, ciała i środowiska w każdym generowanym obrazie.
+   Rozwiązuje problem "twarz się zmienia" w AI generowaniu.
+
+6. Virtual Wallet
+   Persona ma budżet wpływający na decyzje lifestyle'owe.
+   Symulacja realizmu — nie może robić wszystkiego bez ograniczeń.
+
+7. Memory System
+   Krótkoterminowa pamięć wydarzeń.
+   Persona "pamięta" co robiła, co wpływa na przyszłe decyzje.
+
+8. Real-time Status
+   Supabase Realtime pokazuje co persona aktualnie robi.
+   Użytkownik obserwuje "życie" persony w czasie rzeczywistym.
+
+9. Play/Pause Control
+   Możliwość zatrzymania i wznowienia lifecycle persony.
+   Pełna kontrola nad symulacją.
+
+
+JEDNO ZDANIE
+
+Livra to "The Sims meets Generative AI" — tworzysz seed, a AI żyje własnym życiem, generując content osadzony w rzeczywistym kontekście świata.
+
+
+FLAGSHIP USE CASE: AI Lifestyle Influencer
+
+Persona codziennie:
+• Budzi się o odpowiedniej porze (timezone-aware)
+• Sprawdza pogodę i trendy
+• Wybiera outfit
+• Planuje aktywności (kawa, spacer, zakupy, treningi...)
+• Generuje zdjęcia z tych momentów
+• "Śpi" i powtarza cykl
+
+Wszystko automatycznie, bez interwencji użytkownika.
+
+
+STACK TECHNOLOGICZNY
+
+• Next.js 15 (App Router)
+• Mastra (Agentic Framework)
+• Inngest (Durable Workflows)
+• Supabase (PostgreSQL + Auth + Storage + Realtime)
+• Prisma (ORM)
+• Gemini 2.0 Flash (LLM)
+• Nano Banana Pro (Image Generation)
+• Veo 3.1 (Video Generation - planned)

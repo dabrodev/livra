@@ -25,6 +25,10 @@ export async function GET(
                 city: true,
                 clothingStyle: true,
                 personalityVibe: true,
+                lifecycleStatus: true,
+                lifecycleStartedAt: true,
+                currentActivity: true,
+                activityDetails: true,
                 userId: true, // Include userId to verify ownership
             },
         });
@@ -41,7 +45,7 @@ export async function GET(
         // Remove userId from response
         const { userId, ...personaData } = persona;
 
-        return NextResponse.json(personaData);
+        return NextResponse.json({ success: true, persona: personaData });
     } catch (error) {
         console.error("Failed to fetch persona:", error);
 

@@ -25,6 +25,10 @@ const CITY_COORDINATES: Record<string, { lat: number; lon: number }> = {
     'warsaw': { lat: 52.2297, lon: 21.0122 },
     'krakow': { lat: 50.0647, lon: 19.9450 },
     'cracow': { lat: 50.0647, lon: 19.9450 },
+    'poznan': { lat: 52.4064, lon: 16.9252 },
+    'gdansk': { lat: 54.3520, lon: 18.6466 },
+    'wroclaw': { lat: 51.1079, lon: 17.0385 },
+    'lodz': { lat: 51.7592, lon: 19.4560 },
 };
 
 /**
@@ -51,19 +55,15 @@ function interpretWeatherCode(code: number): { condition: string; description: s
 
 /**
  * Get real-time weather using Open-Meteo API (free, no API key needed)
+ * Returns null if weather cannot be fetched (no fallback with fake data)
  */
-export async function getWeather(city: string): Promise<WeatherResult> {
+export async function getWeather(city: string): Promise<WeatherResult | null> {
     const normalizedCity = normalizeCity(city);
     const coords = CITY_COORDINATES[normalizedCity];
 
     if (!coords) {
-        console.warn(`No coordinates for city: ${city}, using default weather`);
-        return {
-            city,
-            condition: 'sunny',
-            temp: 20,
-            description: 'Pleasant weather'
-        };
+        console.warn(`[Weather] No coordinates for city: ${city} - weather will be unavailable`);
+        return null;
     }
 
     try {
@@ -81,20 +81,14 @@ export async function getWeather(city: string): Promise<WeatherResult> {
 
         return { city, condition, temp, description };
     } catch (error) {
-        console.error('Failed to fetch weather from Open-Meteo:', error);
-        // Fallback to pleasant default
-        return {
-            city,
-            condition: 'sunny',
-            temp: 20,
-            description: 'Pleasant weather (fallback)'
-        };
+        console.error('[Weather] Failed to fetch weather from Open-Meteo:', error);
+        return null;
     }
 }
 
 export const weatherTool = createTool({
     id: "get-weather",
-    description: "Get current weather conditions for a city. Use this to decide outdoor activities.",
+    description: "Get current weather conditions for a city. Use this to decide outdoor activities. Returns null if weather is unavailable.",
     inputSchema: z.object({
         city: z.string().describe("The city to get weather for"),
     }),
@@ -103,7 +97,7 @@ export const weatherTool = createTool({
         condition: z.string(),
         temp: z.number(),
         description: z.string(),
-    }),
+    }).nullable(),
     execute: async ({ context }) => {
         return getWeather(context.city);
     },

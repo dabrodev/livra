@@ -164,8 +164,19 @@ function formatRelativeTime(date: Date): string {
     return `${days}d ago`;
 }
 
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
+// ... (imports remain)
+
 export default async function AvatarProfilePage({ params }: TimelinePageProps) {
     const { id } = await params;
+
+    // 1. Verify Authentication
+    const user = await getCurrentUser();
+    if (!user) {
+        redirect("/login");
+    }
 
     const persona = await prisma.persona.findUnique({
         where: { id },
@@ -180,6 +191,15 @@ export default async function AvatarProfilePage({ params }: TimelinePageProps) {
             },
         },
     });
+
+    if (!persona) {
+        notFound();
+    }
+
+    // 2. Verify Ownership
+    if (persona.userId !== user.id) {
+        redirect("/dashboard");
+    }
 
     if (!persona) {
         notFound();

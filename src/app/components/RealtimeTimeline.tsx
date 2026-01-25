@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import {
     Coffee, Camera, Utensils, ShoppingBag, Dumbbell, Moon, Sun,
-    Activity, Heart, Home, Music, BookOpen, type LucideIcon
+    Activity, Heart, Home, Music, BookOpen, LayoutGrid, List, type LucideIcon
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
 
@@ -92,6 +92,7 @@ interface RealtimeTimelineProps {
 
 export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTimelineProps) {
     const [items, setItems] = useState<TimelineItem[]>(initialItems);
+    const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline');
     const [isConnected, setIsConnected] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
@@ -177,13 +178,39 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
         }
     }, [personaId, postsOffset, memoriesOffset, isLoadingMore, hasMore, memoryToTimelineItem, postToTimelineItem]);
 
+    // Load latest items (to catch up after disconnect)
+    const refreshTimeline = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/persona/${personaId}/timeline?limit=10`, {
+                credentials: 'include',
+            });
+            const data = await response.json();
+            if (data.posts || data.memories) {
+                const latestItems: TimelineItem[] = [
+                    ...(data.memories || []).map(memoryToTimelineItem),
+                    ...(data.posts || []).map(postToTimelineItem),
+                ];
+
+                setItems(prev => {
+                    const merged = [...latestItems, ...prev];
+                    const unique = merged.filter((item, index, self) =>
+                        index === self.findIndex(t => t.id === item.id)
+                    );
+                    return unique.sort((a, b) =>
+                        new Date(b.time).getTime() - new Date(a.time).getTime()
+                    );
+                });
+            }
+        } catch (error) {
+            console.error('[RealtimeTimeline] Refresh failed:', error);
+        }
+    }, [personaId, memoryToTimelineItem, postToTimelineItem]);
+
     // Subscribe to real-time updates
     useEffect(() => {
-        console.log('[RealtimeTimeline] Setting up subscriptions for persona:', personaId);
 
-        // Channel for Memory table
-        const memoryChannel = supabase
-            .channel(`memory-${personaId}`)
+        const channel = supabase
+            .channel(`persona-timeline-${personaId}`)
             .on(
                 'postgres_changes',
                 {
@@ -193,21 +220,9 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                     filter: `personaId=eq.${personaId}`,
                 },
                 (payload) => {
-                    console.log('[RealtimeTimeline] New memory received:', payload);
-                    const newMemory = payload.new as MemoryRecord;
-                    addItem(memoryToTimelineItem(newMemory));
+                    addItem(memoryToTimelineItem(payload.new as MemoryRecord));
                 }
             )
-            .subscribe((status) => {
-                console.log('[RealtimeTimeline] Memory channel status:', status);
-                if (status === 'SUBSCRIBED') {
-                    setIsConnected(true);
-                }
-            });
-
-        // Channel for Post table
-        const postChannel = supabase
-            .channel(`post-${personaId}`)
             .on(
                 'postgres_changes',
                 {
@@ -217,22 +232,25 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                     filter: `personaId=eq.${personaId}`,
                 },
                 (payload) => {
-                    console.log('[RealtimeTimeline] New post received:', payload);
-                    const newPost = payload.new as PostRecord;
-                    addItem(postToTimelineItem(newPost));
+                    addItem(postToTimelineItem(payload.new as PostRecord));
                 }
             )
-            .subscribe((status) => {
-                console.log('[RealtimeTimeline] Post channel status:', status);
+            .subscribe(async (status, err) => {
+                if (err) console.error('[RealtimeTimeline] Subscription error:', err);
+
+                if (status === 'SUBSCRIBED') {
+                    setIsConnected(true);
+                    // Always refresh when (re)subscribed to catch any missed events
+                    await refreshTimeline();
+                } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                    setIsConnected(false);
+                }
             });
 
-        // Cleanup on unmount
         return () => {
-            console.log('[RealtimeTimeline] Cleaning up subscriptions');
-            supabase.removeChannel(memoryChannel);
-            supabase.removeChannel(postChannel);
+            supabase.removeChannel(channel);
         };
-    }, [personaId, addItem, memoryToTimelineItem, postToTimelineItem]);
+    }, [personaId, addItem, memoryToTimelineItem, postToTimelineItem, refreshTimeline]);
 
     // Update relative times every minute
     useEffect(() => {
