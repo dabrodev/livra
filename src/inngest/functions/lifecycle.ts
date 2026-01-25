@@ -173,7 +173,7 @@ export const lifecycleCycle = inngest.createFunction(
 
         // Update activity status: PLANNING
         await step.run('update-status-planning', async () => {
-            await updateActivityStatus(personaId, 'planning', 'Checking environment and planning next activity...');
+            await updateActivityStatus(personaId, 'planning', event.data.isManual ? 'Triggering requested activity...' : 'Checking environment and planning next activity...');
         });
 
         // Step 1: Environmental Check - use utility functions directly
@@ -384,6 +384,10 @@ export const lifecycleCycle = inngest.createFunction(
                 };
             }
 
+            // Handle Manual Location override from event
+            const manualLocation = event.data.manualLocation as 'home' | 'outside' | undefined;
+            const isManual = event.data.isManual as boolean | undefined;
+
             const recentMemories = persona.memories
                 .map((m: { description: string }) => m.description)
                 .join(', ')
@@ -399,6 +403,9 @@ ${environment.weather ? `- Weather: ${environment.weather.condition}, ${environm
 - Recent activities: ${recentMemories || 'Just starting their day'}
 - Apartment style: ${persona.apartmentStyle}
 - Clothing style: ${persona.clothingStyle}
+
+${isManual && manualLocation === 'home' ? 'CRITICAL: The user requested an activity AT HOME. Ensure the location is internal (apartment/loft).' : ''}
+${isManual && manualLocation === 'outside' ? 'CRITICAL: The user requested an activity OUTSIDE. Ensure the location is external (cafe, street, park, etc.).' : ''}
 
 Based on this context, plan the next activity. Consider:
 1. THE TIME OF DAY - Do not plan morning activities in the evening!
@@ -492,12 +499,12 @@ Respond with a JSON object containing:
 
         // Step 5: Production (Image) - Using Gemini 3 Pro Image (Nano Banana Pro)
         const image = await step.run('produce-image', async () => {
-            if (!plan.isContentWorthy) {
+            if (!plan.isContentWorthy && !event.data.isManual) {
                 return null
             }
 
             // Update activity status: CREATING
-            await updateActivityStatus(personaId, 'creating', 'Generating content...');
+            await updateActivityStatus(personaId, 'creating', 'Generating content for manual activity...');
 
             // Determine context for outfit variations
             const isAtHome = !plan.location ||

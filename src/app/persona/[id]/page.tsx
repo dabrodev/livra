@@ -11,6 +11,7 @@ import RealtimeTimeline, { TimelineItem } from "@/app/components/RealtimeTimelin
 import LifecycleControls from "@/app/components/LifecycleControls";
 import RealtimeActivityStatus from "@/app/components/RealtimeActivityStatus";
 import RealtimeOutfit from "@/app/components/RealtimeOutfit";
+import ManualActivityTrigger from "@/app/components/ManualActivityTrigger";
 
 // Lifecycle Status Badge (user-controlled: new/running/paused)
 function getLifecycleStatusBadge(lifecycleStatus: string | null, lifecycleStartedAt: Date | null) {
@@ -327,6 +328,10 @@ export default async function AvatarProfilePage({ params }: TimelinePageProps) {
                                         </Link>
                                     </>
                                 )}
+                                <ManualActivityTrigger
+                                    personaId={persona.id}
+                                    isActive={(persona as any).isActive || false}
+                                />
                                 <LifecycleControls
                                     personaId={persona.id}
                                     initialIsActive={(persona as any).isActive || false}
