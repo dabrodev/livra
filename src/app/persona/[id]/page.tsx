@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import {
     Sparkles, ArrowLeft, MapPin, Wallet, Download, Wand2,
-    Zap, Clock, Play, Pause, Moon, Brain, Camera, Coffee
+    Zap, Clock, Play, Pause, Moon, Brain, Camera, Coffee, Settings
 } from "lucide-react";
 import ImageLightbox from "@/app/components/ImageLightbox";
 import AvatarSwap from "@/app/components/AvatarSwap";
@@ -332,6 +332,13 @@ export default async function AvatarProfilePage({ params }: TimelinePageProps) {
                                     initialIsActive={(persona as any).isActive || false}
                                     hasAvatar={persona.faceReferences.length > 0}
                                 />
+                                <Link
+                                    href={`/persona/${persona.id}/settings`}
+                                    className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all"
+                                    title="Edit Preferences"
+                                >
+                                    <Settings className="w-5 h-5" />
+                                </Link>
                                 <button className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 transition-all">
                                     <Download className="w-5 h-5" />
                                 </button>
