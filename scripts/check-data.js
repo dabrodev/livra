@@ -4,12 +4,12 @@ const prisma = new PrismaClient()
 
 async function main() {
     const users = await prisma.user.findMany()
-    const influencers = await prisma.influencer.findMany()
+    const personas = await prisma.persona.findMany()
 
     console.log('--- USERS ---')
     console.log(JSON.stringify(users, null, 2))
-    console.log('\n--- INFLUENCERS ---')
-    console.log(JSON.stringify(influencers, null, 2))
+    console.log('\n--- PERSONAS ---')
+    console.log(JSON.stringify(personas, null, 2))
 }
 
 main()

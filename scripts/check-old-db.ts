@@ -7,15 +7,15 @@ async function main() {
     console.log('Connecting to DB from .env (not local)...')
 
     try {
-        const count = await prisma.influencer.count()
-        console.log(`Influencer count: ${count}`)
+        const count = await prisma.persona.count()
+        console.log(`Persona count: ${count}`)
 
         if (count > 0) {
-            const influencers = await prisma.influencer.findMany({ take: 5 })
-            console.log('Sample data found:', influencers.map(i => i.name))
+            const personas = await prisma.persona.findMany({ take: 5 })
+            console.log('Sample data found:', personas.map(i => i.name))
         }
-    } catch (e) {
-        console.error('Error querying Influencer table:', e.message)
+    } catch (e: any) {
+        console.error('Error querying Persona table:', e.message)
     }
 
     try {

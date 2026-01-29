@@ -1,7 +1,7 @@
 import { prisma } from '../src/lib/db';
 
 async function updateAnna() {
-    const result = await prisma.influencer.update({
+    const result = await prisma.persona.update({
         where: { id: '10e2c38c-19fb-497d-bd17-e82f4fa66c25' },
         data: {
             footwear: ['barefoot'],

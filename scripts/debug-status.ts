@@ -3,18 +3,18 @@ import { prisma } from '../src/lib/db';
 
 async function main() {
     console.log("--- DIAGNOSTIC START ---");
-    const influencerId = "10e2c38c-19fb-497d-bd17-e82f4fa66c25";
+    const personaId = "10e2c38c-19fb-497d-bd17-e82f4fa66c25";
 
     // Get last 5 memories
     const memories = await prisma.memory.findMany({
-        where: { influencerId },
+        where: { personaId },
         take: 5,
         orderBy: { createdAt: 'desc' }
     });
 
     // Get last 5 posts
     const posts = await prisma.post.findMany({
-        where: { influencerId },
+        where: { personaId },
         take: 5,
         orderBy: { postedAt: 'desc' }
     });

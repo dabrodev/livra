@@ -14,7 +14,7 @@ async function main() {
 
     console.log(`Seeding data for user: ${user.email} (${user.id})`)
 
-    const influencers = [
+    const personas = [
         {
             name: "Sofia Chen",
             country: "France",
@@ -69,11 +69,11 @@ async function main() {
         }
     ]
 
-    for (const inf of influencers) {
-        await prisma.influencer.create({
-            data: inf
+    for (const persona of personas) {
+        await prisma.persona.create({
+            data: persona
         })
-        console.log(`Created influencer: ${inf.name}`)
+        console.log(`Created persona: ${persona.name}`)
     }
 }
 

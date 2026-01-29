@@ -27,15 +27,15 @@ const prisma = new PrismaClient({
 async function main() {
     try {
         const userCount = await prisma.user.count()
-        const infCount = await prisma.influencer.count()
+        const personaCount = await prisma.persona.count()
         console.log(`\nFOUND DATA:`)
         console.log(`- Users: ${userCount}`)
-        console.log(`- Influencers: ${infCount}`)
+        console.log(`- Personas: ${personaCount}`)
 
-        if (infCount > 0) {
+        if (personaCount > 0) {
             console.log('\n!!! DATA FOUND !!!')
-            const influencers = await prisma.influencer.findMany()
-            console.log('Sample names:', influencers.map(i => i.name).join(', '))
+            const personas = await prisma.persona.findMany()
+            console.log('Sample names:', personas.map(i => i.name).join(', '))
         } else {
             console.log('\nNo data found in this DB either.')
         }
