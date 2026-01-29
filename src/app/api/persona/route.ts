@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { inngest } from "@/inngest/client";
 import { getOrCreateUser } from "@/lib/auth";
 
+import { getCountryByCode } from "@/lib/countries";
+
 export async function POST(request: NextRequest) {
     try {
         // Require authentication
@@ -11,8 +13,9 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
 
         const {
-            country,
-            city,
+            country: countryInput, // Now receives code e.g. "PL"
+            city: cityInput,
+            normalizedCity,
             neighborhood,
             apartmentStyle,
             name,
@@ -27,12 +30,23 @@ export async function POST(request: NextRequest) {
         } = body;
 
         // Validate required fields
-        if (!country || !city || !apartmentStyle || !name || !personalityVibe || !clothingStyle) {
+        if (!countryInput || !cityInput || !apartmentStyle || !name || !personalityVibe || !clothingStyle) {
             return NextResponse.json(
                 { error: "Missing required fields" },
                 { status: 400 }
             );
         }
+
+        // Logic for country/city mapping
+        const countryObj = getCountryByCode(countryInput);
+        const countryName = countryObj ? countryObj.name : countryInput; // Fallback if not found (legacy behavior)
+        const countryCode = countryObj ? countryObj.code : (countryInput.length === 2 ? countryInput : null);
+
+        // Logic for city mapping
+        // If we have a normalized city (e.g. "Warsaw"), use it as the main 'city' field for APIs
+        // Store the original input (e.g. "Warszawa") as 'cityLocal'
+        const mainCity = normalizedCity || cityInput;
+        const localCity = cityInput;
 
         // Create persona in database with userId
         const persona = await prisma.persona.create({
@@ -41,8 +55,10 @@ export async function POST(request: NextRequest) {
                 name,
                 type: type || "INFLUENCER",
                 gender: gender || "female",
-                country,
-                city,
+                country: countryName,
+                countryCode: countryCode || 'US', // Fallback
+                city: mainCity,
+                cityLocal: localCity,
                 neighborhood: neighborhood || null,
                 apartmentStyle,
                 personalityVibe,

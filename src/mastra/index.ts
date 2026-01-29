@@ -27,5 +27,6 @@ export {
     // Types
     type WeatherResult,
     type TrendsResult,
+    type TrendingTopic,
     type Category,
 } from "./tools";

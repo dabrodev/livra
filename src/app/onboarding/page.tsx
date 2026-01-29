@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin, User, Wallet, ArrowRight, ArrowLeft, Sparkles, Home, Palette, Shirt } from "lucide-react";
 
+import { COUNTRIES } from "@/lib/countries";
+
 // Step data types
 interface OnboardingData {
     // Step 1: World
-    country: string;
-    city: string;
+    country: string; // This will now store countryCode (e.g. "PL")
+    city: string; // User input
+    normalizedCity?: string; // AI normalized (e.g. "Warsaw")
     neighborhood: string;
     apartmentStyle: string;
     // Step 2: Avatar Profile
@@ -206,9 +209,48 @@ export default function OnboardingPage() {
     const [step, setStep] = useState(1);
     const [data, setData] = useState<OnboardingData>(initialData);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isValidatingLocation, setIsValidatingLocation] = useState(false);
+    const [locationError, setLocationError] = useState<string | null>(null);
 
     const updateData = (updates: Partial<OnboardingData>) => {
         setData((prev) => ({ ...prev, ...updates }));
+        // Clear error when user changes city or country
+        if (updates.city || updates.country) setLocationError(null);
+    };
+
+    const validateMyCity = async () => {
+        if (!data.city) return;
+        if (!data.country) {
+            setLocationError("Please select a country first");
+            return;
+        }
+
+        setIsValidatingLocation(true);
+        setLocationError(null);
+
+        try {
+            const res = await fetch("/api/personas/validate-location", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ city: data.city, countryCode: data.country }),
+            });
+
+            const result = await res.json();
+
+            if (result.isValid) {
+                updateData({
+                    normalizedCity: result.cityEnglish,
+                    city: result.cityLocal || result.cityEnglish // Prefer local name for display if available
+                });
+            } else {
+                setLocationError(result.suggestion ? `Did you mean ${result.suggestion}?` : "City not found in this country.");
+            }
+        } catch (error) {
+            console.error("Validation error:", error);
+            setLocationError("Could not validate location. Please checks spelling.");
+        } finally {
+            setIsValidatingLocation(false);
+        }
     };
 
     const toggleArrayItem = (field: 'bottomwear' | 'footwear' | 'signatureItems', item: string) => {
@@ -226,6 +268,7 @@ export default function OnboardingPage() {
     const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
     const canProceed = () => {
+        if (isValidatingLocation) return false;
         if (step === 1) return data.country && data.city && data.apartmentStyle;
         if (step === 2) return data.name && data.type && data.gender && data.personalityVibe;
         if (step === 3) return data.clothingStyle && data.bottomwear.length > 0 && data.footwear.length > 0;
@@ -307,22 +350,36 @@ export default function OnboardingPage() {
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-zinc-300 mb-2">Country</label>
-                                        <input
-                                            type="text"
+                                        <select
                                             value={data.country}
                                             onChange={(e) => updateData({ country: e.target.value })}
-                                            placeholder="e.g. United States"
-                                            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-teal-500 focus:outline-none transition-colors"
-                                        />
+                                            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-teal-500 focus:outline-none transition-colors appearance-none"
+                                        >
+                                            <option value="">Select a country...</option>
+                                            {COUNTRIES.map((c) => (
+                                                <option key={c.code} value={c.code}>
+                                                    {c.flag} {c.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-zinc-300 mb-2">City</label>
+                                        <label className="block text-sm font-medium text-zinc-300 mb-2">
+                                            City
+                                            {isValidatingLocation && <span className="text-zinc-500 ml-2 text-xs animate-pulse">Checking...</span>}
+                                            {data.normalizedCity && !isValidatingLocation && <span className="text-teal-500 ml-2 text-xs">✓ Verified</span>}
+                                            {locationError && <span className="text-red-400 ml-2 text-xs">{locationError}</span>}
+                                        </label>
                                         <input
                                             type="text"
                                             value={data.city}
-                                            onChange={(e) => updateData({ city: e.target.value })}
+                                            onChange={(e) => updateData({ city: e.target.value, normalizedCity: undefined })}
+                                            onBlur={validateMyCity}
                                             placeholder="e.g. Los Angeles"
-                                            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-teal-500 focus:outline-none transition-colors"
+                                            className={`w-full px-4 py-3 rounded-xl bg-zinc-900 border focus:outline-none transition-colors ${locationError ? "border-red-500/50 focus:border-red-500" :
+                                                data.normalizedCity ? "border-teal-500/50 focus:border-teal-500" :
+                                                    "border-zinc-800 focus:border-teal-500"
+                                                }`}
                                         />
                                     </div>
                                 </div>
