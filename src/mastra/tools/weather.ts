@@ -54,15 +54,46 @@ function interpretWeatherCode(code: number): { condition: string; description: s
 }
 
 /**
+ * Fetch coordinates for a city using Open-Meteo Geocoding API
+ */
+async function getCoordinates(city: string): Promise<{ lat: number; lon: number } | null> {
+    try {
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+        const response = await fetch(url);
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+
+        if (data.results && data.results.length > 0) {
+            return {
+                lat: data.results[0].latitude,
+                lon: data.results[0].longitude
+            };
+        }
+        return null;
+    } catch (e) {
+        console.warn(`[Weather] Geocoding failed for ${city}:`, e);
+        return null; // Fallback to hardcoded list if API fails? For now just null.
+    }
+}
+
+/**
  * Get real-time weather using Open-Meteo API (free, no API key needed)
- * Returns null if weather cannot be fetched (no fallback with fake data)
+ * Returns null if weather cannot be fetched
  */
 export async function getWeather(city: string): Promise<WeatherResult | null> {
-    const normalizedCity = normalizeCity(city);
-    const coords = CITY_COORDINATES[normalizedCity];
+    // 1. Try to get coordinates dynamically
+    let coords = await getCoordinates(city);
+
+    // 2. Fallback to hardcoded list if dynamic lookup fails (e.g. rate limit or network issue)
+    if (!coords) {
+        const normalizedCity = normalizeCity(city);
+        coords = CITY_COORDINATES[normalizedCity];
+    }
 
     if (!coords) {
-        console.warn(`[Weather] No coordinates for city: ${city} - weather will be unavailable`);
+        console.warn(`[Weather] No coordinates found for city: ${city}`);
         return null;
     }
 

@@ -2,6 +2,7 @@ import { inngest } from '../client'
 import { prisma } from '@/lib/db'
 import { lifeDirectorAgent, getWeather, getTrends, type WeatherResult, type TrendsResult } from '@/mastra'
 import { generatePersonaImage, saveGeneratedImage } from '@/lib/image-generation'
+import { filterUniqueTrends } from '@/lib/trend-filter'
 
 // Types for better structure
 interface ActivityPlan {
@@ -11,6 +12,7 @@ interface ActivityPlan {
     isContentWorthy: boolean
     estimatedCost: number
     moodImpact: string
+    description: string
 }
 
 interface EnvironmentContext {
@@ -178,8 +180,8 @@ export const lifecycleCycle = inngest.createFunction(
 
         // Step 1: Environmental Check - use utility functions directly
         const environment = await step.run('check-environment', async (): Promise<EnvironmentContext> => {
-            const weather = await getWeather(persona.city)
-            const trends = await getTrends('lifestyle')
+            const weather = await getWeather(persona.city) // Use normalized English city name
+            const trends = await getTrends('lifestyle', (persona as any).countryCode || 'US') // Use ISO country code
             return { weather, trends }
         })
 
@@ -376,6 +378,7 @@ export const lifecycleCycle = inngest.createFunction(
             if (retryMemory) {
                 return {
                     activity: retryMemory.description.split(' - ')[0],
+                    description: retryMemory.description,
                     timeOfDay: currentTimeOfDay, // Approximate
                     location: retryMemory.description.includes('at') ? retryMemory.description.split('at ')[1].split(' - ')[0] : 'home',
                     isContentWorthy: true, // Force content for retry
@@ -392,13 +395,45 @@ export const lifecycleCycle = inngest.createFunction(
                 .map((m: { description: string }) => m.description)
                 .join(', ')
 
+            // Format and Filter trending topics using AI
+            const usedTrendsText = recentMemories; // Pass full text for AI context
+            let trendingContext = "";
+
+            if (environment.trends.trendingTopics && environment.trends.trendingTopics.length > 0) {
+                // Use AI Agent to filter duplicates semantically (e.g. Bridgerton vs Bridgertonowie)
+                const fresh = await filterUniqueTrends(environment.trends.trendingTopics, usedTrendsText);
+
+                // If AI filters everything (rare), fallback to top 3 original just to have something, or switch to generic
+                const topics = fresh.length > 0 ? fresh : environment.trends.trendingTopics.slice(0, 3);
+
+                trendingContext = `\n- Real-time Trending NOW (${environment.trends.source === 'serpapi' ? 'live data' : 'fallback'}):\n${topics.slice(0, 15).map(t => `  • "${t.query}" (${t.traffic} searches)`).join('\n')}`;
+            } else {
+                // Fallback Hashtags logic (simple string filter is enough here)
+                const fresh = environment.trends.trends.filter(t => {
+                    const tag = t.toLowerCase().replace('#', '');
+                    return !usedTrendsText.toLowerCase().includes(tag);
+                });
+                const tags = fresh.length > 0 ? fresh : environment.trends.trends;
+                trendingContext = `\n- Trending hashtags: ${tags.slice(0, 15).join(', ')}`;
+            }
+
+            // Get current date for context
+            const currentDate = new Date();
+            const dateString = currentDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
             const prompt = `
 You are planning the next activity for ${persona.name}, a ${persona.personalityVibe} persona living in ${persona.city}.
 
 Current context:
-- LOCAL TIME: ${localHour}:00 (${currentTimeOfDay}) - THIS IS CRITICAL, plan activities appropriate for this time!
+- DATE: ${dateString}
+- LOCAL TIME: ${localHour}:00 (${currentTimeOfDay})
 ${environment.weather ? `- Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}` : '- Weather: Unknown (plan for indoor activities if unsure)'}
-- Trending: ${environment.trends.trends.slice(0, 3).join(', ')}
+${trendingContext}
 - Current balance: $${persona.currentBalance}
 - Recent activities: ${recentMemories || 'Just starting their day'}
 - Apartment style: ${persona.apartmentStyle}
@@ -409,14 +444,17 @@ ${isManual && manualLocation === 'outside' ? 'CRITICAL: The user requested an ac
 
 Based on this context, plan the next activity. Consider:
 1. THE TIME OF DAY - Do not plan morning activities in the evening!
-2. The weather conditions
-3. Their budget
-4. Their personality vibe
-5. Whether this would be good content (aesthetic lifestyle moments at home ARE content-worthy!)
+2. THE CURRENT DATE AND SEASON - Plan seasonally appropriate activities!
+3. The weather conditions
+4. Their budget
+5. Their personality vibe
+6. Whether this would be good content (aesthetic lifestyle moments at home ARE content-worthy!)
+7. TRENDING TOPICS - Try to incorporate a current trend or hashtag (listed above) into the description naturally. IMPORTANT: Do not repeat topics mentioned in recent activities.
 
 Respond with a JSON object containing:
 {
-    "activity": "activity name appropriate for ${currentTimeOfDay}",
+    "activity": "Short title of activity",
+    "description": "Narrative description (1-2 sentences) of the activity. Incorporate a trend here if relevant.",
     "timeOfDay": "${currentTimeOfDay}",
     "location": "location name or null",
     "isContentWorthy": true or false,
@@ -424,6 +462,7 @@ Respond with a JSON object containing:
     "moodImpact": "positive|neutral|negative"
 }
 `
+            console.log('[Lifecycle Prompt Debug]', prompt);
 
             try {
                 const result = await lifeDirectorAgent.generate(prompt, {
@@ -437,6 +476,7 @@ Respond with a JSON object containing:
                     const parsed = JSON.parse(jsonMatch[0])
                     return {
                         activity: parsed.activity || `${currentTimeOfDay.charAt(0).toUpperCase() + currentTimeOfDay.slice(1)} Activity`,
+                        description: parsed.description || parsed.activity || "Activity",
                         timeOfDay: parsed.timeOfDay || currentTimeOfDay,
                         location: parsed.location || null,
                         isContentWorthy: parsed.isContentWorthy ?? true,
@@ -449,15 +489,16 @@ Respond with a JSON object containing:
             }
 
             // Dynamic fallback based on actual time of day
-            const fallbackActivities: Record<string, { activity: string; location: string }> = {
-                morning: { activity: 'Morning Coffee Run', location: 'Local Café' },
-                afternoon: { activity: 'Exploring the neighborhood', location: 'City Center' },
-                evening: { activity: 'Dinner at a trendy restaurant', location: 'Downtown' },
+            const fallbackActivities: Record<string, { activity: string; location: string; description: string }> = {
+                morning: { activity: 'Morning Coffee Run', location: 'Local Café', description: 'Starting the day with a fresh coffee run to the local café.' },
+                afternoon: { activity: 'Exploring the neighborhood', location: 'City Center', description: 'Taking a walk to explore the neighborhood and city center.' },
+                evening: { activity: 'Dinner at a trendy restaurant', location: 'Downtown', description: 'Enjoying a lovely dinner at a trendy restaurant downtown.' },
             };
             const fallback = fallbackActivities[currentTimeOfDay] || fallbackActivities.evening;
 
             return {
                 activity: fallback.activity,
+                description: fallback.description,
                 timeOfDay: currentTimeOfDay,
                 location: fallback.location,
                 isContentWorthy: true,
@@ -477,7 +518,7 @@ Respond with a JSON object containing:
             return await prisma.memory.create({
                 data: {
                     personaId,
-                    description: `${plan.activity} at ${plan.location || 'home'} - ${plan.moodImpact} vibes`,
+                    description: plan.description || `${plan.activity} at ${plan.location || 'home'} - ${plan.moodImpact} vibes`,
                     importance: plan.isContentWorthy ? 4 : 2,
                 },
             })
@@ -636,7 +677,7 @@ Respond with a JSON object containing:
                 ? `Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}.`
                 : '';
 
-            const imagePrompt = `A beautiful, Instagram-worthy photo of a ${persona.personalityVibe} persona ${plan.activity} at ${plan.location || 'home'}. 
+            const imagePrompt = `A beautiful, Instagram-worthy photo of a ${persona.personalityVibe} persona. Activity: ${plan.description}. Location: ${plan.location || 'home'}. 
 TIME: ${currentMonth} ${season}, ${localHour}:00 local time (${plan.timeOfDay}) - LIGHTING: ${lightingDescription}.
 ${weatherLine}
 Style: authentic lifestyle photography.
