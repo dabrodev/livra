@@ -7,12 +7,12 @@ export function PhoneMockup() {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     // Using diverse instances with dynamic status based on roughly current world time/role
+    // Using diverse instances with dynamic status based on roughly current world time/role
     const instances = [
-        { src: "/examples/cafe.png", id: "JULIA_X9", role: "Lifestyle Avatar", loc: "NYC", status: "ACTIVE" },
-        { src: "/examples/male_cooking.png", id: "MARCUS_B2", role: "Lifestyle Avatar", loc: "Berlin", status: "ACTIVE" },
-        { src: "/portraits/asian_female.png", id: "YUKI_T8", role: "Creative Avatar", loc: "Tokyo", status: "SLEEPING" },
-        { src: "/portraits/black_male.png", id: "KWAME_04", role: "Tech Analyst", loc: "Lagos", status: "ANALYZING" },
-        { src: "/portraits/latina.png", id: "SOFIA_L1", role: "Wellness Coach", loc: "São Paulo", status: "ACTIVE" },
+        { src: "/examples/phone_gaming.png", id: "NEON_V1", brand: "CyberGear", role: "Streamer AI", loc: "Seoul", status: "STREAMING" },
+        { src: "/examples/phone_travel.png", id: "ATLAS_07", brand: "Summit Expeditions", role: "Travel Guide", loc: "Andes", status: "EXPLORING" },
+        { src: "/examples/phone_food.png", id: "CHEF_AI", brand: "Umami Collective", role: "Culinary Artist", loc: "Kyoto", status: "PLATING" },
+        { src: "/examples/phone_music.png", id: "LUNA_DJ", brand: "SoundWave Events", role: "Music Curator", loc: "Ibiza", status: "MIXING" },
     ];
 
     useEffect(() => {
@@ -29,6 +29,10 @@ export function PhoneMockup() {
         switch (status) {
             case "SLEEPING": return { color: "text-indigo-400", bg: "bg-indigo-500", dotAnimation: "" };
             case "ANALYZING": return { color: "text-amber-400", bg: "bg-amber-500", dotAnimation: "animate-pulse" };
+            case "STREAMING": return { color: "text-fuchsia-400", bg: "bg-fuchsia-500", dotAnimation: "animate-pulse" };
+            case "EXPLORING": return { color: "text-orange-400", bg: "bg-orange-500", dotAnimation: "animate-pulse" };
+            case "PLATING": return { color: "text-emerald-400", bg: "bg-emerald-500", dotAnimation: "animate-pulse" };
+            case "MIXING": return { color: "text-cyan-400", bg: "bg-cyan-500", dotAnimation: "animate-pulse" };
             default: return { color: "text-green-400", bg: "bg-green-500", dotAnimation: "animate-pulse" };
         }
     };
@@ -95,13 +99,14 @@ export function PhoneMockup() {
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    <div className="text-lg font-bold text-white mb-1 tracking-tight">{current.id}</div>
-                                    <div className="flex flex-col gap-0.5 text-xs text-zinc-400">
-                                        <div className="flex justify-between">
+                                    <div className="text-lg font-bold text-white mb-0.5 tracking-tight">{current.id}</div>
+                                    <div className="text-xs font-bold text-teal-400 mb-2 uppercase tracking-wide">{current.brand}</div>
+                                    <div className="flex flex-col gap-0.5 text-[10px] text-zinc-400 font-mono">
+                                        <div className="flex justify-between border-b border-white/5 pb-0.5">
                                             <span>ROLE:</span>
                                             <span className="text-zinc-200">{current.role}</span>
                                         </div>
-                                        <div className="flex justify-between">
+                                        <div className="flex justify-between pt-0.5">
                                             <span>LOC:</span>
                                             <span className="text-zinc-200">{current.loc}</span>
                                         </div>
