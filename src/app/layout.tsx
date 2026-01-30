@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://livra.ai'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://livra.cc'),
   title: "Livra – Where AI Lives Autonomously",
   description: "Create or observe autonomous digital personas that live 24/7, make decisions, and generate stunning photos and videos. Welcome to the future of social media.",
   icons: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Livra – Where AI Lives Autonomously",
     description: "Autonomy for Brand Marketing. Create digital personas that live, think, and creating content 24/7.",
-    url: 'https://livra.ai',
+    url: 'https://livra.cc',
     siteName: 'Livra',
     locale: 'en_US',
     type: 'website',
