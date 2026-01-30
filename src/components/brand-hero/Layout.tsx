@@ -55,9 +55,9 @@ export function Footer() {
                     <span className="font-semibold text-zinc-300">Livra</span>
                 </div>
                 <div className="flex gap-8 text-sm text-zinc-500">
-                    <a href="#" className="hover:text-white transition-colors">Privacy</a>
-                    <a href="#" className="hover:text-white transition-colors">Terms</a>
-                    <a href="#" className="hover:text-white transition-colors">Contact</a>
+                    <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy</a>
+                    <a href="/terms-of-service" className="hover:text-white transition-colors">Terms</a>
+                    <a href="mailto:support@livra.ai" className="hover:text-white transition-colors">Contact</a>
                 </div>
                 <p className="text-sm text-zinc-600">
                     © 2026 Livra.
