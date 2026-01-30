@@ -8,12 +8,11 @@ export function PhoneMockup() {
 
     // Using diverse instances with dynamic status based on roughly current world time/role
     // Using diverse instances with dynamic status based on roughly current world time/role
-    // Using Aura Activewear • Julia storyline for the Hero Phone
     const instances = [
-        { src: "/examples/workout.png", id: "JULIA_AH", brand: "Aura Activewear", role: "Brand Hero", loc: "Central Park", status: "TRAINING" },
-        { src: "/examples/cafe.png", id: "JULIA_AH", brand: "Aura Activewear", role: "Brand Hero", loc: "SoHo Workspace", status: "ANALYZING" },
-        { src: "/examples/city.png", id: "JULIA_AH", brand: "Aura Activewear", role: "Brand Hero", loc: "Downtown", status: "COMMUTING" },
-        { src: "/examples/dinner.png", id: "JULIA_AH", brand: "Aura Activewear", role: "Brand Hero", loc: "Rooftop Bar", status: "SOCIALIZING" },
+        { src: "/examples/phone_gaming.png", id: "NEON_V1", brand: "CyberGear", role: "Streamer AI", loc: "Seoul", status: "STREAMING" },
+        { src: "/examples/phone_travel.png", id: "ATLAS_07", brand: "Summit Expeditions", role: "Travel Guide", loc: "Andes", status: "EXPLORING" },
+        { src: "/examples/phone_food.png", id: "CHEF_AI", brand: "Umami Collective", role: "Culinary Artist", loc: "Kyoto", status: "PLATING" },
+        { src: "/examples/phone_music.png", id: "LUNA_DJ", brand: "SoundWave Events", role: "Music Curator", loc: "Ibiza", status: "MIXING" },
     ];
 
     useEffect(() => {
@@ -30,11 +29,10 @@ export function PhoneMockup() {
         switch (status) {
             case "SLEEPING": return { color: "text-indigo-400", bg: "bg-indigo-500", dotAnimation: "" };
             case "ANALYZING": return { color: "text-amber-400", bg: "bg-amber-500", dotAnimation: "animate-pulse" };
-            case "TRAINING": return { color: "text-emerald-400", bg: "bg-emerald-500", dotAnimation: "animate-pulse" };
-            case "COMMUTING": return { color: "text-blue-400", bg: "bg-blue-500", dotAnimation: "animate-pulse" };
-            case "SOCIALIZING": return { color: "text-pink-400", bg: "bg-pink-500", dotAnimation: "animate-pulse" };
             case "STREAMING": return { color: "text-fuchsia-400", bg: "bg-fuchsia-500", dotAnimation: "animate-pulse" };
             case "EXPLORING": return { color: "text-orange-400", bg: "bg-orange-500", dotAnimation: "animate-pulse" };
+            case "PLATING": return { color: "text-emerald-400", bg: "bg-emerald-500", dotAnimation: "animate-pulse" };
+            case "MIXING": return { color: "text-cyan-400", bg: "bg-cyan-500", dotAnimation: "animate-pulse" };
             default: return { color: "text-green-400", bg: "bg-green-500", dotAnimation: "animate-pulse" };
         }
     };
