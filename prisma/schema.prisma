@@ -12,6 +12,7 @@ model User {
   name      String?
   createdAt DateTime  @default(now())
   personas  Persona[]
+  role      String    @default("USER") // "USER", "ADMIN", "CREATOR"
 }
 
 model Persona {
@@ -29,6 +30,7 @@ model Persona {
   personalityVibe String // e.g., "Minimalist Glam", "Streetwear Rebel"
   gender          String  @default("female") // "male" or "female"
   isActive        Boolean @default(false)
+  isPublic        Boolean @default(true)
 
   // Appearance
   hairColor  String   @default("brown") // blonde, brunette, red, black, auburn, gray

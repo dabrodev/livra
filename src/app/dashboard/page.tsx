@@ -90,6 +90,9 @@ export default async function DashboardPage() {
         redirect('/login');
     }
 
+    // Check role
+    const canCreate = user.role === 'ADMIN' || user.role === 'CREATOR';
+
     const personas = await prisma.persona.findMany({
         where: { userId: user.id }, // Only show user's personas
         orderBy: { createdAt: "desc" },
@@ -112,13 +115,14 @@ export default async function DashboardPage() {
             {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/5">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2">
+                    <Link href="/pulse" className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-4 h-4 text-white" />
                         </div>
-                        <span className="font-semibold text-lg">Livra</span>
+                        <span className="font-semibold text-lg">Livra Pulse</span>
                     </Link>
                     <div className="flex items-center gap-4">
+                        <Link href="/pulse" className="text-sm text-zinc-400 hover:text-white">Global Feed</Link>
                         {avatarCount > 0 && (
                             <Link
                                 href="/avatars"
@@ -142,13 +146,19 @@ export default async function DashboardPage() {
                             <h1 className="text-3xl font-bold">Your AI Avatars</h1>
                             <p className="text-zinc-400 mt-1">Manage your AI-powered digital avatars</p>
                         </div>
-                        <Link
-                            href="/onboarding"
-                            className="btn-glow px-5 py-2.5 rounded-full text-white font-medium flex items-center gap-2"
-                        >
-                            <Plus className="w-4 h-4" />
-                            Create New
-                        </Link>
+                        {canCreate ? (
+                            <Link
+                                href="/onboarding"
+                                className="btn-glow px-5 py-2.5 rounded-full text-white font-medium flex items-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Create New
+                            </Link>
+                        ) : (
+                            <div className="px-5 py-2.5 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-400 font-medium text-sm">
+                                Access Level: Viewer
+                            </div>
+                        )}
                     </div>
 
                     {/* Stats summary */}

@@ -37,10 +37,10 @@ export async function GET(request: NextRequest) {
         // If we have a forwarded host (e.g. Vercel custom domain), use it
         const forwardedHost = request.headers.get('x-forwarded-host')
         if (forwardedHost) {
-            return NextResponse.redirect(`https://${forwardedHost}/dashboard`)
+            return NextResponse.redirect(`https://${forwardedHost}/pulse`)
         }
 
-        return NextResponse.redirect(`${origin}/dashboard`)
+        return NextResponse.redirect(`${origin}/pulse`)
     }
 
     // No code provided

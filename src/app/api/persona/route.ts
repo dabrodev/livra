@@ -10,6 +10,14 @@ export async function POST(request: NextRequest) {
         // Require authentication
         const user = await getOrCreateUser();
 
+        // Check if user has permission to create
+        if (user.role !== 'ADMIN' && user.role !== 'CREATOR') {
+            return NextResponse.json(
+                { error: "Access denied: You do not have permission to create personas." },
+                { status: 403 }
+            );
+        }
+
         const body = await request.json();
 
         const {
