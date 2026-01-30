@@ -18,10 +18,36 @@ export default function AvatarLibraryPage() {
     const [avatars, setAvatars] = useState<Avatar[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
     useEffect(() => {
-        fetchAvatars();
+        checkUserAndFetch();
     }, []);
+
+    const checkUserAndFetch = async () => {
+        try {
+            // Check role first
+            const authRes = await fetch('/api/auth/me');
+            if (authRes.ok) {
+                const user = await authRes.json();
+                if (user.role !== 'ADMIN' && user.role !== 'CREATOR') {
+                    // No permission -> Redirect (don't even fetch avatars)
+                    window.location.href = '/pulse';
+                    return;
+                }
+            } else {
+                window.location.href = '/login';
+                return;
+            }
+            setIsCheckingAuth(false);
+
+            // Then fetch avatars
+            await fetchAvatars();
+        } catch (err) {
+            console.error("Auth check failed", err);
+            window.location.href = '/pulse';
+        }
+    };
 
     const fetchAvatars = async () => {
         try {
@@ -36,6 +62,14 @@ export default function AvatarLibraryPage() {
             setIsLoading(false);
         }
     };
+
+    if (isCheckingAuth) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background text-foreground">

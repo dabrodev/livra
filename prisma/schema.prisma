@@ -102,6 +102,7 @@ model Memory {
 // Global avatar library for reuse across influencers
 model AvatarLibrary {
   id     String  @id @default(uuid())
+  userId String? // Owner of this generation (optional for backward compat)
   url    String // URL to the stored avatar image
   gender String? // "male" or "female"
 

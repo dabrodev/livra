@@ -5,12 +5,23 @@ import { prisma } from "@/lib/db";
  * GET /api/avatars - Get all avatars from the library
  * Optional query params for filtering by appearance
  */
+import { getOrCreateUser } from "@/lib/auth";
+
+/**
+ * GET /api/avatars - Get user's avatar library
+ * Optional query params for filtering by appearance
+ */
 export async function GET(request: NextRequest) {
     try {
+        // Authenticate user
+        const user = await getOrCreateUser();
+
         const { searchParams } = new URL(request.url);
 
         // Build filter from query params
-        const where: Record<string, string | undefined> = {};
+        const where: any = {
+            userId: user.id // enforce ownership filtering
+        };
 
         if (searchParams.get("hairColor")) where.hairColor = searchParams.get("hairColor")!;
         if (searchParams.get("hairStyle")) where.hairStyle = searchParams.get("hairStyle")!;
@@ -19,7 +30,7 @@ export async function GET(request: NextRequest) {
         if (searchParams.get("bodyType")) where.bodyType = searchParams.get("bodyType")!;
 
         const avatars = await prisma.avatarLibrary.findMany({
-            where: Object.keys(where).length > 0 ? where : undefined,
+            where,
             orderBy: { createdAt: "desc" },
             take: 50, // Limit results
         });
@@ -31,6 +42,11 @@ export async function GET(request: NextRequest) {
         });
     } catch (error) {
         console.error("Failed to fetch avatars:", error);
+
+        if (error instanceof Error && error.message === 'Unauthorized') {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         return NextResponse.json(
             { error: "Failed to fetch avatars" },
             { status: 500 }
