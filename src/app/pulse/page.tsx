@@ -3,12 +3,17 @@ import { Sparkles, Globe } from "lucide-react";
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from "@/lib/db";
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PulsePage() {
-    const supabase = await createClient(); // Use await for server client
+    const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+        redirect('/login');
+    }
 
     // Check user role for rendering UI elements (Create button)
     let userRole = 'USER';
