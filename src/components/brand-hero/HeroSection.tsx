@@ -5,8 +5,11 @@ import { Sparkles, Zap, Smartphone, Play } from "lucide-react";
 import { staggerContainer, fadeInUp } from "@/components/animations";
 import { SystemStatus, AnimatedOrbs } from "./Visuals";
 import { PhoneMockup } from "./PhoneMockup";
+import { useWaitlist } from "./WaitlistContext";
 
 export function HeroSection() {
+    const { openWaitlist } = useWaitlist();
+
     return (
         <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden pt-32 pb-16">
             <AnimatedOrbs />
@@ -58,23 +61,15 @@ export function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.6 }}
                 >
-                    <motion.a
-                        href="/onboarding"
+                    <button
+                        onClick={openWaitlist}
                         className="relative group overflow-hidden px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 min-w-[240px] text-white bg-gradient-to-r from-teal-500 to-emerald-600 shadow-[0_0_20px_rgba(20,184,166,0.3)] hover:shadow-[0_0_30px_rgba(20,184,166,0.5)] transition-all duration-300"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.98 }}
                     >
                         <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-500 skew-x-12 -translate-x-full" />
                         <Zap className="w-5 h-5 fill-current" />
                         Create Your Brand Hero
-                    </motion.a>
-                    <motion.a
-                        href="/pulse"
-                        className="px-8 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-zinc-300 font-semibold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2 min-w-[200px]"
-                        whileHover={{ scale: 1.05, borderColor: "rgba(255, 255, 255, 0.2)" }}
-                    >
-                        See Global Pulse
-                    </motion.a>
+                    </button>
+
                 </motion.div>
 
                 {/* Availability Badges */}
