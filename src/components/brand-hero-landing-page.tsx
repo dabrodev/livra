@@ -571,9 +571,6 @@ function Header() {
                 </a>
 
                 <div className="flex items-center gap-4">
-                    <a href="/pulse" className="text-sm text-zinc-400 hover:text-white transition-colors">
-                        Live Pulse
-                    </a>
                     <a href="/login" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">
                         Log in
                     </a>
