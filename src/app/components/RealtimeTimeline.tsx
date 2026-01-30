@@ -219,10 +219,12 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                     event: 'INSERT',
                     schema: 'public',
                     table: 'Memory',
-                    filter: `personaId=eq.${personaId}`,
                 },
                 (payload) => {
-                    addItem(memoryToTimelineItem(payload.new as MemoryRecord));
+                    const newRecord = payload.new as MemoryRecord;
+                    if (newRecord.personaId === personaId) {
+                        addItem(memoryToTimelineItem(newRecord));
+                    }
                 }
             )
             .on(
@@ -231,10 +233,12 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                     event: 'INSERT',
                     schema: 'public',
                     table: 'Post',
-                    filter: `personaId=eq.${personaId}`,
                 },
                 (payload) => {
-                    addItem(postToTimelineItem(payload.new as PostRecord));
+                    const newRecord = payload.new as PostRecord;
+                    if (newRecord.personaId === personaId) {
+                        addItem(postToTimelineItem(newRecord));
+                    }
                 }
             )
             .subscribe(async (status, err) => {
