@@ -30,16 +30,17 @@ export async function GET(request: NextRequest) {
 
         // Success - redirect to dashboard
         console.log('Successfully authenticated, redirecting to dashboard')
-        const forwardedHost = request.headers.get('x-forwarded-host')
-        const isLocalEnv = process.env.NODE_ENV === 'development'
 
-        if (isLocalEnv) {
-            return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
-        } else if (forwardedHost) {
+        // Ensure we redirect to the same domain we came from
+        const origin = request.headers.get('origin') || requestUrl.origin
+
+        // If we have a forwarded host (e.g. Vercel custom domain), use it
+        const forwardedHost = request.headers.get('x-forwarded-host')
+        if (forwardedHost) {
             return NextResponse.redirect(`https://${forwardedHost}/dashboard`)
-        } else {
-            return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
         }
+
+        return NextResponse.redirect(`${origin}/dashboard`)
     }
 
     // No code provided
