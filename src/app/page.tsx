@@ -1,6 +1,6 @@
-import AnimatedLandingPage from "@/components/animated-landing-page";
+import BrandHeroLandingPage from "@/components/brand-hero-landing-page";
 
 export default function Home() {
-  return <AnimatedLandingPage />;
+  return <BrandHeroLandingPage />;
 }
 
