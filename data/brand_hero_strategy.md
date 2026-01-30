@@ -44,3 +44,10 @@ Why a business needs an AI Brand Hero via Livra:
 1.  **Stage 1 (Current):** Establish the **Influencer** and **Model** roles to perfect the visual and narrative engine.
 2.  **Stage 2:** Introduce simple **Specialist** roles (e.g., fitness trainer) that require specific domain knowledge injections.
 3.  **Stage 3:** Full Enterprise "AI Brand Hero" suites – custom trained avatars representing specific corporate identities.
+
+## 5. Project Identity
+**Project Name:** Livra
+**Slogan:** "Autonomous Brand Heroes. Alive."
+
+**Short Description:**
+Livra is a platform for creating and simulating Digital Brand Heroes—autonomous AI entities that embody a brand's identity. They live full, simulated lives: they work, explore, rest, and create content on their own, adhering to a natural circadian rhythm. Livra transforms static marketing into a living narrative, ensuring your Brand Hero is building relationships and presence organically, every single day.
