@@ -4,59 +4,35 @@ import { motion } from "framer-motion";
 import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/animations";
 
 export function VisualProofSection() {
-    // Julia's Day (Aura Activewear)
-    const juliaTimeline = [
+    // Brand Hero Scenarios (4 distinct 'Power Moments' - Action Focused)
+    const scenarios = [
         {
-            src: "/examples/workout.png",
-            context: "🌦️ 8°C Morning mist",
-            action: "Early yoga flow. Promoting thermal collection.",
-            time: "07:15:22"
+            src: "/examples/action_volt.png",
+            brand: "Volt E-Scooters",
+            context: "⚡ 18km/h Bypass",
+            action: "Weaving through gridlock. Calculating fastest route in real-time.",
+            time: "08:45:11"
         },
         {
-            src: "/examples/cafe.png",
-            context: "☕ Coffee Break",
-            action: "Checking manufacturing updates. 'Sustainable seamless' tease.",
-            time: "10:30:15"
-        },
-        {
-            src: "/examples/city.png",
-            context: "🚦 Evening Commute",
-            action: "Transit comfort test. Highlighting breathable layers.",
-            time: "18:45:11"
-        },
-        {
-            src: "/examples/dinner.png",
-            context: "🎉 Social Hour",
-            action: "Aura After-Dark. 'From gym to gin' styling tips.",
+            src: "/examples/action_luxe.png",
+            brand: "Luxe Dining App",
+            context: "💎 VIP Access",
+            action: "Instant reservation confirmation at fully booked Michelin spot.",
             time: "20:30:00"
         },
-    ];
-
-    // Marcus's Day (Nomad OS) - Using correct male assets
-    const marcusTimeline = [
         {
-            src: "/examples/male_gym.png",
-            context: "🧘‍♂️ Mental Reset",
-            action: "Pre-market meditation & workout. 'Clarity before code.'",
-            time: "06:45:10"
+            src: "/examples/action_nova.png",
+            brand: "Nova FinTech",
+            context: "📈 Buy Signal",
+            action: "Executing automated trade precisely at the market dip.",
+            time: "14:15:05"
         },
         {
-            src: "/examples/male_coffee.png",
-            context: "💻 Remote HQ",
-            action: "Deep work sprint at local hub. Analysis of Q3 user trends.",
-            time: "11:15:44"
-        },
-        {
-            src: "/examples/male_rooftop.png",
-            context: "🏙️ Tech Hub Meetup",
-            action: "Roof session with founders. Discussing async culture.",
-            time: "17:20:33"
-        },
-        {
-            src: "/examples/male_cooking.png",
-            context: "🥗 Meal Prep",
-            action: "Unwinding with nutrition. 'Fuel for the mind.'",
-            time: "20:00:00"
+            src: "/examples/action_pure.png",
+            brand: "Pure Threads",
+            context: "🌿 Texture Audit",
+            action: "Verifying fabric integrity and organic certification scan.",
+            time: "11:10:22"
         },
     ];
 
@@ -72,92 +48,49 @@ export function VisualProofSection() {
                     </p>
                 </AnimatedSection>
 
-                {/* JULIA ROW */}
-                <div className="mb-20">
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="w-10 h-10 rounded-full bg-teal-500/10 flex items-center justify-center border border-teal-500/20">
-                            <span className="font-bold text-teal-400">J</span>
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-white">Julia <span className="text-zinc-500 font-normal">for Aura Activewear</span></h3>
-                            <p className="text-xs text-zinc-500 font-mono uppercase tracking-wider">Lifestyle & Wellness Archetype</p>
-                        </div>
-                    </div>
+                <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {scenarios.map((item, i) => (
+                        <StaggerItem key={i}>
+                            <motion.div
+                                className="bg-zinc-900/50 rounded-xl overflow-hidden border border-white/5 group h-full flex flex-col relative"
+                                whileHover={{ y: -5, borderColor: "rgba(20, 184, 166, 0.3)" }}
+                            >
+                                {/* Image Area */}
+                                <div className="aspect-[3/4] relative overflow-hidden">
+                                    <img
+                                        src={item.src}
+                                        alt={item.brand}
+                                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
-                    <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {juliaTimeline.map((item, i) => (
-                            <StaggerItem key={i}>
-                                <HeroCard item={item} color="teal" />
-                            </StaggerItem>
-                        ))}
-                    </StaggerContainer>
-                </div>
+                                    <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
+                                        <span className="px-2 py-1 rounded bg-black/60 backdrop-blur-md text-[10px] font-mono text-zinc-300 border border-white/10 uppercase tracking-wide">
+                                            {item.brand}
+                                        </span>
+                                    </div>
 
-                {/* MARCUS ROW */}
-                <div>
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-                            <span className="font-bold text-indigo-400">M</span>
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-white">Marcus <span className="text-zinc-500 font-normal">for Nomad OS</span></h3>
-                            <p className="text-xs text-zinc-500 font-mono uppercase tracking-wider">Tech & Productivity Archetype</p>
-                        </div>
-                    </div>
+                                    <div className="absolute bottom-3 left-3 bg-teal-500/20 backdrop-blur-md border border-teal-500/30 px-2 py-1 rounded text-[10px] font-medium text-teal-100 flex items-center gap-1.5">
+                                        <span>{item.context}</span>
+                                    </div>
+                                </div>
 
-                    <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {marcusTimeline.map((item, i) => (
-                            <StaggerItem key={i + 10}>
-                                <HeroCard item={item} color="indigo" />
-                            </StaggerItem>
-                        ))}
-                    </StaggerContainer>
-                </div>
+                                <div className="p-4 flex flex-col flex-1 gap-2">
+                                    <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono border-b border-white/5 pb-2">
+                                        <span className="flex items-center gap-1.5 text-emerald-400">
+                                            EXECUTED
+                                        </span>
+                                        <span>{item.time}</span>
+                                    </div>
+                                    <p className="text-sm text-zinc-300 leading-snug font-medium">
+                                        {item.action}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </StaggerItem>
+                    ))}
+                </StaggerContainer>
             </div>
         </section>
-    );
-}
-
-function HeroCard({ item, color }: { item: any, color: "teal" | "indigo" }) {
-    const borderColor = color === "teal" ? "border-teal-500/30" : "border-indigo-500/30";
-    const bgBadge = color === "teal" ? "bg-teal-500/20 text-teal-200" : "bg-indigo-500/20 text-indigo-200";
-    const textAccent = color === "teal" ? "text-teal-400" : "text-indigo-400";
-    const hoverColor = color === "teal" ? "rgba(20, 184, 166, 0.3)" : "rgba(99, 102, 241, 0.3)";
-
-    return (
-        <motion.div
-            className="bg-zinc-900/40 rounded-xl overflow-hidden border border-white/5 group h-full flex flex-col relative"
-            whileHover={{ y: -5, borderColor: hoverColor }}
-        >
-            {/* Image Area */}
-            <div className="aspect-[3/4] relative overflow-hidden">
-                <img
-                    src={item.src}
-                    alt="Action"
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-
-                {/* Context Badge */}
-                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded text-[10px] font-medium text-zinc-300">
-                    {item.context}
-                </div>
-            </div>
-
-            {/* Content Details */}
-            <div className="p-4 flex flex-col flex-1 gap-2 border-t border-white/5">
-                <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono pb-1">
-                    <span className={`font-bold ${textAccent}`}>{item.time}</span>
-                    <span className="flex items-center gap-1">
-                        <span className={`w-1 h-1 rounded-full ${color === 'teal' ? 'bg-teal-500' : 'bg-indigo-500'}`} />
-                        POSTED
-                    </span>
-                </div>
-
-                <p className="text-sm text-zinc-300 leading-snug font-medium">
-                    {item.action}
-                </p>
-            </div>
-        </motion.div>
     );
 }
