@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
-
-// export const runtime = 'edge'; // Removed to fix size limit issue
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 // Image metadata
 export const alt = 'Livra - Autonomous Brand Heroes';
@@ -12,13 +12,8 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
-    const interSemiBold = await fetch(
-        new URL('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hAqw.woff2', import.meta.url)
-    ).then((res) => res.arrayBuffer());
-
-    const imageData = await fetch(
-        new URL('../../public/examples/action_luxe.png', import.meta.url)
-    ).then((res) => res.arrayBuffer());
+    const imagePath = join(process.cwd(), 'public/examples/action_luxe.png');
+    const imageData = await readFile(imagePath);
 
     return new ImageResponse(
         (
@@ -31,12 +26,12 @@ export default async function Image() {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontFamily: '"Inter"',
+                    fontFamily: 'sans-serif',
                 }}
             >
                 {/* @ts-ignore */}
                 <img
-                    src={imageData as unknown as string}
+                    src={imageData.buffer as unknown as string}
                     alt="Background"
                     style={{
                         position: 'absolute',
@@ -91,14 +86,6 @@ export default async function Image() {
         ),
         {
             ...size,
-            fonts: [
-                {
-                    name: 'Inter',
-                    data: interSemiBold,
-                    style: 'normal',
-                    weight: 600,
-                },
-            ],
         }
     );
 }
