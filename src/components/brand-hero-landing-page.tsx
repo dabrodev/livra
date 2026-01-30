@@ -7,6 +7,7 @@ import { VisualProofSection } from "./brand-hero/VisualProofSection";
 import { ValuePropsSection } from "./brand-hero/ValuePropsSection";
 import { ComparisonSection } from "./brand-hero/ComparisonSection";
 import { BrandDNASection } from "./brand-hero/BrandDNASection";
+import { DayInTheLifeSection } from "./brand-hero/DayInTheLifeSection";
 
 export default function BrandHeroLandingPage() {
     return (
@@ -18,6 +19,7 @@ export default function BrandHeroLandingPage() {
             <ValuePropsSection />
             <ComparisonSection />
             <BrandDNASection />
+            <DayInTheLifeSection />
             <Footer />
         </div>
     );
