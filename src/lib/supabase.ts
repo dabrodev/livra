@@ -14,7 +14,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // This is required for Realtime subscriptions to work with auth
 export const supabase = createBrowserClient(
     supabaseUrl || '',
-    supabaseAnonKey || ''
+    supabaseAnonKey || '',
+    {
+        realtime: {
+            timeout: 20000
+        }
+    }
 )
 
 // Server-side Supabase client (uses service role key if available, bypasses RLS)
