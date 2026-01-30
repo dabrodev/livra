@@ -81,6 +81,9 @@ model Post {
   caption    String
   prompt     String?
   postedAt   DateTime @default(now())
+
+  memoryId   String?
+  memory     Memory?  @relation(fields: [memoryId], references: [id])
 }
 
 model Memory {
@@ -90,6 +93,8 @@ model Memory {
   description String // Short-term memory of recent events
   importance  Int      @default(1)
   createdAt   DateTime @default(now())
+  
+  posts       Post[]
 }
 
 // Global avatar library for reuse across influencers

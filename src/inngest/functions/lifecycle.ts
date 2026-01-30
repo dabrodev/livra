@@ -732,6 +732,7 @@ Location: ${persona.city}, in a ${persona.apartmentStyle} setting.`
                         contentUrl: imageUrl || '',
                         caption,
                         prompt: imagePrompt,
+                        memoryId: memory.id,
                     },
                 })
 
