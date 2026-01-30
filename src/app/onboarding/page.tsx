@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from "next/navigation";
 import { MapPin, User, Wallet, ArrowRight, ArrowLeft, Sparkles, Home, Palette, Shirt } from "lucide-react";
 
@@ -211,6 +212,21 @@ export default function OnboardingPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isValidatingLocation, setIsValidatingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
+
+    // Check authentication
+    const supabase = createClient();
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                // Redirect to login preserving the onboarding intent
+                router.push('/login?next=/onboarding');
+            }
+        };
+        checkUser();
+    }, [router, supabase.auth]);
+
 
     const updateData = (updates: Partial<OnboardingData>) => {
         setData((prev) => ({ ...prev, ...updates }));
