@@ -213,20 +213,41 @@ export default function OnboardingPage() {
     const [isValidatingLocation, setIsValidatingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
 
-    // Check authentication
+    // Check authentication and role
     const supabase = createClient();
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
     useEffect(() => {
         const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                // Redirect to login preserving the onboarding intent
+                // Redirect to login
                 router.push('/login?next=/onboarding');
+                return;
+            }
+
+            // Check role via API
+            try {
+                const res = await fetch('/api/auth/me');
+                if (res.ok) {
+                    const user = await res.json();
+                    if (user.role !== 'ADMIN' && user.role !== 'CREATOR') {
+                        // User is logged in but has no permission -> Redirect to Pulse
+                        router.push('/pulse');
+                    } else {
+                        // All good
+                        setIsCheckingAuth(false);
+                    }
+                } else {
+                    router.push('/login');
+                }
+            } catch (err) {
+                console.error("Auth check failed", err);
+                router.push('/pulse');
             }
         };
         checkUser();
     }, [router, supabase.auth]);
-
 
     const updateData = (updates: Partial<OnboardingData>) => {
         setData((prev) => ({ ...prev, ...updates }));
@@ -317,6 +338,14 @@ export default function OnboardingPage() {
             setIsSubmitting(false);
         }
     };
+
+    if (isCheckingAuth) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background text-foreground">
