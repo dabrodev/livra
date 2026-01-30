@@ -108,7 +108,10 @@ export default async function DashboardPage() {
     });
 
     // Get avatar library count
-    const avatarCount = await prisma.avatarLibrary.count();
+    // Get avatar library count
+    const avatarCount = await prisma.avatarLibrary.count({
+        where: { userId: user.id }
+    });
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -123,7 +126,7 @@ export default async function DashboardPage() {
                     </Link>
                     <div className="flex items-center gap-4">
                         <Link href="/pulse" className="text-sm text-zinc-400 hover:text-white">Global Feed</Link>
-                        {avatarCount > 0 && (
+                        {canCreate && avatarCount > 0 && (
                             <Link
                                 href="/avatars"
                                 className="text-sm text-zinc-400 hover:text-white transition-colors"
