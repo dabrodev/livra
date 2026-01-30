@@ -242,6 +242,7 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                 }
             )
             .subscribe(async (status, err) => {
+                console.log('[RealtimeTimeline] Subscription status:', status);
                 if (err) console.error('[RealtimeTimeline] Subscription error:', err);
 
                 if (status === 'SUBSCRIBED') {
@@ -249,6 +250,7 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
                     // Always refresh when (re)subscribed to catch any missed events
                     await refreshTimeline();
                 } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                    console.warn('[RealtimeTimeline] Connection closed or error:', status);
                     setIsConnected(false);
                 }
             });
