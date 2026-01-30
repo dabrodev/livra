@@ -197,8 +197,9 @@ export default async function AvatarProfilePage({ params }: TimelinePageProps) {
         notFound();
     }
 
-    // 2. Verify Ownership
-    if (persona.userId !== user.id) {
+    // 2. Verify Access
+    const isOwner = persona.userId === user.id;
+    if (!isOwner && !(persona as any).isPublic) {
         redirect("/dashboard");
     }
 
@@ -243,10 +244,18 @@ export default async function AvatarProfilePage({ params }: TimelinePageProps) {
             {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/5">
                 <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/dashboard" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
-                        <ArrowLeft className="w-4 h-4" />
-                        <span className="text-sm">Back to Dashboard</span>
-                    </Link>
+                    {isOwner ? (
+                        <Link href="/dashboard" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+                            <ArrowLeft className="w-4 h-4" />
+                            <span className="text-sm">Back to Dashboard</span>
+                        </Link>
+                    ) : (
+                        <Link href="/pulse" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+                            <ArrowLeft className="w-4 h-4" />
+                            <span className="text-sm">Back to Pulse</span>
+                        </Link>
+                    )}
+
                     <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
                             <Sparkles className="w-3.5 h-3.5 text-white" />
@@ -298,56 +307,60 @@ export default async function AvatarProfilePage({ params }: TimelinePageProps) {
                                         <Clock className="w-3.5 h-3.5" />
                                         {getLocalTimeForCity(persona.city)} local
                                     </span>
-                                    <span className="flex items-center gap-1">
-                                        <Wallet className="w-3.5 h-3.5" />
-                                        <span className="gradient-text font-medium">${persona.currentBalance.toLocaleString()}</span>
-                                    </span>
+                                    {isOwner && (
+                                        <span className="flex items-center gap-1">
+                                            <Wallet className="w-3.5 h-3.5" />
+                                            <span className="gradient-text font-medium">${persona.currentBalance.toLocaleString()}</span>
+                                        </span>
+                                    )}
                                 </div>
                                 <p className="text-sm text-zinc-500 mt-2">
                                     {persona.personalityVibe.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())} • {persona.apartmentStyle.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}
                                 </p>
                             </div>
 
-                            {/* Controls */}
-                            <div className="flex gap-2">
-                                {/* Avatar controls - only before lifecycle starts */}
-                                {persona.faceReferences.length > 0 && !hasRealActivity && (
-                                    <>
-                                        {/* Swap from library */}
-                                        <AvatarSwap
-                                            personaId={persona.id}
-                                            currentAvatarUrl={persona.faceReferences[0]}
-                                        />
-                                        {/* Generate new */}
-                                        <Link
-                                            href={`/persona/${persona.id}/avatar`}
-                                            className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all"
-                                            title="Generate New Avatar Look"
-                                        >
-                                            <Wand2 className="w-5 h-5" />
-                                        </Link>
-                                    </>
-                                )}
-                                <ManualActivityTrigger
-                                    personaId={persona.id}
-                                    isActive={(persona as any).isActive || false}
-                                />
-                                <LifecycleControls
-                                    personaId={persona.id}
-                                    initialIsActive={(persona as any).isActive || false}
-                                    hasAvatar={persona.faceReferences.length > 0}
-                                />
-                                <Link
-                                    href={`/persona/${persona.id}/settings`}
-                                    className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all"
-                                    title="Edit Preferences"
-                                >
-                                    <Settings className="w-5 h-5" />
-                                </Link>
-                                <button className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 transition-all">
-                                    <Download className="w-5 h-5" />
-                                </button>
-                            </div>
+                            {/* Controls - Owner Only */}
+                            {isOwner && (
+                                <div className="flex gap-2">
+                                    {/* Avatar controls - only before lifecycle starts */}
+                                    {persona.faceReferences.length > 0 && !hasRealActivity && (
+                                        <>
+                                            {/* Swap from library */}
+                                            <AvatarSwap
+                                                personaId={persona.id}
+                                                currentAvatarUrl={persona.faceReferences[0]}
+                                            />
+                                            {/* Generate new */}
+                                            <Link
+                                                href={`/persona/${persona.id}/avatar`}
+                                                className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all"
+                                                title="Generate New Avatar Look"
+                                            >
+                                                <Wand2 className="w-5 h-5" />
+                                            </Link>
+                                        </>
+                                    )}
+                                    <ManualActivityTrigger
+                                        personaId={persona.id}
+                                        isActive={(persona as any).isActive || false}
+                                    />
+                                    <LifecycleControls
+                                        personaId={persona.id}
+                                        initialIsActive={(persona as any).isActive || false}
+                                        hasAvatar={persona.faceReferences.length > 0}
+                                    />
+                                    <Link
+                                        href={`/persona/${persona.id}/settings`}
+                                        className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-teal-400 transition-all"
+                                        title="Edit Preferences"
+                                    >
+                                        <Settings className="w-5 h-5" />
+                                    </Link>
+                                    <button className="p-3 rounded-xl bg-zinc-800 text-zinc-400 hover:bg-zinc-700 transition-all">
+                                        <Download className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 

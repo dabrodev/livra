@@ -196,14 +196,32 @@ export default async function DashboardPage() {
                                 <Sparkles className="w-10 h-10 text-zinc-600" />
                             </div>
                             <h2 className="text-xl font-semibold mb-2">No avatars yet</h2>
-                            <p className="text-zinc-400 mb-6">Create your first AI avatar to get started</p>
-                            <Link
-                                href="/onboarding"
-                                className="btn-glow px-6 py-3 rounded-full text-white font-medium inline-flex items-center gap-2"
-                            >
-                                <Plus className="w-4 h-4" />
-                                Create Avatar
-                            </Link>
+                            <p className="text-zinc-400 mb-6">
+                                {canCreate
+                                    ? "Create your first AI avatar to get started"
+                                    : "You don't have any avatars yet."}
+                            </p>
+                            {canCreate ? (
+                                <Link
+                                    href="/onboarding"
+                                    className="btn-glow px-6 py-3 rounded-full text-white font-medium inline-flex items-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Create Avatar
+                                </Link>
+                            ) : (
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="px-4 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700 text-zinc-400 text-sm">
+                                        Access Level: Viewer (Waitlist)
+                                    </div>
+                                    <Link
+                                        href="/pulse"
+                                        className="text-teal-400 hover:text-teal-300 transition-colors text-sm"
+                                    >
+                                        Explore Global Pulse &rarr;
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
