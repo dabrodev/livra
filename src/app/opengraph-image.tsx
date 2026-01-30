@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+// export const runtime = 'edge'; // Removed to fix size limit issue
 
 // Image metadata
 export const alt = 'Livra - Autonomous Brand Heroes';
