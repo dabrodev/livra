@@ -8,15 +8,11 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 config({ path: resolve(process.cwd(), '.env.local') });
 
-// Use PrismaClient directly for scripts
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
+// Use shared prisma client
+import { prisma } from '../src/lib/db';
 import { getCountryByName } from '../src/lib/countries';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+
 
 // Manual mapping for common country names to ISO codes
 const COUNTRY_NAME_TO_CODE: Record<string, string> = {
