@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Zap } from "lucide-react";
+import { Sparkles, Zap, Smartphone, Play } from "lucide-react";
 import { staggerContainer, fadeInUp } from "@/components/animations";
 import { SystemStatus, AnimatedOrbs } from "./Visuals";
 import { PhoneMockup } from "./PhoneMockup";
@@ -74,6 +74,41 @@ export function HeroSection() {
                     >
                         See Global Pulse
                     </motion.a>
+                </motion.div>
+
+                {/* Availability Badges */}
+                <motion.div
+                    className="mt-8 flex flex-wrap justify-center gap-6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                >
+                    {/* Web Platform (Live) */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wide h-fit my-auto">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)] animate-pulse"></span>
+                        Web Live
+                    </div>
+
+                    {/* Stores (Coming Soon) */}
+                    <div className="flex gap-3 opacity-70 grayscale hover:grayscale-0 transition-all duration-300 cursor-not-allowed" title="Coming Soon">
+                        {/* App Store Badge Style */}
+                        <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2.5 rounded-xl backdrop-blur-sm">
+                            <Smartphone className="w-6 h-6 text-white" />
+                            <div className="flex flex-col leading-none text-left">
+                                <span className="text-[10px] uppercase text-zinc-400 font-medium tracking-wide">Coming to</span>
+                                <span className="text-sm font-bold text-white mt-0.5">App Store</span>
+                            </div>
+                        </div>
+
+                        {/* Google Play Badge Style */}
+                        <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2.5 rounded-xl backdrop-blur-sm">
+                            <Play className="w-6 h-6 text-white fill-current" />
+                            <div className="flex flex-col leading-none text-left">
+                                <span className="text-[10px] uppercase text-zinc-400 font-medium tracking-wide">Coming to</span>
+                                <span className="text-sm font-bold text-white mt-0.5">Google Play</span>
+                            </div>
+                        </div>
+                    </div>
                 </motion.div>
 
                 <SystemStatus />
