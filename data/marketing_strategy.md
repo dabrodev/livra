@@ -19,7 +19,7 @@
 
 ### Primary Slogan
 
-> **Autonomous Digital Avatar**
+> **Autonomous Brand AI Hero**
 
 **Why:**
 
@@ -140,13 +140,13 @@ Autonomous Digital Avatar
 
 Optional subline:
 
-> A long-running digital being with its own lifecycle.
+> A long-running digital brand ambassador with its own lifecycle.
 
 ---
 
 ### 2️⃣ What Is Livra?
 
-> Livra is an autonomous digital avatar that senses its environment, makes decisions, and acts without prompts.
+> Livra is an autonomous Brand AI Hero that senses its environment, makes decisions, and acts without prompts to represent and grow a brand.
 
 ---
 
@@ -176,7 +176,7 @@ These are **roles**, not the identity.
 
 ## 9. Core Positioning Sentence (Canonical)
 
-> **Livra is an autonomous digital avatar — a long-running system that perceives context, makes decisions, and acts in the world on its own.**
+> **Livra is an autonomous Brand AI Hero — a long-running system that perceives context, makes decisions, and acts in the world to embody a brand.**
 
 This sentence can be reused across:
 

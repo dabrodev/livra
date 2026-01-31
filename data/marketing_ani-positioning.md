@@ -89,7 +89,7 @@ These signals indicate **liveness**, not generation.
 
 ```
 livra
-Autonomous Digital Avatar
+Autonomous Brand AI Hero
 ```
 
 No mention of:
