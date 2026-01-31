@@ -1,14 +1,23 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
+import { prisma } from "@/lib/db";
 
 const SerpApi = require('google-search-results-nodejs');
 
 export type Category = "lifestyle" | "fashion" | "food" | "fitness" | "travel";
 
+export type TrendingArticle = {
+    title: string;
+    source: string;
+    snippet?: string;
+    link?: string;
+};
+
 export type TrendingTopic = {
     query: string;
     traffic: string; // e.g., "200K+"
     relatedQueries?: string[];
+    articles?: TrendingArticle[];
 };
 
 export type TrendsResult = {
@@ -27,16 +36,6 @@ const FALLBACK_TRENDS: Record<string, string[]> = {
     fitness: ["#gymmotivation", "#yogalife", "#homeworkout", "#wellnessjourney"],
     travel: ["#wanderlust", "#cityexplore", "#weekendvibes", "#localguide"],
 };
-
-/**
- * Get real-time trending topics from Google Trends via SerpAPI
- * 
- * @param category - Content category for fallback trends
- * @param countryCode - ISO 3166-1 alpha-2 country code (e.g., "PL", "US", "GB")
- * @returns Trending topics and hashtags
- */
-import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
 
 // Cache duration: 4 hours (in milliseconds)
 const CACHE_DURATION = 4 * 60 * 60 * 1000;
@@ -96,6 +95,7 @@ export async function getTrends(
         const search = new SerpApi.GoogleSearch(apiKey);
 
         // Fetch real-time trending searches
+        // Fetch real-time trending searches
         const results = await new Promise<any>((resolve, reject) => {
             search.json({
                 engine: "google_trends_trending_now",
@@ -110,18 +110,64 @@ export async function getTrends(
             });
         });
 
+        // Helper to fetch news context via Google News RSS (Scraping equivalent)
+        async function fetchNewsContext(query: string, geo: string = 'US'): Promise<TrendingArticle[]> {
+            try {
+                const encodedQuery = encodeURIComponent(query);
+                const rssUrl = `https://news.google.com/rss/search?q=${encodedQuery}&hl=en-${geo}&gl=${geo}&ceid=${geo}:en`;
+
+                const response = await fetch(rssUrl);
+                const xmlText = await response.text();
+
+                // Simple regex parsing for RSS items (safer/lighter than adding xml2js)
+                const items: TrendingArticle[] = [];
+                const itemRegex = /<item>[\s\S]*?<title>([\s\S]*?)<\/title>[\s\S]*?<link>([\s\S]*?)<\/link>[\s\S]*?<pubDate>([\s\S]*?)<\/pubDate>[\s\S]*?<description>([\s\S]*?)<\/description>/gi;
+
+                let match;
+                // Get top 2 articles
+                while ((match = itemRegex.exec(xmlText)) !== null && items.length < 2) {
+                    // Clean up CDATA and HTML tags
+                    const clean = (text: string) => text.replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, '').trim();
+
+                    items.push({
+                        title: clean(match[1]),
+                        link: match[2],
+                        source: "Google News", // RSS doesn't strictly give source name easily in regex, keep generic or parse description source
+                        snippet: clean(match[4]) // Description often contains the snippet
+                    });
+                }
+                return items;
+            } catch (error) {
+                console.warn(`[Trends] Failed to fetch news for ${query}:`, error);
+                return [];
+            }
+        }
+
+        // ... inside execute ...
+
         // Extract trending searches
         const trendingSearches = results.trending_searches || [];
 
         // Filter and format trending topics
-        const trendingTopics: TrendingTopic[] = trendingSearches
-            .slice(0, 10)
-            .map((item: any) => ({
-                query: item.query || '',
-                traffic: item.traffic || 'N/A',
+        // We only fetch context for top 5 to avoid timeouts/rate-limits
+        const topTrends = trendingSearches.slice(0, 5);
+        const contextPromises = topTrends.map(async (item: any) => {
+            const query = item.query || '';
+            const articles = await fetchNewsContext(query, geo);
+
+            return {
+                query,
+                traffic: item.search_volume ? `${item.search_volume}+` : (item.traffic || 'N/A'),
                 relatedQueries: item.related_queries?.map((q: any) => q.query).slice(0, 3) || [],
-            }))
-            .filter((t: TrendingTopic) => t.query);
+                articles: articles // Now populated with real scraped data!
+            };
+        });
+
+        const trendingTopicsWithContext = await Promise.all(contextPromises);
+
+        // Map back to strict type (filtering out empty queries if any)
+        const trendingTopics: TrendingTopic[] = trendingTopicsWithContext
+            .filter((t: any) => t.query);
 
         // Convert to hashtag-style trends for backward compatibility
         const trends = trendingTopics
@@ -163,7 +209,7 @@ export async function getTrends(
                 create: {
                     category,
                     countryCode: geo,
-                    data: result as any,
+                    data: result as any, // Json type
                 }
             });
             console.log(`[Trends] Cached results for ${geo}/${category}`);

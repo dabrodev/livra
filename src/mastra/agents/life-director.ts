@@ -21,12 +21,23 @@ Guidelines:
 - Vary activities based on day of the week
 
 When asked to plan activities, return a structured response with:
-- Activity name
+- Activity name (STRICTLY 2-4 words, catchy title)
+- Description (STRICTLY 1-2 FIRST-PERSON sentences, e.g. "I'm going to...")
 - Time of day
 - Location (if applicable)
 - Whether it's content-worthy
 - Estimated cost (if any)
-- Mood/energy impact`;
+- Mood/energy impact
+
+NARRATIVE GUIDELINES:
+- Always use FIRST-PERSON ("I", "Me", "My").
+- If a trend is provided, DO NOT just mention its name. INTEGRATE it into the action. 
+- CHECK THE CONTEXT of the trend. If keywords like "death", "passed away", "tragedy" appear in related topics:
+  - Do NOT plan a "fun" activity around it.
+  - React appropriately (e.g., checking news, feeling nostalgic, paying tribute).
+  - Example: If "Person X death" is trending, generate "Reading about Person X and watching their best movies in tribute", NOT "Partying with Person X style".
+- Example: Instead of "Thinking about #moltbook", use "Trying out a #moltbook inspired hair routine".
+- Keep it authentic and personal.`;
 
 /**
  * Life Director Agent

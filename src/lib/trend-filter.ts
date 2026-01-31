@@ -21,10 +21,10 @@ export type FilteredTrend = {
  * Uses AI to semantically filter out trends that have already been discussed.
  * Handles language differences (e.g. Bridgerton vs Bridgertonowie) and partial matches.
  */
-export async function filterUniqueTrends(
-    newTrends: { query: string; traffic: string }[],
+export async function filterUniqueTrends<T extends { query: string; traffic: string }>(
+    newTrends: T[],
     recentMemories: string
-): Promise<FilteredTrend[]> {
+): Promise<T[]> {
     if (!newTrends.length) return [];
     if (!recentMemories || recentMemories.length < 10) return newTrends;
 

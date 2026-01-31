@@ -28,6 +28,7 @@ interface MemoryRecord {
     description: string;
     importance: number;
     createdAt: string;
+    action?: string | null;
 }
 
 interface PostRecord {
@@ -106,8 +107,12 @@ export default function RealtimeTimeline({ personaId, initialItems }: RealtimeTi
         id: memory.id,
         time: parseTimestamp(memory.createdAt),
         icon: getActivityIconName(memory.description),
-        action: memory.description.split(' - ')[0] || memory.description.slice(0, 30),
-        description: memory.description,
+        action: memory.action || (memory.description.includes(' - ')
+            ? memory.description.split(' - ')[0]
+            : (memory.description.length > 30 ? memory.description.slice(0, 30) + '...' : memory.description)),
+        description: memory.action ? memory.description : (memory.description.includes(' - ')
+            ? memory.description.split(' - ').slice(1).join(' - ')
+            : memory.description),
         type: 'life',
         importance: memory.importance,
     }), []);

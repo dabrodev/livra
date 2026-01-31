@@ -92,6 +92,7 @@ model Memory {
   id          String   @id @default(uuid())
   personaId   String
   persona     Persona  @relation(fields: [personaId], references: [id])
+  action      String?  // Title of the activity
   description String // Short-term memory of recent events
   importance  Int      @default(1)
   createdAt   DateTime @default(now())

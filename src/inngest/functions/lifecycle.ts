@@ -377,8 +377,8 @@ export const lifecycleCycle = inngest.createFunction(
             // If this is a retry, reconstruct the plan from memory
             if (retryMemory) {
                 return {
-                    activity: retryMemory.description.split(' - ')[0],
-                    description: retryMemory.description,
+                    activity: retryMemory.action || retryMemory.description.split(' - ')[0],
+                    description: retryMemory.action ? retryMemory.description : (retryMemory.description.includes(' - ') ? retryMemory.description.split(' - ').slice(1).join(' - ') : retryMemory.description),
                     timeOfDay: currentTimeOfDay, // Approximate
                     location: retryMemory.description.includes('at') ? retryMemory.description.split('at ')[1].split(' - ')[0] : 'home',
                     isContentWorthy: true, // Force content for retry
@@ -392,7 +392,7 @@ export const lifecycleCycle = inngest.createFunction(
             const isManual = event.data.isManual as boolean | undefined;
 
             const recentMemories = persona.memories
-                .map((m: { description: string }) => m.description)
+                .map((m: any) => m.action ? `${m.action} - ${m.description}` : m.description)
                 .join(', ')
 
             // Format and Filter trending topics using AI
@@ -406,7 +406,15 @@ export const lifecycleCycle = inngest.createFunction(
                 // If AI filters everything (rare), fallback to top 3 original just to have something, or switch to generic
                 const topics = fresh.length > 0 ? fresh : environment.trends.trendingTopics.slice(0, 3);
 
-                trendingContext = `\n- Real-time Trending NOW (${environment.trends.source === 'serpapi' ? 'live data' : 'fallback'}):\n${topics.slice(0, 15).map(t => `  • "${t.query}" (${t.traffic} searches)`).join('\n')}`;
+                trendingContext = `\n- Real-time Trending NOW (${environment.trends.source === 'serpapi' ? 'live data' : 'fallback'}):\n${topics.slice(0, 15).map(t => {
+                    // Start with articles if avail (unlikely in realtime), fallback to related queries from trend_breakdown
+                    const contextItems = (t.articles && t.articles.length > 0)
+                        ? t.articles.map(a => `${a.title} - ${a.snippet}`).slice(0, 1).join('; ')
+                        : (t.relatedQueries && t.relatedQueries.length > 0 ? t.relatedQueries.slice(0, 5).join(', ') : '');
+
+                    const contextString = contextItems ? `\n    Context: ${contextItems}` : '';
+                    return `  • "${t.query}" (${t.traffic} searches)${contextString}`;
+                }).join('\n')}`;
             } else {
                 // Fallback Hashtags logic (simple string filter is enough here)
                 const fresh = environment.trends.trends.filter(t => {
@@ -434,6 +442,13 @@ Current context:
 - LOCAL TIME: ${localHour}:00 (${currentTimeOfDay})
 ${environment.weather ? `- Weather: ${environment.weather.condition}, ${environment.weather.temp}°C - ${environment.weather.description}` : '- Weather: Unknown (plan for indoor activities if unsure)'}
 ${trendingContext}
+
+You are creating a plan for the next immediate activity.
+CRITICAL: Review the 'Context' (if available) for the chosen trend.
+- If the trend involves a death, tragedy, or controversy (keywords: death, passed, died, kill, accident, scandal):
+  - Do NOT play games about it or treat it as a lifestyle aesthetic.
+  - React as a normal human would (shock, sadness, reading news, checking social media discussions).
+- Otherwise, integrate it naturally into a lifestyle activity.
 - Current balance: $${persona.currentBalance}
 - Recent activities: ${recentMemories || 'Just starting their day'}
 - Apartment style: ${persona.apartmentStyle}
@@ -453,8 +468,8 @@ Based on this context, plan the next activity. Consider:
 
 Respond with a JSON object containing:
 {
-    "activity": "Short title of activity",
-    "description": "Narrative description (1-2 sentences) of the activity. Incorporate a trend here if relevant.",
+    "activity": "Catchy title (2-4 words maximum)",
+    "description": "Narrative in FIRST-PERSON (1-2 sentences). Use the trend NATURALLY as an action. NO 'inspired by' or 'trending' prefixes unless it fits a lifestyle context.",
     "timeOfDay": "${currentTimeOfDay}",
     "location": "location name or null",
     "isContentWorthy": true or false,
@@ -518,7 +533,8 @@ Respond with a JSON object containing:
             return await prisma.memory.create({
                 data: {
                     personaId,
-                    description: plan.description || `${plan.activity} at ${plan.location || 'home'} - ${plan.moodImpact} vibes`,
+                    action: plan.activity,
+                    description: plan.description,
                     importance: plan.isContentWorthy ? 4 : 2,
                 },
             })
