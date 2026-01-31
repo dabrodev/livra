@@ -119,3 +119,13 @@ See you there. 🌱
 (Link in first comment 👇)
 
 #buildinpublic #AI #AgenticAI #Supabase #Inngest #SystemArchitecture
+
+---
+
+## Engagement (Pivot Post)
+
+**Comment:** 
+"Damian, you test, try and launch so many amazing projects that I can’t keep up with you! Fingers crossed because it really sonds promising."
+
+**Reply:**
+> Thanks! I'm just trying to keep up with the AI myself! 😄 The tech finally caught up with the vision. Excited to show what these agents can do! 🌱

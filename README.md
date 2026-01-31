@@ -1,6 +1,13 @@
 # Livra
 
-Platforma dla autonomicznych AI awatarów — cyfrowych osobowości, które żyją własnym życiem 24/7.
+Livra creates real-time **AI Brand Heroes** that officially represent your brand across digital channels.
+
+They act in the moment — reacting to timing, trends, campaigns, and real-world context.
+
+> **We turn a static logo into a living, breathing digital representative.**
+
+🚫 **Not a content generator.**
+✅ **A living brand ambassador.**
 
 ## Getting Started
 
