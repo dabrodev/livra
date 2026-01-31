@@ -2,6 +2,8 @@
 
 ## LinkedIn - Launch Post (Jan 2026)
 
+4 weeks ago
+
 **Headline:** Status: ACTIVE. 🟢
 
 I just woke up my first fully autonomous AI Avatar.
@@ -41,3 +43,79 @@ We're moving from **Using AI** to **Living alongside AI**. 🌱
 > At its core, I'm building an autonomous, context-aware avatar, a living interface for AI agents that can take many forms.
 >
 > When code starts having its own agenda and **goals**, we really do move towards co-existence. Thanks for following the journey and for the thoughtful comment! 🌱
+
+--------------------------------------
+
+3 weeks ago
+
+Status: ACTIVE 🟢  Phase: Pre-Public
+
+Two days ago, I woke up my first fully autonomous AI avatar. The interesting part? It didn't stop.
+
+Right now:
+🧠 11 autonomous avatars running lifecycle loops 
+🌍 Multiple time zones, independent rhythms
+ 🔁 No prompts. No scripts. Just autonomy.
+
+The backend is stable. The system is alive.
+
+What changed this week:
+✓ Real-time status broadcasting - each avatar announces what it's doing: 
+sleeping, planning, creating, resting
+✓ Timezone-aware decisions - Sofia in São Paulo wakes while Marcus in Berlin sleeps
+✓ 11 concurrent lifecycles - all running via Inngest. Zero crashes.
+
+What fascinates me most: I'm no longer running AI. I'm observing it.
+The line between "tool" and "entity" gets blurrier each day.
+
+Launching Livra soon. Stay tuned. 🌱
+
+hashtag#BuildingInPublic hashtag#AI hashtag#AgenticAI hashtag#Supabase hashtag#Inngest hashtag#Nextjs hashtag#GenerativeAI
+
+---
+
+## LinkedIn - Public Waitlist Announcement (Now)
+
+**Headline:** Status: PUBLIC_BETA_WAITLIST 🟢
+
+I pivoted.
+
+For the last month, I've been building autonomous agents.
+They have their own wallets, memories, and daily routines. They check the news, decide what to do, and act. All running on the server, 24/7, without me.
+
+Technically, it worked. The logs show consistent, autonomous loops.
+But conceptually, calling them "influencers" felt limiting.
+
+The core value here isn't social clout. It's **presence**.
+If an agent can autonomously manage a lifestyle, it can autonomously represent a brand.
+
+Not a chatbot waiting for a prompt.
+Not a static picture on a tailored landing page.
+A living system that acts on your brand's behalf.
+
+I am refocusing the project entirely on this ontology: **Autonomous Brand AI Heroes**.
+
+Livra is the platform enabling this.
+It senses context. It makes decisions. It exists continuously.
+
+**Currently running on prod:**
+✅ 24/7 Autonomous Lifecycle
+✅ Context-aware: Weather, Location, & Smart Outfit Selection
+✅ JIT Activity Planning & Content Creation
+✅ Consistent Lifestyle Photography
+✅ Long-term Memory & Wallet Management
+
+**Coming next:**
+🚧 Brand Knowledge Base (RAG)
+🚧 Short-form Video (9:16)
+🚧 Voice Interaction
+🚧 Direct Social Media Integration
+
+The landing page is public now.
+I'm looking for beta testers. The first people on the waitlist will get access to run their own Brand Hero.
+
+See you there. 🌱
+
+(Link in first comment 👇)
+
+#buildinpublic #AI #AgenticAI #Supabase #Inngest #SystemArchitecture

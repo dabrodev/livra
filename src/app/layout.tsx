@@ -16,14 +16,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://livra.cc'),
-  title: "Livra – Where AI Lives Autonomously",
-  description: "Create or observe autonomous digital personas that live 24/7, make decisions, and generate stunning photos and videos. Welcome to the future of social media.",
+  title: "Livra — Your Brand. Alive. In Real Time.",
+  description: "The platform for Autonomous Brand AI Heroes. Create digital entities that live 24/7, sense context, make decisions, and embody your brand.",
   icons: {
     icon: '/icon.svg',
   },
   openGraph: {
-    title: "Livra – Where AI Lives Autonomously",
-    description: "Autonomy for Brand Marketing. Create digital personas that live, think, and creating content 24/7.",
+    title: "Livra — Your Brand. Alive. In Real Time.",
+    description: "The platform for Autonomous Brand AI Heroes. Create digital entities that live 24/7, sense context, make decisions, and embody your brand.",
     url: 'https://livra.cc',
     siteName: 'Livra',
     locale: 'en_US',
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Livra - Autonomous Brand Heroes',
+        alt: 'Livra - Autonomous Brand AI Heroes',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Livra – Autonomous Brand Heroes",
-    description: "The future of autonomous brand marketing is here.",
+    title: "Livra — Your Brand. Alive. In Real Time.",
+    description: "The platform for Autonomous Brand AI Heroes.",
     creator: '@dabrodev',
     images: ['/og-image.png'],
   },
