@@ -129,3 +129,42 @@ See you there. 🌱
 
 **Reply:**
 > Thanks! I'm just trying to keep up with the AI myself! 😄 The tech finally caught up with the vision. Excited to show what these agents can do! 🌱
+
+
+---
+
+## Official Bios / Elevator Pitch
+
+**PL (Polska):**
+Livra tworzy AI Brand Heroes w czasie rzeczywistym, którzy oficjalnie reprezentują Twoją markę w kanałach cyfrowych.
+
+Generują treści zgodne z marką dokładnie w momencie publikacji, reagując na czas, trendy, kampanie i kontekst świata rzeczywistego — budując organiczne zasięgi. 🌱
+
+**Zmieniamy statyczne logo w cyfrową osobowość.**
+
+> To nie jest generator treści. To żywy ambasador marki.
+
+**EN (Global):**
+Livra creates real-time AI Brand Heroes that officially represent your brand across digital channels.
+
+They generate on-brand content in the moment — reacting to timing, trends, campaigns, and real-world context to drive organic growth. 🌱
+
+**We turn a static logo into a living, breathing digital representative.**
+
+> This is not a content generator. It’s a living brand ambassador.
+
+
+---
+Old version:
+---
+
+Livra tworzy AI Brand Heroes w czasie rzeczywistym, którzy oficjalnie reprezentują Twoją markę w kanałach cyfrowych.
+
+Generują treści zgodne z marką dokładnie w momencie publikacji, reagując na czas, trendy, kampanie i kontekst świata rzeczywistego.
+
+To nie jest generator treści. To żywy ambasador marki.
+
+EN:
+Livra creates real-time AI Brand Heroes that officially represent your brand across digital channels.
+They generate on-brand content in the moment - reacting to timing, trends, campaigns and real-world context.
+This is not a content generator. It’s a living brand ambassador.

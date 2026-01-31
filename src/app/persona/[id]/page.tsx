@@ -214,8 +214,12 @@ export default async function AvatarProfilePage({ params }: TimelinePageProps) {
             id: memory.id,
             time: memory.createdAt,
             icon: getActivityIconName(memory.description),
-            action: memory.description.split(' - ')[0] || memory.description.slice(0, 30),
-            description: memory.description,
+            action: memory.action || (memory.description.includes(' - ')
+                ? memory.description.split(' - ')[0]
+                : (memory.description.length > 30 ? memory.description.slice(0, 30) + '...' : memory.description)),
+            description: memory.action ? memory.description : (memory.description.includes(' - ')
+                ? memory.description.split(' - ').slice(1).join(' - ')
+                : memory.description),
             type: 'life' as const,
             importance: memory.importance,
         })),
